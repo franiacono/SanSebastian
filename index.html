@@ -370,7 +370,58 @@
 
   .resena-notas { font-size: 0.88rem; color: var(--text); line-height: 1.5; }
 
-  /* ── EMPTY / LOADING ── */
+  /* ── CONTACTO SIEMPRE VISIBLE ── */
+  .card-contacto {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0 20px 14px;
+  }
+
+  .contacto-item {
+    font-size: 0.82rem;
+    color: var(--muted);
+    background: var(--crema);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  a.contacto-item.tel {
+    color: var(--verde);
+    text-decoration: none;
+    border-color: var(--verde2);
+    background: rgba(74,124,47,0.06);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background .2s;
+  }
+
+  a.contacto-item.tel:hover {
+    background: rgba(74,124,47,0.15);
+  }
+
+  .card-resenas-toggle {
+    padding: 8px 20px;
+    border-top: 1px solid var(--crema2);
+    cursor: pointer;
+    transition: background .15s;
+  }
+
+  .card-resenas-toggle:hover { background: var(--crema); }
+
+  .toggle-label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    user-select: none;
+  }
+
+  .proveedor-card.open .toggle-label { content: 'Ocultar reseñas ▴'; }
+
+
   .empty-state {
     text-align: center;
     padding: 60px 20px;
@@ -456,7 +507,7 @@
 <script>
 // ── CONFIGURACIÓN ──────────────────────────────────────────────────────────
 // CAMBIÁ ESTA URL por la URL de tu Apps Script desplegado como Web App
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSTr7f_pV2Fh_CXBL4Y74nuKbIQHT9MqFydD5A5RxAecNqropWJZkJ_Kvu304X0WYzAA/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/TU_SCRIPT_ID_AQUI/exec';
 
 // ── ESTADO ────────────────────────────────────────────────────────────────
 let todosLosProveedores = [];   // datos agrupados (un objeto por proveedor único)
@@ -612,11 +663,22 @@ function renderResults() {
     filtrados = filtrados.filter(p => p.score.etiqueta === activeFilter);
   }
 
-  // Filtro por búsqueda
+  // Filtro por búsqueda — parcial en todos los campos incluyendo notas de reseñas
   if (query) {
-    const palabras = query.split(' ').filter(Boolean);
+    const palabras = query.replace(/\s+/g,' ').trim().split(' ').filter(Boolean);
     filtrados = filtrados.filter(p => {
-      const texto = [p.nombre, p.empresa, p.servicio, p.telefono, p.dni].map(normalizar).join(' ');
+      // Construir texto buscable: campos principales + todas las notas de reseñas
+      const notasTexto = p.resenas.map(r => normalizar(r.notas) + ' ' + normalizar(r.recomendacion)).join(' ');
+      // Normalizar teléfono quitando espacios/guiones para buscar dígitos directos
+      const telLimpio = (p.telefono || '').replace(/\D/g,'');
+      const dniLimpio = (p.dni || '').replace(/\D/g,'');
+      const texto = [
+        p.nombre, p.empresa, p.servicio,
+        p.telefono, telLimpio,
+        p.dni, dniLimpio,
+        notasTexto
+      ].map(normalizar).join(' ');
+      // Cada palabra del query debe aparecer en algún campo (búsqueda parcial)
       return palabras.every(w => texto.includes(w));
     });
   }
@@ -654,19 +716,28 @@ function cardHTML(p, idx) {
     </div>
   `).join('');
 
-  const metaItems = [
-    p.telefono && p.telefono !== 'N/A' ? `<div class="detail-meta-item"><strong>📞 Teléfono</strong>${p.telefono}</div>` : '',
-    p.dni && p.dni !== 'N/A' ? `<div class="detail-meta-item"><strong>🪪 DNI</strong>${p.dni}</div>` : '',
-    p.empresa && p.empresa !== 'N/A' && p.empresa !== p.nombre ? `<div class="detail-meta-item"><strong>🏢 Empresa</strong>${p.empresa}</div>` : '',
-  ].filter(Boolean).join('');
+  // Datos de contacto siempre visibles
+  const telValido = p.telefono && p.telefono !== 'N/A' && p.telefono !== 'n/a' && p.telefono !== '';
+  const dniValido = p.dni && p.dni !== 'N/A' && p.dni !== 'n/a' && p.dni !== '';
+  const empresaValida = p.empresa && p.empresa !== 'N/A' && p.empresa !== p.nombre;
+
+  const contactoHTML = `
+    <div class="card-contacto">
+      ${telValido ? `<a class="contacto-item tel" href="tel:${p.telefono.replace(/\s/g,'')}">📞 ${p.telefono}</a>` : ''}
+      ${dniValido ? `<span class="contacto-item">🪪 ${p.dni}</span>` : ''}
+      ${empresaValida ? `<span class="contacto-item">🏢 ${p.empresa}</span>` : ''}
+    </div>
+  `;
+
+  const tieneResenas = p.resenas.length > 0;
 
   return `
-    <div class="proveedor-card" onclick="toggleCard(this)">
-      <div class="card-main">
+    <div class="proveedor-card">
+      <div class="card-main" onclick="toggleCard(this.closest('.proveedor-card'))">
         <div class="card-avatar">${emoji}</div>
         <div class="card-info">
           <div class="card-nombre">${p.nombre}</div>
-          <div class="card-empresa">${p.empresa && p.empresa !== p.nombre ? p.empresa : p.servicio}</div>
+          <div class="card-empresa">${empresaValida ? p.empresa : p.servicio}</div>
           <span class="card-servicio">${p.servicio}</span>
         </div>
         <div class="card-right">
@@ -677,23 +748,32 @@ function cardHTML(p, idx) {
           <div class="reviews-count">${score.total} reseña${score.total !== 1 ? 's' : ''}</div>
         </div>
       </div>
-      <div class="card-detail">
-        ${metaItems ? `<div class="detail-meta">${metaItems}</div>` : ''}
-        ${p.resenas.length > 0 ? `
+      ${contactoHTML}
+      ${tieneResenas ? `
+        <div class="card-resenas-toggle" onclick="toggleCard(this.closest('.proveedor-card'))">
+          <span class="toggle-label">Ver reseñas ▾</span>
+        </div>
+        <div class="card-detail">
           <div class="resenas-title">Reseñas (${p.resenas.length})</div>
           ${resenas}
-        ` : '<p style="color:var(--muted);font-size:.85rem">Sin reseñas cargadas aún.</p>'}
-      </div>
+        </div>
+      ` : ''}
     </div>
   `;
 }
 
 function toggleCard(el) {
   const detail = el.querySelector('.card-detail');
+  if (!detail) return;
+  const label = el.querySelector('.toggle-label');
   const isOpen = detail.classList.contains('open');
-  // Cerrar el anterior
-  if (openCard && openCard !== detail) openCard.classList.remove('open');
+  if (openCard && openCard !== detail) {
+    openCard.classList.remove('open');
+    const prevLabel = openCard.closest('.proveedor-card')?.querySelector('.toggle-label');
+    if (prevLabel) prevLabel.textContent = 'Ver reseñas ▾';
+  }
   detail.classList.toggle('open', !isOpen);
+  if (label) label.textContent = !isOpen ? 'Ocultar reseñas ▴' : 'Ver reseñas ▾';
   openCard = !isOpen ? detail : null;
 }
 
