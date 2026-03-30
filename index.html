@@ -166,7 +166,116 @@
   }
   .logout-btn:hover { background: rgba(255,255,255,0.25); }
 
-  main { max-width: 900px; margin: 0 auto; padding: 24px 16px 60px; }
+  main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 60px; }
+
+  .app-layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* ── SIDEBAR DE RUBROS ── */
+  .sidebar {
+    background: var(--white);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    position: sticky;
+    top: 84px;
+  }
+
+  .sidebar-title {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--muted);
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid var(--crema2);
+  }
+
+  .rubro-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    color: var(--text);
+    border-bottom: 1px solid var(--crema2);
+    transition: background .15s;
+    user-select: none;
+  }
+
+  .rubro-item:last-child { border-bottom: none; }
+  .rubro-item:hover { background: var(--crema); }
+  .rubro-item.active { background: var(--verde); color: white; font-weight: 500; }
+  .rubro-item.active .rubro-count { background: rgba(255,255,255,0.25); color: white; }
+
+  .rubro-emoji { font-size: 1rem; width: 20px; text-align: center; }
+  .rubro-label { flex: 1; }
+  .rubro-count {
+    background: var(--crema2);
+    color: var(--muted);
+    border-radius: 10px;
+    padding: 1px 7px;
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+
+  /* ── CONTENIDO PRINCIPAL ── */
+  .main-content { min-width: 0; }
+
+  /* ── TOOLBAR (ordenamiento) ── */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .sort-select {
+    padding: 7px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--white);
+    color: var(--text);
+    cursor: pointer;
+  }
+
+  .sort-select:focus { outline: none; border-color: var(--verde2); }
+
+  /* ── CARD DESTACADA ── */
+  .proveedor-card.destacado {
+    border-color: #f0c040;
+    background: linear-gradient(to right, #fffdf0, var(--white));
+  }
+
+  .destacado-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #b7770d;
+    background: #fff8e1;
+    border: 1px solid #f0c040;
+    border-radius: 4px;
+    padding: 2px 7px;
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 700px) {
+    .app-layout { grid-template-columns: 1fr; }
+    .sidebar { position: static; }
+  }
 
   /* ── SEARCH ── */
   .search-bar {
@@ -303,7 +412,8 @@
   .badge-muy-recomendable  { background: #d4edda; color: var(--verde-ex); }
   .badge-recomendable       { background: #d1f2eb; color: #1a7a5e; }
   .badge-malas-experiencias { background: #fdebd0; color: var(--naranja); }
-  .badge-no-contratar       { background: #fadbd8; color: var(--rojo); }
+  .badge-no-recomendable    { background: #fadbd8; color: var(--rojo); }
+  .badge-destacado          { background: #fff8e1; color: #b7770d; border: 1px solid #f0c040; }
   .badge-sin-datos          { background: #f0f0f0; color: #888; }
 
   .score-display {
@@ -488,30 +598,50 @@
 
   <main>
     <div class="search-bar">
-      <input type="search" id="search-input" placeholder="🔍  Buscá por nombre, servicio, teléfono..." oninput="renderResults()">
+      <input type="search" id="search-input" placeholder="🔍  Buscá por nombre, servicio, teléfono, DNI..." oninput="renderResults()">
     </div>
 
     <div class="filters" id="filters-bar">
       <span class="filter-chip active" data-filter="todos" onclick="setFilter(this)">Todos</span>
-      <span class="filter-chip" data-filter="Muy Recomendable" onclick="setFilter(this)">⭐ Muy recomendables</span>
+      <span class="filter-chip" data-filter="Destacado" onclick="setFilter(this)">⭐ Destacados</span>
+      <span class="filter-chip" data-filter="Muy Recomendable" onclick="setFilter(this)">💚 Muy recomendables</span>
       <span class="filter-chip" data-filter="Recomendable" onclick="setFilter(this)">👍 Recomendables</span>
       <span class="filter-chip" data-filter="Malas Experiencias" onclick="setFilter(this)">⚠️ Malas experiencias</span>
-      <span class="filter-chip" data-filter="No Contratar" onclick="setFilter(this)">🚫 No contratar</span>
+      <span class="filter-chip" data-filter="No Recomendable" onclick="setFilter(this)">🚫 No recomendables</span>
     </div>
 
-    <div class="stats-bar" id="stats-bar"></div>
-    <div id="results-container"></div>
+    <div class="app-layout">
+      <!-- Sidebar rubros -->
+      <div class="sidebar" id="sidebar-rubros">
+        <div class="sidebar-title">📂 Rubros</div>
+        <div id="rubros-list"></div>
+      </div>
+
+      <!-- Contenido principal -->
+      <div class="main-content">
+        <div class="toolbar">
+          <div class="stats-bar" id="stats-bar" style="margin:0;padding:0;border:none"></div>
+          <select class="sort-select" id="sort-select" onchange="renderResults()">
+            <option value="destacados">⭐ Destacados primero</option>
+            <option value="puntuacion">★ Mayor puntuación</option>
+            <option value="alfabetico">🔤 Alfabético</option>
+          </select>
+        </div>
+        <div id="results-container"></div>
+      </div>
+    </div>
   </main>
 </div>
 
 <script>
 // ── CONFIGURACIÓN ──────────────────────────────────────────────────────────
 // CAMBIÁ ESTA URL por la URL de tu Apps Script desplegado como Web App
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSTr7f_pV2Fh_CXBL4Y74nuKbIQHT9MqFydD5A5RxAecNqropWJZkJ_Kvu304X0WYzAA/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/TU_SCRIPT_ID_AQUI/exec';
 
 // ── ESTADO ────────────────────────────────────────────────────────────────
-let todosLosProveedores = [];   // datos agrupados (un objeto por proveedor único)
+let todosLosProveedores = [];
 let activeFilter = 'todos';
+let activeRubro = 'todos';
 let openCard = null;
 
 // ── LOGIN ──────────────────────────────────────────────────────────────────
@@ -560,24 +690,27 @@ function fetchProveedores(password) {
   return fetch(url).then(r => r.json());
 }
 
-// ── PROCESAR DATOS (agrupar reseñas por proveedor) ────────────────────────
+// ── PROCESAR DATOS ────────────────────────────────────────────────────────
 function procesarDatos(filas) {
-  // Agrupa por clave: nombre+dni o nombre+telefono
   const mapaProveedores = {};
 
   filas.forEach(fila => {
     const key = generarClave(fila);
     if (!mapaProveedores[key]) {
       mapaProveedores[key] = {
-        nombre:   fila.nombre,
-        empresa:  fila.empresa,
-        dni:      fila.dni,
-        telefono: fila.telefono,
-        servicio: fila.servicio,
-        resenas:  []
+        nombre:    fila.nombre,
+        empresa:   fila.empresa,
+        dni:       fila.dni,
+        telefono:  fila.telefono,
+        servicio:  fila.servicio,
+        destacado: false,
+        resenas:   []
       };
     }
-    if (fila.puntuacion > 0 || fila.notas) {
+    // Si alguna fila tiene "Publicidad" en recomendación, es destacado
+    if (normalizar(fila.recomendacion) === 'publicidad') {
+      mapaProveedores[key].destacado = true;
+    } else if (fila.puntuacion > 0 || fila.notas) {
       mapaProveedores[key].resenas.push({
         puntuacion:    fila.puntuacion,
         recomendacion: fila.recomendacion,
@@ -586,18 +719,14 @@ function procesarDatos(filas) {
     }
   });
 
-  // Calcular score compuesto para cada proveedor
   todosLosProveedores = Object.values(mapaProveedores).map(p => {
-    const score = calcularScore(p.resenas);
+    const score = p.destacado
+      ? { promedio: 5, ajustado: 5, total: 0, etiqueta: 'Destacado' }
+      : calcularScore(p.resenas);
     return { ...p, score };
   });
 
-  // Ordenar: primero muy recomendables, luego por score
-  todosLosProveedores.sort((a, b) => {
-    const orden = { 'Muy Recomendable': 4, 'Recomendable': 3, 'Malas Experiencias': 2, 'No Contratar': 1, 'Sin datos': 0 };
-    const diff = (orden[b.score.etiqueta] || 0) - (orden[a.score.etiqueta] || 0);
-    return diff !== 0 ? diff : b.score.promedio - a.score.promedio;
-  });
+  generarSidebar();
 }
 
 function generarClave(fila) {
@@ -609,81 +738,112 @@ function generarClave(fila) {
   return n + '_emp_' + normalizar(fila.empresa);
 }
 
-// Score estilo Mercado Libre / Google:
-// - Pesa más las reseñas recientes (no tenemos fecha, entonces usamos cantidad)
-// - Penaliza reseñas negativas más que lo que suma una positiva
-// - Necesita al menos 3 reseñas para ser "Muy Recomendable"
 function calcularScore(resenas) {
   if (!resenas || resenas.length === 0) {
-    return { promedio: 0, total: 0, etiqueta: 'Sin datos', confianza: 0 };
+    return { promedio: 0, total: 0, etiqueta: 'Sin datos', ajustado: 0 };
   }
-
   const total = resenas.length;
   const suma = resenas.reduce((acc, r) => acc + (r.puntuacion || 0), 0);
   const promedio = suma / total;
-
-  // Factor de confianza: sube con más reseñas (bayesian average)
-  // Usamos 3 como "prior" con valor 3.0
-  const priorN = 3;
-  const priorMean = 3.0;
+  const priorN = 3, priorMean = 3.0;
   const scoreAjustado = (priorN * priorMean + suma) / (priorN + total);
-
-  // Etiqueta final
-  let etiqueta;
   const negativas = resenas.filter(r => r.puntuacion <= 2).length;
   const pctNegativo = negativas / total;
+  let etiqueta;
+  if (pctNegativo > 0.4)                              etiqueta = 'No Recomendable';
+  else if (pctNegativo > 0.2 || scoreAjustado < 2.8)  etiqueta = 'Malas Experiencias';
+  else if (scoreAjustado >= 4.2 && total >= 2)         etiqueta = 'Muy Recomendable';
+  else                                                  etiqueta = 'Recomendable';
+  return { promedio: Math.round(promedio*10)/10, ajustado: Math.round(scoreAjustado*10)/10, total, etiqueta };
+}
 
-  if (pctNegativo > 0.4) {
-    etiqueta = 'No Contratar';
-  } else if (pctNegativo > 0.2 || scoreAjustado < 2.8) {
-    etiqueta = 'Malas Experiencias';
-  } else if (scoreAjustado >= 4.2 && total >= 2) {
-    etiqueta = 'Muy Recomendable';
-  } else {
-    etiqueta = 'Recomendable';
-  }
+// ── SIDEBAR DE RUBROS ──────────────────────────────────────────────────────
+function generarSidebar() {
+  const conteo = {};
+  todosLosProveedores.forEach(p => {
+    const r = p.servicio || 'Otros';
+    conteo[r] = (conteo[r] || 0) + 1;
+  });
+  const rubros = Object.entries(conteo).sort((a,b) => b[1] - a[1]);
+  const lista = document.getElementById('rubros-list');
+  const total = todosLosProveedores.length;
+  lista.innerHTML = `
+    <div class="rubro-item active" data-rubro="todos" onclick="setRubro(this)">
+      <span class="rubro-emoji">🏠</span>
+      <span class="rubro-label">Todos</span>
+      <span class="rubro-count">${total}</span>
+    </div>
+    ${rubros.map(([rubro, cnt]) => `
+      <div class="rubro-item" data-rubro="${rubro}" onclick="setRubro(this)">
+        <span class="rubro-emoji">${servicioEmoji(rubro)}</span>
+        <span class="rubro-label">${rubro}</span>
+        <span class="rubro-count">${cnt}</span>
+      </div>
+    `).join('')}
+  `;
+}
 
-  return {
-    promedio:      Math.round(promedio * 10) / 10,
-    ajustado:      Math.round(scoreAjustado * 10) / 10,
-    total,
-    etiqueta
-  };
+function setRubro(el) {
+  document.querySelectorAll('.rubro-item').forEach(r => r.classList.remove('active'));
+  el.classList.add('active');
+  activeRubro = el.dataset.rubro;
+  openCard = null;
+  renderResults();
 }
 
 // ── RENDER ─────────────────────────────────────────────────────────────────
 function renderResults() {
   const query = normalizar(document.getElementById('search-input').value);
+  const sortBy = document.getElementById('sort-select').value;
   const container = document.getElementById('results-container');
 
-  let filtrados = todosLosProveedores;
+  let filtrados = [...todosLosProveedores];
 
-  // Filtro por categoría
+  // Filtro por rubro (sidebar)
+  if (activeRubro !== 'todos') {
+    filtrados = filtrados.filter(p => p.servicio === activeRubro);
+  }
+
+  // Filtro por estado (chips superiores)
   if (activeFilter !== 'todos') {
     filtrados = filtrados.filter(p => p.score.etiqueta === activeFilter);
   }
 
-  // Filtro por búsqueda — parcial en todos los campos incluyendo notas de reseñas
+  // Filtro por búsqueda
   if (query) {
     const palabras = query.replace(/\s+/g,' ').trim().split(' ').filter(Boolean);
     filtrados = filtrados.filter(p => {
-      // Construir texto buscable: campos principales + todas las notas de reseñas
       const notasTexto = p.resenas.map(r => normalizar(r.notas) + ' ' + normalizar(r.recomendacion)).join(' ');
-      // Normalizar teléfono quitando espacios/guiones para buscar dígitos directos
       const telLimpio = (p.telefono || '').replace(/\D/g,'');
       const dniLimpio = (p.dni || '').replace(/\D/g,'');
-      const texto = [
-        p.nombre, p.empresa, p.servicio,
-        p.telefono, telLimpio,
-        p.dni, dniLimpio,
-        notasTexto
-      ].map(normalizar).join(' ');
-      // Cada palabra del query debe aparecer en algún campo (búsqueda parcial)
+      const texto = [p.nombre, p.empresa, p.servicio, p.telefono, telLimpio, p.dni, dniLimpio, notasTexto].map(normalizar).join(' ');
       return palabras.every(w => texto.includes(w));
     });
   }
 
-  // Stats
+  // Ordenamiento
+  const ordenEtiqueta = { 'Destacado': 5, 'Muy Recomendable': 4, 'Recomendable': 3, 'Malas Experiencias': 2, 'No Recomendable': 1, 'Sin datos': 0 };
+
+  if (sortBy === 'alfabetico') {
+    filtrados.sort((a, b) => {
+      // Destacados siempre primero aunque sea alfabético
+      if (a.destacado !== b.destacado) return a.destacado ? -1 : 1;
+      return a.nombre.localeCompare(b.nombre, 'es');
+    });
+  } else if (sortBy === 'puntuacion') {
+    filtrados.sort((a, b) => {
+      if (a.destacado !== b.destacado) return a.destacado ? -1 : 1;
+      return b.score.ajustado - a.score.ajustado || a.nombre.localeCompare(b.nombre, 'es');
+    });
+  } else {
+    // "destacados primero": destacados → por etiqueta → por score
+    filtrados.sort((a, b) => {
+      if (a.destacado !== b.destacado) return a.destacado ? -1 : 1;
+      const diff = (ordenEtiqueta[b.score.etiqueta] || 0) - (ordenEtiqueta[a.score.etiqueta] || 0);
+      return diff !== 0 ? diff : b.score.ajustado - a.score.ajustado;
+    });
+  }
+
   document.getElementById('stats-bar').textContent =
     `${filtrados.length} proveedor${filtrados.length !== 1 ? 'es' : ''} encontrado${filtrados.length !== 1 ? 's' : ''}`;
 
@@ -702,8 +862,10 @@ function renderResults() {
 
 function cardHTML(p, idx) {
   const { score } = p;
-  const badgeClass = badgeCSSClass(score.etiqueta);
-  const estrellas = score.total > 0 ? renderEstrellas(score.promedio) : '—';
+  const esDestacado = p.destacado;
+  const badgeClass = esDestacado ? 'badge-destacado' : badgeCSSClass(score.etiqueta);
+  const etiquetaVisible = esDestacado ? '⭐ Destacado' : score.etiqueta;
+  const estrellas = score.total > 0 ? renderEstrellas(score.promedio) : (esDestacado ? '★★★★★' : '—');
   const emoji = servicioEmoji(p.servicio);
 
   const resenas = p.resenas.map(r => `
@@ -716,7 +878,6 @@ function cardHTML(p, idx) {
     </div>
   `).join('');
 
-  // Datos de contacto siempre visibles
   const telValido = p.telefono && p.telefono !== 'N/A' && p.telefono !== 'n/a' && p.telefono !== '';
   const dniValido = p.dni && p.dni !== 'N/A' && p.dni !== 'n/a' && p.dni !== '';
   const empresaValida = p.empresa && p.empresa !== 'N/A' && p.empresa !== p.nombre;
@@ -732,20 +893,21 @@ function cardHTML(p, idx) {
   const tieneResenas = p.resenas.length > 0;
 
   return `
-    <div class="proveedor-card">
+    <div class="proveedor-card${esDestacado ? ' destacado' : ''}">
       <div class="card-main" onclick="toggleCard(this.closest('.proveedor-card'))">
         <div class="card-avatar">${emoji}</div>
         <div class="card-info">
+          ${esDestacado ? '<div class="destacado-badge">⭐ Destacado</div>' : ''}
           <div class="card-nombre">${p.nombre}</div>
           <div class="card-empresa">${empresaValida ? p.empresa : p.servicio}</div>
           <span class="card-servicio">${p.servicio}</span>
         </div>
         <div class="card-right">
-          <div class="badge ${badgeClass}">${score.etiqueta}</div><br>
+          <div class="badge ${badgeClass}">${etiquetaVisible}</div><br>
           <div class="score-display">
             <span class="stars">${estrellas}</span>
           </div>
-          <div class="reviews-count">${score.total} reseña${score.total !== 1 ? 's' : ''}</div>
+          <div class="reviews-count">${score.total > 0 ? score.total + ' reseña' + (score.total !== 1 ? 's' : '') : ''}</div>
         </div>
       </div>
       ${contactoHTML}
@@ -805,10 +967,12 @@ function renderEstrellas(n) {
 
 function badgeCSSClass(etiqueta) {
   const m = {
-    'Muy Recomendable':   'badge-muy-recomendable',
+    'Destacado':           'badge-destacado',
+    'Muy Recomendable':    'badge-muy-recomendable',
     'Recomendable':        'badge-recomendable',
     'Malas Experiencias':  'badge-malas-experiencias',
-    'No Contratar':        'badge-no-contratar',
+    'No Recomendable':     'badge-no-recomendable',
+    'No Contratar':        'badge-no-recomendable', // compatibilidad con datos viejos
   };
   return m[etiqueta] || 'badge-sin-datos';
 }
