@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proveedores · San Sebastián</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde:    #2d5016;
+    --verde2:   #4a7c2f;
+    --crema:    #f5f0e8;
+    --crema2:   #ede6d6;
+    --text:     #1a1a1a;
+    --muted:    #6b6b5a;
+    --border:   #d4c9b0;
+    --white:    #ffffff;
+    --rojo:     #c0392b;
+    --naranja:  #d35400;
+    --amarillo: #d4ac0d;
+    --verde-ok: #27ae60;
+    --verde-ex: #1e8449;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--crema);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── LOGIN ── */
+  #login-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--verde);
+    background-image:
+      radial-gradient(ellipse at 20% 50%, rgba(74,124,47,0.4) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(45,80,22,0.6) 0%, transparent 50%);
+  }
+
+  .login-card {
+    background: var(--crema);
+    border-radius: 16px;
+    padding: 48px 40px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.3);
+  }
+
+  .login-logo {
+    width: 64px;
+    height: 64px;
+    background: var(--verde);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 28px;
+  }
+
+  .login-card h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: var(--verde);
+    margin-bottom: 4px;
+  }
+
+  .login-card p {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 32px;
+  }
+
+  .login-card input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--white);
+    color: var(--text);
+    margin-bottom: 12px;
+    transition: border-color .2s;
+    text-align: center;
+    letter-spacing: 2px;
+  }
+
+  .login-card input:focus {
+    outline: none;
+    border-color: var(--verde2);
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: var(--verde);
+    color: var(--white);
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background .2s, transform .1s;
+  }
+
+  .btn-primary:hover { background: var(--verde2); }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .login-error {
+    color: var(--rojo);
+    font-size: 0.85rem;
+    margin-top: 10px;
+    display: none;
+  }
+
+  /* ── APP ── */
+  #app { display: none; }
+
+  header {
+    background: var(--verde);
+    color: var(--white);
+    padding: 0 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  }
+
+  .header-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 64px;
+  }
+
+  .header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    flex: 1;
+  }
+
+  .header-title span { font-size: 0.8rem; font-weight: 300; opacity: 0.8; display: block; }
+
+  .logout-btn {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: background .2s;
+  }
+  .logout-btn:hover { background: rgba(255,255,255,0.25); }
+
+  main { max-width: 900px; margin: 0 auto; padding: 24px 16px 60px; }
+
+  /* ── SEARCH ── */
+  .search-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .search-bar input {
+    flex: 1;
+    padding: 14px 18px;
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    font-size: 1rem;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--white);
+    transition: border-color .2s, box-shadow .2s;
+  }
+
+  .search-bar input:focus {
+    outline: none;
+    border-color: var(--verde2);
+    box-shadow: 0 0 0 4px rgba(74,124,47,0.1);
+  }
+
+  /* ── FILTROS ── */
+  .filters {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+  }
+
+  .filter-chip {
+    padding: 6px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    font-size: 0.82rem;
+    cursor: pointer;
+    background: var(--white);
+    color: var(--muted);
+    transition: all .2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .filter-chip:hover { border-color: var(--verde2); color: var(--verde); }
+  .filter-chip.active { background: var(--verde); border-color: var(--verde); color: white; }
+
+  /* ── STATS ── */
+  .stats-bar {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── CARDS ── */
+  .results-grid { display: flex; flex-direction: column; gap: 12px; }
+
+  .proveedor-card {
+    background: var(--white);
+    border-radius: 14px;
+    border: 1.5px solid var(--border);
+    overflow: hidden;
+    transition: box-shadow .2s, transform .15s;
+    cursor: pointer;
+  }
+
+  .proveedor-card:hover {
+    box-shadow: 0 6px 24px rgba(45,80,22,0.12);
+    transform: translateY(-1px);
+  }
+
+  .card-main {
+    padding: 18px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .card-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--crema2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    border: 2px solid var(--border);
+  }
+
+  .card-info { flex: 1; min-width: 0; }
+
+  .card-nombre {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--verde);
+    margin-bottom: 2px;
+  }
+
+  .card-empresa {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .card-servicio {
+    display: inline-block;
+    background: var(--crema2);
+    color: var(--verde);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    margin-right: 6px;
+    margin-bottom: 4px;
+  }
+
+  .card-right { text-align: right; flex-shrink: 0; }
+
+  .badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+
+  .badge-muy-recomendable  { background: #d4edda; color: var(--verde-ex); }
+  .badge-recomendable       { background: #d1f2eb; color: #1a7a5e; }
+  .badge-malas-experiencias { background: #fdebd0; color: var(--naranja); }
+  .badge-no-contratar       { background: #fadbd8; color: var(--rojo); }
+  .badge-sin-datos          { background: #f0f0f0; color: #888; }
+
+  .score-display {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .score-display .stars { font-size: 0.9rem; }
+  .reviews-count { font-size: 0.75rem; color: var(--muted); }
+
+  /* ── DETALLE (expandido) ── */
+  .card-detail {
+    display: none;
+    border-top: 1px solid var(--crema2);
+    padding: 0 20px 20px;
+  }
+
+  .card-detail.open { display: block; }
+
+  .detail-meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 14px 0;
+    border-bottom: 1px dashed var(--border);
+    margin-bottom: 14px;
+  }
+
+  .detail-meta-item { font-size: 0.82rem; color: var(--muted); }
+  .detail-meta-item strong { color: var(--text); display: block; }
+
+  .resenas-title {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+
+  .resena-item {
+    background: var(--crema);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    border-left: 3px solid var(--border);
+  }
+
+  .resena-item.muy-recomendable  { border-color: var(--verde-ok); }
+  .resena-item.recomendable       { border-color: #1abc9c; }
+  .resena-item.malas-experiencias { border-color: var(--naranja); }
+  .resena-item.no-contratar       { border-color: var(--rojo); }
+
+  .resena-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+
+  .resena-estrellas { font-size: 0.85rem; }
+  .resena-badge { font-size: 0.72rem; }
+
+  .resena-notas { font-size: 0.88rem; color: var(--text); line-height: 1.5; }
+
+  /* ── EMPTY / LOADING ── */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+
+  .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+  .empty-state h3 { font-family: 'Playfair Display', serif; color: var(--text); margin-bottom: 6px; }
+
+  .loading {
+    text-align: center;
+    padding: 60px;
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+
+  .spinner {
+    width: 36px; height: 36px;
+    border: 3px solid var(--border);
+    border-top-color: var(--verde);
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+    margin: 0 auto 16px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .login-card { padding: 36px 24px; }
+    .card-main { gap: 12px; }
+    .card-avatar { width: 40px; height: 40px; font-size: 16px; }
+    .detail-meta { gap: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">🏡</div>
+    <h1>San Sebastián</h1>
+    <p>Proveedores del barrio · Ingresá con tu contraseña vecinal</p>
+    <input type="password" id="pwd-input" placeholder="Contraseña" autocomplete="current-password">
+    <button class="btn-primary" id="login-btn" onclick="doLogin()">Ingresar</button>
+    <p class="login-error" id="login-error">Contraseña incorrecta. Intentá de nuevo.</p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header>
+    <div class="header-inner">
+      <div>
+        <div class="header-title">
+          Proveedores
+          <span>San Sebastián · Pilar</span>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">Salir</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="search-bar">
+      <input type="search" id="search-input" placeholder="🔍  Buscá por nombre, servicio, teléfono..." oninput="renderResults()">
+    </div>
+
+    <div class="filters" id="filters-bar">
+      <span class="filter-chip active" data-filter="todos" onclick="setFilter(this)">Todos</span>
+      <span class="filter-chip" data-filter="Muy Recomendable" onclick="setFilter(this)">⭐ Muy recomendables</span>
+      <span class="filter-chip" data-filter="Recomendable" onclick="setFilter(this)">👍 Recomendables</span>
+      <span class="filter-chip" data-filter="Malas Experiencias" onclick="setFilter(this)">⚠️ Malas experiencias</span>
+      <span class="filter-chip" data-filter="No Contratar" onclick="setFilter(this)">🚫 No contratar</span>
+    </div>
+
+    <div class="stats-bar" id="stats-bar"></div>
+    <div id="results-container"></div>
+  </main>
+</div>
+
+<script>
+// ── CONFIGURACIÓN ──────────────────────────────────────────────────────────
+// CAMBIÁ ESTA URL por la URL de tu Apps Script desplegado como Web App
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw8N0fCMxYqsnm2cgj7R8X-zXBRPK4L4Lmw-RK_Z6dgSoU9mbPlE1CZdou3NPalLZRLJw/exec';
+
+// ── ESTADO ────────────────────────────────────────────────────────────────
+let todosLosProveedores = [];   // datos agrupados (un objeto por proveedor único)
+let activeFilter = 'todos';
+let openCard = null;
+
+// ── LOGIN ──────────────────────────────────────────────────────────────────
+function doLogin() {
+  const pwd = document.getElementById('pwd-input').value.trim();
+  if (!pwd) return;
+
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true;
+  btn.textContent = 'Verificando...';
+
+  fetchProveedores(pwd)
+    .then(data => {
+      if (data.error === 'unauthorized') {
+        document.getElementById('login-error').style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Ingresar';
+      } else {
+        sessionStorage.setItem('ss_pwd', pwd);
+        procesarDatos(data.proveedores || []);
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        renderResults();
+      }
+    })
+    .catch(() => {
+      document.getElementById('login-error').textContent = 'Error de conexión. Revisá la URL del script.';
+      document.getElementById('login-error').style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Ingresar';
+    });
+}
+
+document.getElementById('pwd-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+function doLogout() {
+  sessionStorage.removeItem('ss_pwd');
+  location.reload();
+}
+
+// ── FETCH ──────────────────────────────────────────────────────────────────
+function fetchProveedores(password) {
+  const url = `${APPS_SCRIPT_URL}?action=getProveedores&password=${encodeURIComponent(password)}`;
+  return fetch(url).then(r => r.json());
+}
+
+// ── PROCESAR DATOS (agrupar reseñas por proveedor) ────────────────────────
+function procesarDatos(filas) {
+  // Agrupa por clave: nombre+dni o nombre+telefono
+  const mapaProveedores = {};
+
+  filas.forEach(fila => {
+    const key = generarClave(fila);
+    if (!mapaProveedores[key]) {
+      mapaProveedores[key] = {
+        nombre:   fila.nombre,
+        empresa:  fila.empresa,
+        dni:      fila.dni,
+        telefono: fila.telefono,
+        servicio: fila.servicio,
+        resenas:  []
+      };
+    }
+    if (fila.puntuacion > 0 || fila.notas) {
+      mapaProveedores[key].resenas.push({
+        puntuacion:    fila.puntuacion,
+        recomendacion: fila.recomendacion,
+        notas:         fila.notas
+      });
+    }
+  });
+
+  // Calcular score compuesto para cada proveedor
+  todosLosProveedores = Object.values(mapaProveedores).map(p => {
+    const score = calcularScore(p.resenas);
+    return { ...p, score };
+  });
+
+  // Ordenar: primero muy recomendables, luego por score
+  todosLosProveedores.sort((a, b) => {
+    const orden = { 'Muy Recomendable': 4, 'Recomendable': 3, 'Malas Experiencias': 2, 'No Contratar': 1, 'Sin datos': 0 };
+    const diff = (orden[b.score.etiqueta] || 0) - (orden[a.score.etiqueta] || 0);
+    return diff !== 0 ? diff : b.score.promedio - a.score.promedio;
+  });
+}
+
+function generarClave(fila) {
+  const n = normalizar(fila.nombre);
+  const d = normalizar(fila.dni);
+  const t = normalizar(fila.telefono);
+  if (d && d !== 'n/a') return n + '_dni_' + d;
+  if (t && t !== 'n/a') return n + '_tel_' + t.replace(/\D/g,'').slice(-8);
+  return n + '_emp_' + normalizar(fila.empresa);
+}
+
+// Score estilo Mercado Libre / Google:
+// - Pesa más las reseñas recientes (no tenemos fecha, entonces usamos cantidad)
+// - Penaliza reseñas negativas más que lo que suma una positiva
+// - Necesita al menos 3 reseñas para ser "Muy Recomendable"
+function calcularScore(resenas) {
+  if (!resenas || resenas.length === 0) {
+    return { promedio: 0, total: 0, etiqueta: 'Sin datos', confianza: 0 };
+  }
+
+  const total = resenas.length;
+  const suma = resenas.reduce((acc, r) => acc + (r.puntuacion || 0), 0);
+  const promedio = suma / total;
+
+  // Factor de confianza: sube con más reseñas (bayesian average)
+  // Usamos 3 como "prior" con valor 3.0
+  const priorN = 3;
+  const priorMean = 3.0;
+  const scoreAjustado = (priorN * priorMean + suma) / (priorN + total);
+
+  // Etiqueta final
+  let etiqueta;
+  const negativas = resenas.filter(r => r.puntuacion <= 2).length;
+  const pctNegativo = negativas / total;
+
+  if (pctNegativo > 0.4) {
+    etiqueta = 'No Contratar';
+  } else if (pctNegativo > 0.2 || scoreAjustado < 2.8) {
+    etiqueta = 'Malas Experiencias';
+  } else if (scoreAjustado >= 4.2 && total >= 2) {
+    etiqueta = 'Muy Recomendable';
+  } else {
+    etiqueta = 'Recomendable';
+  }
+
+  return {
+    promedio:      Math.round(promedio * 10) / 10,
+    ajustado:      Math.round(scoreAjustado * 10) / 10,
+    total,
+    etiqueta
+  };
+}
+
+// ── RENDER ─────────────────────────────────────────────────────────────────
+function renderResults() {
+  const query = normalizar(document.getElementById('search-input').value);
+  const container = document.getElementById('results-container');
+
+  let filtrados = todosLosProveedores;
+
+  // Filtro por categoría
+  if (activeFilter !== 'todos') {
+    filtrados = filtrados.filter(p => p.score.etiqueta === activeFilter);
+  }
+
+  // Filtro por búsqueda
+  if (query) {
+    const palabras = query.split(' ').filter(Boolean);
+    filtrados = filtrados.filter(p => {
+      const texto = [p.nombre, p.empresa, p.servicio, p.telefono, p.dni].map(normalizar).join(' ');
+      return palabras.every(w => texto.includes(w));
+    });
+  }
+
+  // Stats
+  document.getElementById('stats-bar').textContent =
+    `${filtrados.length} proveedor${filtrados.length !== 1 ? 'es' : ''} encontrado${filtrados.length !== 1 ? 's' : ''}`;
+
+  if (filtrados.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">🔍</div>
+        <h3>Sin resultados</h3>
+        <p>Probá con otras palabras clave o cambiá el filtro</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = filtrados.map((p, idx) => cardHTML(p, idx)).join('');
+}
+
+function cardHTML(p, idx) {
+  const { score } = p;
+  const badgeClass = badgeCSSClass(score.etiqueta);
+  const estrellas = score.total > 0 ? renderEstrellas(score.promedio) : '—';
+  const emoji = servicioEmoji(p.servicio);
+
+  const resenas = p.resenas.map(r => `
+    <div class="resena-item ${slugify(r.recomendacion)}">
+      <div class="resena-top">
+        <span class="resena-estrellas">${renderEstrellas(r.puntuacion)}</span>
+        <span class="badge ${badgeCSSClass(r.recomendacion)} resena-badge">${r.recomendacion || 'Sin etiqueta'}</span>
+      </div>
+      ${r.notas && r.notas !== 'N/A' && r.notas !== 'n/a' ? `<div class="resena-notas">"${r.notas}"</div>` : ''}
+    </div>
+  `).join('');
+
+  const metaItems = [
+    p.telefono && p.telefono !== 'N/A' ? `<div class="detail-meta-item"><strong>📞 Teléfono</strong>${p.telefono}</div>` : '',
+    p.dni && p.dni !== 'N/A' ? `<div class="detail-meta-item"><strong>🪪 DNI</strong>${p.dni}</div>` : '',
+    p.empresa && p.empresa !== 'N/A' && p.empresa !== p.nombre ? `<div class="detail-meta-item"><strong>🏢 Empresa</strong>${p.empresa}</div>` : '',
+  ].filter(Boolean).join('');
+
+  return `
+    <div class="proveedor-card" onclick="toggleCard(this)">
+      <div class="card-main">
+        <div class="card-avatar">${emoji}</div>
+        <div class="card-info">
+          <div class="card-nombre">${p.nombre}</div>
+          <div class="card-empresa">${p.empresa && p.empresa !== p.nombre ? p.empresa : p.servicio}</div>
+          <span class="card-servicio">${p.servicio}</span>
+        </div>
+        <div class="card-right">
+          <div class="badge ${badgeClass}">${score.etiqueta}</div><br>
+          <div class="score-display">
+            <span class="stars">${estrellas}</span>
+          </div>
+          <div class="reviews-count">${score.total} reseña${score.total !== 1 ? 's' : ''}</div>
+        </div>
+      </div>
+      <div class="card-detail">
+        ${metaItems ? `<div class="detail-meta">${metaItems}</div>` : ''}
+        ${p.resenas.length > 0 ? `
+          <div class="resenas-title">Reseñas (${p.resenas.length})</div>
+          ${resenas}
+        ` : '<p style="color:var(--muted);font-size:.85rem">Sin reseñas cargadas aún.</p>'}
+      </div>
+    </div>
+  `;
+}
+
+function toggleCard(el) {
+  const detail = el.querySelector('.card-detail');
+  const isOpen = detail.classList.contains('open');
+  // Cerrar el anterior
+  if (openCard && openCard !== detail) openCard.classList.remove('open');
+  detail.classList.toggle('open', !isOpen);
+  openCard = !isOpen ? detail : null;
+}
+
+function setFilter(chip) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  chip.classList.add('active');
+  activeFilter = chip.dataset.filter;
+  openCard = null;
+  renderResults();
+}
+
+// ── HELPERS ────────────────────────────────────────────────────────────────
+function normalizar(txt) {
+  if (!txt) return '';
+  return String(txt).toLowerCase().trim()
+    .replace(/á/g,'a').replace(/é/g,'e').replace(/í/g,'i')
+    .replace(/ó/g,'o').replace(/ú/g,'u').replace(/ü/g,'u');
+}
+
+function slugify(txt) {
+  return normalizar(txt || '').replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+}
+
+function renderEstrellas(n) {
+  if (!n) return '☆☆☆☆☆';
+  const llenas = Math.round(n);
+  return '★'.repeat(llenas) + '☆'.repeat(5 - llenas);
+}
+
+function badgeCSSClass(etiqueta) {
+  const m = {
+    'Muy Recomendable':   'badge-muy-recomendable',
+    'Recomendable':        'badge-recomendable',
+    'Malas Experiencias':  'badge-malas-experiencias',
+    'No Contratar':        'badge-no-contratar',
+  };
+  return m[etiqueta] || 'badge-sin-datos';
+}
+
+function servicioEmoji(servicio) {
+  if (!servicio) return '🔧';
+  const s = normalizar(servicio);
+  if (s.includes('plom')) return '🔧';
+  if (s.includes('electr')) return '⚡';
+  if (s.includes('limp')) return '🧹';
+  if (s.includes('pint')) return '🖌️';
+  if (s.includes('jardin') || s.includes('pasto')) return '🌿';
+  if (s.includes('comid') || s.includes('delivery') || s.includes('empanada') || s.includes('pizza')) return '🍕';
+  if (s.includes('gas') || s.includes('calef')) return '🔥';
+  if (s.includes('piscina') || s.includes('pileta')) return '🏊';
+  if (s.includes('carpint')) return '🪵';
+  if (s.includes('albañ') || s.includes('construc')) return '🏗️';
+  if (s.includes('segur') || s.includes('alarm')) return '🔒';
+  if (s.includes('mudanz')) return '📦';
+  return '⚙️';
+}
+
+// Auto-login si la sesión está activa
+window.addEventListener('load', () => {
+  const pwd = sessionStorage.getItem('ss_pwd');
+  if (pwd) {
+    document.getElementById('results-container').innerHTML = '<div class="loading"><div class="spinner"></div>Cargando proveedores...</div>';
+    fetchProveedores(pwd).then(data => {
+      if (!data.error) {
+        procesarDatos(data.proveedores || []);
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+        renderResults();
+      } else {
+        sessionStorage.removeItem('ss_pwd');
+      }
+    }).catch(() => sessionStorage.removeItem('ss_pwd'));
+  }
+});
+</script>
+</body>
+</html>
