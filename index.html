@@ -6,566 +6,172 @@
 <title>Proveedores · San Sebastián</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --verde:    #2d5016;
-    --verde2:   #4a7c2f;
-    --crema:    #f5f0e8;
-    --crema2:   #ede6d6;
-    --text:     #1a1a1a;
-    --muted:    #6b6b5a;
-    --border:   #d4c9b0;
-    --white:    #ffffff;
-    --rojo:     #c0392b;
-    --naranja:  #d35400;
-    --amarillo: #d4ac0d;
-    --verde-ok: #27ae60;
-    --verde-ex: #1e8449;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--crema);
-    color: var(--text);
-    min-height: 100vh;
-  }
-
-  /* ── LOGIN ── */
-  #login-screen {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--verde);
-    background-image:
-      radial-gradient(ellipse at 20% 50%, rgba(74,124,47,0.4) 0%, transparent 60%),
-      radial-gradient(ellipse at 80% 20%, rgba(45,80,22,0.6) 0%, transparent 50%);
-  }
-
-  .login-card {
-    background: var(--crema);
-    border-radius: 16px;
-    padding: 48px 40px;
-    width: 100%;
-    max-width: 400px;
-    text-align: center;
-    box-shadow: 0 24px 60px rgba(0,0,0,0.3);
-  }
-
-  .login-logo {
-    width: 64px;
-    height: 64px;
-    background: var(--verde);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 20px;
-    font-size: 28px;
-  }
-
-  .login-card h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.8rem;
-    color: var(--verde);
-    margin-bottom: 4px;
-  }
-
-  .login-card p {
-    color: var(--muted);
-    font-size: 0.9rem;
-    margin-bottom: 32px;
-  }
-
-  .login-card input {
-    width: 100%;
-    padding: 14px 16px;
-    border: 2px solid var(--border);
-    border-radius: 10px;
-    font-size: 1rem;
-    font-family: 'DM Sans', sans-serif;
-    background: var(--white);
-    color: var(--text);
-    margin-bottom: 12px;
-    transition: border-color .2s;
-    text-align: center;
-    letter-spacing: 2px;
-  }
-
-  .login-card input:focus {
-    outline: none;
-    border-color: var(--verde2);
-  }
-
-  .btn-primary {
-    width: 100%;
-    padding: 14px;
-    background: var(--verde);
-    color: var(--white);
-    border: none;
-    border-radius: 10px;
-    font-size: 1rem;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background .2s, transform .1s;
-  }
-
-  .btn-primary:hover { background: var(--verde2); }
-  .btn-primary:active { transform: scale(0.98); }
-  .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
-
-  .login-error {
-    color: var(--rojo);
-    font-size: 0.85rem;
-    margin-top: 10px;
-    display: none;
-  }
-
-  /* ── APP ── */
-  #app { display: none; }
-
-  header {
-    background: var(--verde);
-    color: var(--white);
-    padding: 0 24px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
-  }
-
-  .header-inner {
-    max-width: 900px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    height: 64px;
-  }
-
-  .header-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.2rem;
-    flex: 1;
-  }
-
-  .header-title span { font-size: 0.8rem; font-weight: 300; opacity: 0.8; display: block; }
-
-  .logout-btn {
-    background: rgba(255,255,255,0.15);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: white;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    cursor: pointer;
-    font-family: 'DM Sans', sans-serif;
-    transition: background .2s;
-  }
-  .logout-btn:hover { background: rgba(255,255,255,0.25); }
-
-  main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 60px; }
-
-  .app-layout {
-    display: grid;
-    grid-template-columns: 220px 1fr;
-    gap: 24px;
-    align-items: start;
-  }
-
-  /* ── SIDEBAR DE RUBROS ── */
-  .sidebar {
-    background: var(--white);
-    border: 1.5px solid var(--border);
-    border-radius: 14px;
-    overflow: hidden;
-    position: sticky;
-    top: 84px;
-  }
-
-  .sidebar-title {
-    font-size: 0.72rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    color: var(--muted);
-    padding: 14px 16px 10px;
-    border-bottom: 1px solid var(--crema2);
-  }
-
-  .rubro-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 16px;
-    cursor: pointer;
-    font-size: 0.88rem;
-    color: var(--text);
-    border-bottom: 1px solid var(--crema2);
-    transition: background .15s;
-    user-select: none;
-  }
-
-  .rubro-item:last-child { border-bottom: none; }
-  .rubro-item:hover { background: var(--crema); }
-  .rubro-item.active { background: var(--verde); color: white; font-weight: 500; }
-  .rubro-item.active .rubro-count { background: rgba(255,255,255,0.25); color: white; }
-
-  .rubro-emoji { font-size: 1rem; width: 20px; text-align: center; }
-  .rubro-label { flex: 1; }
-  .rubro-count {
-    background: var(--crema2);
-    color: var(--muted);
-    border-radius: 10px;
-    padding: 1px 7px;
-    font-size: 0.72rem;
-    font-weight: 600;
-  }
-
-  /* ── CONTENIDO PRINCIPAL ── */
-  .main-content { min-width: 0; }
-
-  /* ── TOOLBAR (ordenamiento) ── */
-  .toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 14px;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-
-  .sort-select {
-    padding: 7px 12px;
-    border: 1.5px solid var(--border);
-    border-radius: 8px;
-    font-size: 0.82rem;
-    font-family: 'DM Sans', sans-serif;
-    background: var(--white);
-    color: var(--text);
-    cursor: pointer;
-  }
-
-  .sort-select:focus { outline: none; border-color: var(--verde2); }
-
-  /* ── CARD DESTACADA ── */
-  .proveedor-card.destacado {
-    border-color: #f0c040;
-    background: linear-gradient(to right, #fffdf0, var(--white));
-  }
-
-  .destacado-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    color: #b7770d;
-    background: #fff8e1;
-    border: 1px solid #f0c040;
-    border-radius: 4px;
-    padding: 2px 7px;
-    margin-bottom: 4px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-  }
-
-  @media (max-width: 700px) {
-    .app-layout { grid-template-columns: 1fr; }
-    .sidebar { position: static; }
-  }
-
-  /* ── SEARCH ── */
-  .search-bar {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-
-  .search-bar input {
-    flex: 1;
-    padding: 14px 18px;
-    border: 2px solid var(--border);
-    border-radius: 12px;
-    font-size: 1rem;
-    font-family: 'DM Sans', sans-serif;
-    background: var(--white);
-    transition: border-color .2s, box-shadow .2s;
-  }
-
-  .search-bar input:focus {
-    outline: none;
-    border-color: var(--verde2);
-    box-shadow: 0 0 0 4px rgba(74,124,47,0.1);
-  }
-
-  /* ── FILTROS ── */
-  .filters {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 24px;
-  }
-
-  .filter-chip {
-    padding: 6px 14px;
-    border: 1.5px solid var(--border);
-    border-radius: 20px;
-    font-size: 0.82rem;
-    cursor: pointer;
-    background: var(--white);
-    color: var(--muted);
-    transition: all .2s;
-    font-family: 'DM Sans', sans-serif;
-  }
-
-  .filter-chip:hover { border-color: var(--verde2); color: var(--verde); }
-  .filter-chip.active { background: var(--verde); border-color: var(--verde); color: white; }
-
-  /* ── STATS ── */
-  .stats-bar {
-    font-size: 0.85rem;
-    color: var(--muted);
-    margin-bottom: 16px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  /* ── CARDS ── */
-  .results-grid { display: flex; flex-direction: column; gap: 12px; }
-
-  .proveedor-card {
-    background: var(--white);
-    border-radius: 14px;
-    border: 1.5px solid var(--border);
-    overflow: hidden;
-    transition: box-shadow .2s, transform .15s;
-    cursor: pointer;
-  }
-
-  .proveedor-card:hover {
-    box-shadow: 0 6px 24px rgba(45,80,22,0.12);
-    transform: translateY(-1px);
-  }
-
-  .card-main {
-    padding: 18px 20px;
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
-  }
-
-  .card-avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: var(--crema2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    flex-shrink: 0;
-    border: 2px solid var(--border);
-  }
-
-  .card-info { flex: 1; min-width: 0; }
-
-  .card-nombre {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--verde);
-    margin-bottom: 2px;
-  }
-
-  .card-empresa {
-    font-size: 0.82rem;
-    color: var(--muted);
-    margin-bottom: 6px;
-  }
-
-  .card-servicio {
-    display: inline-block;
-    background: var(--crema2);
-    color: var(--verde);
-    border-radius: 20px;
-    padding: 3px 10px;
-    font-size: 0.78rem;
-    font-weight: 500;
-    margin-right: 6px;
-    margin-bottom: 4px;
-  }
-
-  .card-right { text-align: right; flex-shrink: 0; }
-
-  .badge {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    margin-bottom: 6px;
-  }
-
-  .badge-muy-recomendable  { background: #d4edda; color: var(--verde-ex); }
-  .badge-recomendable       { background: #d1f2eb; color: #1a7a5e; }
-  .badge-malas-experiencias { background: #fdebd0; color: var(--naranja); }
-  .badge-no-recomendable    { background: #fadbd8; color: var(--rojo); }
-  .badge-destacado          { background: #fff8e1; color: #b7770d; border: 1px solid #f0c040; }
-  .badge-sin-datos          { background: #f0f0f0; color: #888; }
-
-  .score-display {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text);
-  }
-
-  .score-display .stars { font-size: 0.9rem; }
-  .reviews-count { font-size: 0.75rem; color: var(--muted); }
-
-  /* ── DETALLE (expandido) ── */
-  .card-detail {
-    display: none;
-    border-top: 1px solid var(--crema2);
-    padding: 0 20px 20px;
-  }
-
-  .card-detail.open { display: block; }
-
-  .detail-meta {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-    padding: 14px 0;
-    border-bottom: 1px dashed var(--border);
-    margin-bottom: 14px;
-  }
-
-  .detail-meta-item { font-size: 0.82rem; color: var(--muted); }
-  .detail-meta-item strong { color: var(--text); display: block; }
-
-  .resenas-title {
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 10px;
-  }
-
-  .resena-item {
-    background: var(--crema);
-    border-radius: 10px;
-    padding: 12px 14px;
-    margin-bottom: 8px;
-    border-left: 3px solid var(--border);
-  }
-
-  .resena-item.muy-recomendable  { border-color: var(--verde-ok); }
-  .resena-item.recomendable       { border-color: #1abc9c; }
-  .resena-item.malas-experiencias { border-color: var(--naranja); }
-  .resena-item.no-contratar       { border-color: var(--rojo); }
-
-  .resena-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 6px;
-  }
-
-  .resena-estrellas { font-size: 0.85rem; }
-  .resena-badge { font-size: 0.72rem; }
-
-  .resena-notas { font-size: 0.88rem; color: var(--text); line-height: 1.5; }
-
-  /* ── CONTACTO SIEMPRE VISIBLE ── */
-  .card-contacto {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 0 20px 14px;
-  }
-
-  .contacto-item {
-    font-size: 0.82rem;
-    color: var(--muted);
-    background: var(--crema);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 4px 12px;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  a.contacto-item.tel {
-    color: var(--verde);
-    text-decoration: none;
-    border-color: var(--verde2);
-    background: rgba(74,124,47,0.06);
-    font-weight: 500;
-    cursor: pointer;
-    transition: background .2s;
-  }
-
-  a.contacto-item.tel:hover {
-    background: rgba(74,124,47,0.15);
-  }
-
-  .card-resenas-toggle {
-    padding: 8px 20px;
-    border-top: 1px solid var(--crema2);
-    cursor: pointer;
-    transition: background .15s;
-  }
-
-  .card-resenas-toggle:hover { background: var(--crema); }
-
-  .toggle-label {
-    font-size: 0.8rem;
-    color: var(--muted);
-    user-select: none;
-  }
-
-  .proveedor-card.open .toggle-label { content: 'Ocultar reseñas ▴'; }
-
-
-  .empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--muted);
-  }
-
-  .empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
-  .empty-state h3 { font-family: 'Playfair Display', serif; color: var(--text); margin-bottom: 6px; }
-
-  .loading {
-    text-align: center;
-    padding: 60px;
-    color: var(--muted);
-    font-size: 0.95rem;
-  }
-
-  .spinner {
-    width: 36px; height: 36px;
-    border: 3px solid var(--border);
-    border-top-color: var(--verde);
-    border-radius: 50%;
-    animation: spin .8s linear infinite;
-    margin: 0 auto 16px;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* ── RESPONSIVE ── */
-  @media (max-width: 600px) {
-    .login-card { padding: 36px 24px; }
-    .card-main { gap: 12px; }
-    .card-avatar { width: 40px; height: 40px; font-size: 16px; }
-    .detail-meta { gap: 12px; }
-  }
+:root {
+  --verde:   #2d5016; --verde2: #4a7c2f;
+  --crema:   #f5f0e8; --crema2: #ede6d6;
+  --text:    #1a1a1a; --muted:  #6b6b5a;
+  --border:  #d4c9b0; --white:  #ffffff;
+  --rojo:    #c0392b; --naranja:#d35400;
+  --verde-ok:#27ae60; --verde-ex:#1e8449;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--crema);color:var(--text);min-height:100vh}
+
+/* ── LOGIN ── */
+#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--verde);background-image:radial-gradient(ellipse at 20% 50%,rgba(74,124,47,.4) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(45,80,22,.6) 0%,transparent 50%)}
+.login-card{background:var(--crema);border-radius:16px;padding:48px 40px;width:100%;max-width:400px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.3)}
+.login-logo{width:64px;height:64px;background:var(--verde);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px}
+.login-card h1{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--verde);margin-bottom:4px}
+.login-card>p{color:var(--muted);font-size:.9rem;margin-bottom:32px}
+.login-card input{width:100%;padding:14px 16px;border:2px solid var(--border);border-radius:10px;font-size:1rem;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);margin-bottom:12px;transition:border-color .2s;text-align:center;letter-spacing:2px}
+.login-card input:focus{outline:none;border-color:var(--verde2)}
+.btn-primary{width:100%;padding:14px;background:var(--verde);color:var(--white);border:none;border-radius:10px;font-size:1rem;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:background .2s,transform .1s}
+.btn-primary:hover{background:var(--verde2)}.btn-primary:active{transform:scale(.98)}.btn-primary:disabled{opacity:.6;cursor:not-allowed}
+.login-error{color:var(--rojo);font-size:.85rem;margin-top:10px;display:none}
+
+/* ── APP SHELL ── */
+#app{display:none}
+header{background:var(--verde);color:var(--white);padding:0 20px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:12px;height:60px}
+.header-title{font-family:'Playfair Display',serif;font-size:1.15rem;flex:1}
+.header-title span{font-size:.75rem;font-weight:300;opacity:.8;display:block}
+.header-nav{display:flex;gap:6px}
+.nav-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:white;padding:6px 13px;border-radius:20px;font-size:.8rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s;white-space:nowrap}
+.nav-btn:hover{background:rgba(255,255,255,.22)}
+.nav-btn.active{background:rgba(255,255,255,.9);color:var(--verde);font-weight:600}
+
+/* ── PAGES ── */
+.page{display:none;max-width:1200px;margin:0 auto;padding:20px 16px 60px}
+.page.active{display:block}
+
+/* ── SEARCH + FILTERS ── */
+.top-controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;align-items:center}
+.search-wrap{flex:1;min-width:200px;position:relative}
+.search-wrap input{width:100%;padding:12px 16px 12px 42px;border:2px solid var(--border);border-radius:12px;font-size:.95rem;font-family:'DM Sans',sans-serif;background:var(--white);transition:border-color .2s,box-shadow .2s}
+.search-wrap input:focus{outline:none;border-color:var(--verde2);box-shadow:0 0 0 3px rgba(74,124,47,.1)}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1rem;pointer-events:none}
+
+/* Rubros desplegable */
+.rubros-select-wrap{position:relative}
+.rubros-select{padding:11px 36px 11px 14px;border:2px solid var(--border);border-radius:12px;font-size:.88rem;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);cursor:pointer;appearance:none;-webkit-appearance:none;min-width:170px}
+.rubros-select:focus{outline:none;border-color:var(--verde2)}
+.rubros-arrow{position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--muted);font-size:.8rem}
+
+.sort-select{padding:11px 14px;border:2px solid var(--border);border-radius:12px;font-size:.88rem;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);cursor:pointer}
+.sort-select:focus{outline:none;border-color:var(--verde2)}
+
+.filter-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.chip{padding:5px 12px;border:1.5px solid var(--border);border-radius:20px;font-size:.78rem;cursor:pointer;background:var(--white);color:var(--muted);transition:all .2s;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.chip:hover{border-color:var(--verde2);color:var(--verde)}
+.chip.active{background:var(--verde);border-color:var(--verde);color:white}
+
+.stats-bar{font-size:.82rem;color:var(--muted);margin-bottom:12px}
+
+/* ── DESTACADOS GRID ── */
+.destacados-section{margin-bottom:24px}
+.section-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:#b7770d;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.section-label::after{content:'';flex:1;height:1px;background:#f0c040;opacity:.5}
+.destacados-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.regular-section .section-label{color:var(--muted)}
+.regular-section .section-label::after{background:var(--border)}
+
+/* ── CARDS ── */
+.proveedor-card{background:var(--white);border-radius:14px;border:1.5px solid var(--border);overflow:hidden;transition:box-shadow .2s,transform .15s}
+.proveedor-card:hover{box-shadow:0 6px 20px rgba(45,80,22,.11);transform:translateY(-1px)}
+.proveedor-card.destacado{border-color:#f0c040;background:linear-gradient(135deg,#fffef5,var(--white))}
+.card-main{padding:14px 16px;display:flex;align-items:flex-start;gap:12px;cursor:pointer}
+.card-avatar{width:42px;height:42px;border-radius:50%;background:var(--crema2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;border:2px solid var(--border)}
+.card-info{flex:1;min-width:0}
+.destacado-badge{display:inline-flex;align-items:center;gap:3px;font-size:.65rem;font-weight:700;color:#b7770d;background:#fff8e1;border:1px solid #f0c040;border-radius:4px;padding:1px 6px;margin-bottom:3px;text-transform:uppercase;letter-spacing:.4px}
+.card-nombre{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--verde);line-height:1.2;margin-bottom:1px}
+.card-sub{font-size:.77rem;color:var(--muted);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-servicio-tag{display:inline-block;background:var(--crema2);color:var(--verde);border-radius:20px;padding:2px 8px;font-size:.72rem;font-weight:500}
+.card-right{text-align:right;flex-shrink:0}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:.7rem;font-weight:500;margin-bottom:3px}
+.badge-muy-recomendable{background:#d4edda;color:var(--verde-ex)}
+.badge-recomendable{background:#d1f2eb;color:#1a7a5e}
+.badge-malas-experiencias{background:#fdebd0;color:var(--naranja)}
+.badge-no-recomendable{background:#fadbd8;color:var(--rojo)}
+.badge-destacado{background:#fff8e1;color:#b7770d;border:1px solid #f0c040}
+.badge-sin-datos{background:#f0f0f0;color:#888}
+.score-stars{font-size:.85rem;color:#e0a800;letter-spacing:-1px}
+.reviews-count{font-size:.7rem;color:var(--muted)}
+
+/* Contacto siempre visible */
+.card-contacto{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 12px}
+.contacto-item{font-size:.77rem;color:var(--muted);background:var(--crema);border:1px solid var(--border);border-radius:20px;padding:3px 10px;display:inline-flex;align-items:center;gap:3px}
+a.contacto-item.tel{color:var(--verde);text-decoration:none;border-color:rgba(74,124,47,.4);background:rgba(74,124,47,.06);font-weight:500;transition:background .2s}
+a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
+
+/* Reseñas toggle */
+.card-resenas-toggle{padding:7px 16px;border-top:1px solid var(--crema2);cursor:pointer;transition:background .15s}
+.card-resenas-toggle:hover{background:var(--crema)}
+.toggle-label{font-size:.77rem;color:var(--muted);user-select:none}
+.card-detail{display:none;padding:0 16px 14px}
+.card-detail.open{display:block}
+.resenas-title{font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:8px;padding-top:10px}
+.resena-item{background:var(--crema);border-radius:8px;padding:10px 12px;margin-bottom:6px;border-left:3px solid var(--border)}
+.resena-item.recomendable{border-color:#1abc9c}
+.resena-item.muy-recomendable{border-color:var(--verde-ok)}
+.resena-item.malas-experiencias{border-color:var(--naranja)}
+.resena-item.no-recomendable,.resena-item.no-contratar{border-color:var(--rojo)}
+.resena-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.resena-estrellas{font-size:.82rem;color:#e0a800}
+.resena-notas{font-size:.83rem;color:var(--text);line-height:1.45}
+
+/* ── EMPTY / LOADING ── */
+.empty-state{text-align:center;padding:50px 20px;color:var(--muted)}
+.empty-state .icon{font-size:2.5rem;margin-bottom:10px}
+.empty-state h3{font-family:'Playfair Display',serif;color:var(--text);margin-bottom:5px}
+.loading{text-align:center;padding:50px;color:var(--muted)}
+.spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--verde);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── FORMULARIO ── */
+.form-page{max-width:680px;margin:0 auto}
+.form-card{background:var(--white);border-radius:16px;border:1.5px solid var(--border);overflow:hidden}
+.form-header{background:var(--verde);color:white;padding:24px 28px}
+.form-header h2{font-family:'Playfair Display',serif;font-size:1.5rem;margin-bottom:6px}
+.form-disclaimer{background:#f0f7ec;border:1px solid rgba(74,124,47,.25);border-radius:10px;padding:12px 16px;margin:0 28px 24px;font-size:.8rem;color:var(--muted);line-height:1.55}
+.form-disclaimer strong{color:var(--verde);display:block;margin-bottom:3px}
+.form-body{padding:0 28px 28px}
+.form-section-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--verde);margin:20px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--crema2)}
+.form-row{margin-bottom:14px}
+.form-row label{display:block;font-size:.83rem;font-weight:500;color:var(--text);margin-bottom:5px}
+.form-row label .req{color:var(--rojo);margin-left:2px}
+.form-row label .opt{font-size:.75rem;color:var(--muted);font-weight:400;margin-left:4px}
+.form-input,.form-select,.form-textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:.92rem;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);transition:border-color .2s,box-shadow .2s}
+.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--verde2);box-shadow:0 0 0 3px rgba(74,124,47,.1)}
+.form-textarea{resize:vertical;min-height:80px}
+.star-rating{display:flex;gap:6px;flex-direction:row-reverse;justify-content:flex-end}
+.star-rating input{display:none}
+.star-rating label{font-size:1.8rem;cursor:pointer;color:#ddd;transition:color .15s}
+.star-rating input:checked~label,.star-rating label:hover,.star-rating label:hover~label{color:#e0a800}
+.radio-group{display:flex;gap:8px;flex-wrap:wrap}
+.radio-opt{display:flex;align-items:center;gap:6px;padding:8px 14px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;font-size:.85rem;transition:all .2s}
+.radio-opt:hover{border-color:var(--verde2)}
+.radio-opt input{accent-color:var(--verde);cursor:pointer}
+.radio-opt.rec{border-color:rgba(26,122,94,.4);background:#d1f2eb20}
+.radio-opt.mal{border-color:rgba(211,84,0,.3);background:#fdebd020}
+.form-submit-row{margin-top:22px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.btn-submit{padding:13px 28px;background:var(--verde);color:white;border:none;border-radius:10px;font-size:.95rem;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:background .2s}
+.btn-submit:hover{background:var(--verde2)}.btn-submit:disabled{opacity:.6;cursor:not-allowed}
+.form-msg{font-size:.85rem;display:none}
+.form-msg.ok{color:var(--verde-ok)}.form-msg.err{color:var(--rojo)}
+.form-success{text-align:center;padding:40px 28px;display:none}
+.form-success .icon{font-size:3rem;margin-bottom:12px}
+.form-success h3{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--verde);margin-bottom:8px}
+.form-success p{color:var(--muted);margin-bottom:20px}
+.btn-secondary{padding:10px 20px;background:transparent;color:var(--verde);border:1.5px solid var(--verde);border-radius:10px;font-size:.88rem;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s}
+.btn-secondary:hover{background:var(--verde);color:white}
+
+/* ── RESPONSIVE ── */
+@media(max-width:650px){
+  .destacados-grid{grid-template-columns:1fr}
+  .login-card{padding:36px 22px}
+  .form-body,.form-header,.form-disclaimer{padding-left:18px;padding-right:18px}
+  .header-nav .nav-btn span.label{display:none}
+}
 </style>
 </head>
 <body>
@@ -586,430 +192,509 @@
 <div id="app">
   <header>
     <div class="header-inner">
-      <div>
-        <div class="header-title">
-          Proveedores
-          <span>San Sebastián · Pilar</span>
-        </div>
+      <div class="header-title">Proveedores <span>San Sebastián · Pilar</span></div>
+      <div class="header-nav">
+        <button class="nav-btn active" onclick="showPage('buscar',this)">🔍 <span class="label">Buscar</span></button>
+        <button class="nav-btn" onclick="showPage('recomendar',this)">✍️ <span class="label">Recomendar</span></button>
+        <button class="nav-btn" onclick="doLogout()">Salir</button>
       </div>
-      <button class="logout-btn" onclick="doLogout()">Salir</button>
     </div>
   </header>
 
-  <main>
-    <div class="search-bar">
-      <input type="search" id="search-input" placeholder="🔍  Buscá por nombre, servicio, teléfono, DNI..." oninput="renderResults()">
-    </div>
-
-    <div class="filters" id="filters-bar">
-      <span class="filter-chip active" data-filter="todos" onclick="setFilter(this)">Todos</span>
-      <span class="filter-chip" data-filter="Destacado" onclick="setFilter(this)">⭐ Destacados</span>
-      <span class="filter-chip" data-filter="Muy Recomendable" onclick="setFilter(this)">💚 Muy recomendables</span>
-      <span class="filter-chip" data-filter="Recomendable" onclick="setFilter(this)">👍 Recomendables</span>
-      <span class="filter-chip" data-filter="Malas Experiencias" onclick="setFilter(this)">⚠️ Malas experiencias</span>
-      <span class="filter-chip" data-filter="No Recomendable" onclick="setFilter(this)">🚫 No recomendables</span>
-    </div>
-
-    <div class="app-layout">
-      <!-- Sidebar rubros -->
-      <div class="sidebar" id="sidebar-rubros">
-        <div class="sidebar-title">📂 Rubros</div>
-        <div id="rubros-list"></div>
+  <!-- PÁGINA BUSCAR -->
+  <div class="page active" id="page-buscar">
+    <div class="top-controls">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="search" id="search-input" placeholder="Nombre, servicio, teléfono, DNI..." oninput="renderResults()">
       </div>
+      <div class="rubros-select-wrap">
+        <select class="rubros-select" id="rubros-select" onchange="renderResults()">
+          <option value="todos">📂 Todos los rubros</option>
+        </select>
+        <span class="rubros-arrow">▾</span>
+      </div>
+      <select class="sort-select" id="sort-select" onchange="renderResults()">
+        <option value="destacados">⭐ Destacados primero</option>
+        <option value="puntuacion">★ Mayor puntuación</option>
+        <option value="alfabetico">🔤 Alfabético</option>
+      </select>
+    </div>
 
-      <!-- Contenido principal -->
-      <div class="main-content">
-        <div class="toolbar">
-          <div class="stats-bar" id="stats-bar" style="margin:0;padding:0;border:none"></div>
-          <select class="sort-select" id="sort-select" onchange="renderResults()">
-            <option value="destacados">⭐ Destacados primero</option>
-            <option value="puntuacion">★ Mayor puntuación</option>
-            <option value="alfabetico">🔤 Alfabético</option>
-          </select>
+    <div class="filter-chips">
+      <span class="chip active" data-filter="todos" onclick="setFilter(this)">Todos</span>
+      <span class="chip" data-filter="Destacado" onclick="setFilter(this)">⭐ Destacados</span>
+      <span class="chip" data-filter="Muy Recomendable" onclick="setFilter(this)">💚 Muy recomendables</span>
+      <span class="chip" data-filter="Recomendable" onclick="setFilter(this)">👍 Recomendables</span>
+      <span class="chip" data-filter="Malas Experiencias" onclick="setFilter(this)">⚠️ Malas experiencias</span>
+      <span class="chip" data-filter="No Recomendable" onclick="setFilter(this)">🚫 No recomendables</span>
+    </div>
+
+    <div class="stats-bar" id="stats-bar"></div>
+    <div id="results-container"></div>
+  </div>
+
+  <!-- PÁGINA RECOMENDAR -->
+  <div class="page" id="page-recomendar">
+    <div class="form-page">
+      <div class="form-card">
+        <div class="form-header">
+          <h2>✍️ Recomendá un Proveedor</h2>
+          <p style="opacity:.85;font-size:.88rem">Tu opinión ayuda a toda la comunidad de San Sebastián</p>
         </div>
-        <div id="results-container"></div>
+
+        <div class="form-disclaimer" style="margin-top:20px">
+          <strong>🔒 Privacidad</strong>
+          Este formulario no recopila ninguna información personal de los usuarios más allá de los datos que completás voluntariamente. Tu información será tratada con total confidencialidad, no será compartida ni utilizada para ningún otro fin que validar que la referencia proviene de un vecino del barrio cerrado San Sebastián.
+        </div>
+
+        <div class="form-body" id="form-body">
+
+          <div class="form-section-title">Datos del proveedor</div>
+
+          <div class="form-row">
+            <label>Nombre del proveedor <span class="req">*</span></label>
+            <input class="form-input" id="f-nombre" placeholder="Nombre completo o razón social">
+          </div>
+          <div class="form-row">
+            <label>Empresa <span class="opt">(opcional)</span></label>
+            <input class="form-input" id="f-empresa" placeholder="Nombre de la empresa o emprendimiento">
+          </div>
+          <div class="form-row">
+            <label>DNI <span class="opt">(opcional)</span></label>
+            <input class="form-input" id="f-dni" placeholder="Solo números, sin puntos">
+          </div>
+          <div class="form-row">
+            <label>Teléfono del proveedor <span class="req">*</span></label>
+            <input class="form-input" id="f-telefono" placeholder="Ej: 11 2345-6789" type="tel">
+          </div>
+          <div class="form-row">
+            <label>Tipo de servicio <span class="req">*</span></label>
+            <input class="form-input" id="f-servicio" placeholder="Ej: Plomería, Limpieza, Empanadas...">
+          </div>
+          <div class="form-row">
+            <label>¿Es del barrio?</label>
+            <div class="radio-group">
+              <label class="radio-opt"><input type="radio" name="barrio" value="Sí"> Sí, vive en el barrio</label>
+              <label class="radio-opt"><input type="radio" name="barrio" value="No"> No</label>
+              <label class="radio-opt"><input type="radio" name="barrio" value="No sé" checked> No sé</label>
+            </div>
+          </div>
+
+          <div class="form-section-title">Tu opinión</div>
+
+          <div class="form-row">
+            <label>Recomendación <span class="req">*</span></label>
+            <div class="radio-group">
+              <label class="radio-opt rec"><input type="radio" name="recomen" value="Recomendable"> 👍 Recomendable</label>
+              <label class="radio-opt mal"><input type="radio" name="recomen" value="Malas Experiencias"> ⚠️ Malas experiencias</label>
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Puntuación <span class="req">*</span></label>
+            <div class="star-rating" id="star-rating">
+              <input type="radio" name="puntuacion" id="s5" value="5"><label for="s5">★</label>
+              <input type="radio" name="puntuacion" id="s4" value="4"><label for="s4">★</label>
+              <input type="radio" name="puntuacion" id="s3" value="3"><label for="s3">★</label>
+              <input type="radio" name="puntuacion" id="s2" value="2"><label for="s2">★</label>
+              <input type="radio" name="puntuacion" id="s1" value="1"><label for="s1">★</label>
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Notas <span class="opt">(puede incluir link de página web, Instagram, etc.)</span></label>
+            <textarea class="form-textarea" id="f-notas" placeholder="Contanos tu experiencia, horarios de atención, links útiles..."></textarea>
+          </div>
+
+          <div class="form-section-title">Tus datos (confidenciales)</div>
+          <p style="font-size:.82rem;color:var(--muted);margin-bottom:12px">Estos datos no serán compartidos con nadie. Solo se utilizan para validar que la información provenga de vecinos del barrio.</p>
+          <div class="form-row">
+            <label>Nombre, Área, Lote y Teléfono <span class="req">*</span></label>
+            <textarea class="form-textarea" id="f-vecino" placeholder="Ej: Juan García, Sector A, Lote 42, Tel: 11 2345-6789" style="min-height:64px"></textarea>
+          </div>
+
+          <div class="form-submit-row">
+            <button class="btn-submit" id="btn-submit" onclick="enviarFormulario()">Enviar recomendación</button>
+            <span class="form-msg" id="form-msg"></span>
+          </div>
+        </div>
+
+        <!-- Success state -->
+        <div class="form-success" id="form-success">
+          <div class="icon">✅</div>
+          <h3>¡Gracias por tu recomendación!</h3>
+          <p>Tu aporte fue recibido y será revisado para incorporarlo a la lista de proveedores del barrio.</p>
+          <button class="btn-secondary" onclick="resetForm()">Enviar otra recomendación</button>
+        </div>
       </div>
     </div>
-  </main>
+  </div>
 </div>
 
 <script>
-// ── CONFIGURACIÓN ──────────────────────────────────────────────────────────
-// CAMBIÁ ESTA URL por la URL de tu Apps Script desplegado como Web App
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSTr7f_pV2Fh_CXBL4Y74nuKbIQHT9MqFydD5A5RxAecNqropWJZkJ_Kvu304X0WYzAA/exec';
+// ── CONFIG ────────────────────────────────────────────────────────────────
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyeJ4Ajg6UUDI9bgTQUr6fqgYiSuy3bW3X4Gw106wSDeH89Zy_cMKkIfD_ty_Bl7lp1Tg/exec';
 
 // ── ESTADO ────────────────────────────────────────────────────────────────
 let todosLosProveedores = [];
 let activeFilter = 'todos';
-let activeRubro = 'todos';
 let openCard = null;
+
+// ── NAVEGACIÓN ─────────────────────────────────────────────────────────────
+function showPage(page, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  if(btn) btn.classList.add('active');
+}
 
 // ── LOGIN ──────────────────────────────────────────────────────────────────
 function doLogin() {
   const pwd = document.getElementById('pwd-input').value.trim();
   if (!pwd) return;
-
   const btn = document.getElementById('login-btn');
-  btn.disabled = true;
-  btn.textContent = 'Verificando...';
-
-  fetchProveedores(pwd)
-    .then(data => {
-      if (data.error === 'unauthorized') {
-        document.getElementById('login-error').style.display = 'block';
-        btn.disabled = false;
-        btn.textContent = 'Ingresar';
-      } else {
-        sessionStorage.setItem('ss_pwd', pwd);
-        procesarDatos(data.proveedores || []);
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('app').style.display = 'block';
-        renderResults();
-      }
-    })
-    .catch(() => {
-      document.getElementById('login-error').textContent = 'Error de conexión. Revisá la URL del script.';
+  btn.disabled = true; btn.textContent = 'Verificando...';
+  fetchProveedores(pwd).then(data => {
+    if (data.error === 'unauthorized') {
       document.getElementById('login-error').style.display = 'block';
-      btn.disabled = false;
-      btn.textContent = 'Ingresar';
-    });
+      btn.disabled = false; btn.textContent = 'Ingresar';
+    } else {
+      sessionStorage.setItem('ss_pwd', pwd);
+      procesarDatos(data.proveedores || []);
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      renderResults();
+    }
+  }).catch(() => {
+    document.getElementById('login-error').textContent = 'Error de conexión. Revisá la URL del script.';
+    document.getElementById('login-error').style.display = 'block';
+    btn.disabled = false; btn.textContent = 'Ingresar';
+  });
 }
-
-document.getElementById('pwd-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') doLogin();
-});
-
-function doLogout() {
-  sessionStorage.removeItem('ss_pwd');
-  location.reload();
-}
+document.getElementById('pwd-input').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+function doLogout() { sessionStorage.removeItem('ss_pwd'); location.reload(); }
 
 // ── FETCH ──────────────────────────────────────────────────────────────────
 function fetchProveedores(password) {
-  const url = `${APPS_SCRIPT_URL}?action=getProveedores&password=${encodeURIComponent(password)}`;
-  return fetch(url).then(r => r.json());
+  return fetch(`${APPS_SCRIPT_URL}?action=getProveedores&password=${encodeURIComponent(password)}`).then(r=>r.json());
+}
+
+// ── CATEGORÍAS DE RUBROS ───────────────────────────────────────────────────
+const CATEGORIAS = [
+  { label:'🍕 Comida & Delivery',   keywords:['comid','delivery','empanada','pizza','panad','sushi','helad','restau','catering','alfajor','torta','dulce','miel'] },
+  { label:'🧹 Limpieza',            keywords:['limp','cleaning'] },
+  { label:'🌿 Jardín & Pileta',     keywords:['jardin','pasto','poda','paisaj','pileta','piscina','arbol'] },
+  { label:'🔧 Plomería & Gas',      keywords:['plom','gas','calef','termotanque','calefon','sanitari'] },
+  { label:'⚡ Electricidad',        keywords:['electr','luminaria','panel solar'] },
+  { label:'🖌️ Pintura & Construcción',keywords:['pint','albañ','construc','refacci','obra','revoque','yeso'] },
+  { label:'🪵 Carpintería',         keywords:['carpint','mader','mueble','puerta','ventana'] },
+  { label:'🔒 Seguridad',           keywords:['segur','alarm','camara','cctv','cerraj'] },
+  { label:'📦 Mudanza & Fletes',    keywords:['mudanz','flete','transporte'] },
+  { label:'🏠 Hogar & Varios',      keywords:[] },
+];
+
+function categoriaDeServicio(servicio) {
+  const s = normalizar(servicio || '');
+  for (const cat of CATEGORIAS) {
+    if (cat.keywords.length === 0) continue;
+    if (cat.keywords.some(k => s.includes(k))) return cat.label;
+  }
+  return '🏠 Hogar & Varios';
 }
 
 // ── PROCESAR DATOS ────────────────────────────────────────────────────────
 function procesarDatos(filas) {
-  const mapaProveedores = {};
-
+  const mapa = {};
   filas.forEach(fila => {
     const key = generarClave(fila);
-    if (!mapaProveedores[key]) {
-      mapaProveedores[key] = {
-        nombre:    fila.nombre,
-        empresa:   fila.empresa,
-        dni:       fila.dni,
-        telefono:  fila.telefono,
-        servicio:  fila.servicio,
-        destacado: false,
-        resenas:   []
-      };
+    if (!mapa[key]) {
+      mapa[key] = { nombre:fila.nombre, empresa:fila.empresa, dni:fila.dni,
+        telefono:fila.telefono, servicio:fila.servicio, destacado:false, resenas:[] };
     }
-    // Si alguna fila tiene "Publicidad" en recomendación, es destacado
     if (normalizar(fila.recomendacion) === 'publicidad') {
-      mapaProveedores[key].destacado = true;
+      mapa[key].destacado = true;
     } else if (fila.puntuacion > 0 || fila.notas) {
-      mapaProveedores[key].resenas.push({
-        puntuacion:    fila.puntuacion,
-        recomendacion: fila.recomendacion,
-        notas:         fila.notas
-      });
+      mapa[key].resenas.push({ puntuacion:fila.puntuacion, recomendacion:fila.recomendacion, notas:fila.notas });
     }
   });
-
-  todosLosProveedores = Object.values(mapaProveedores).map(p => {
+  todosLosProveedores = Object.values(mapa).map(p => {
     const score = p.destacado
-      ? { promedio: 5, ajustado: 5, total: 0, etiqueta: 'Destacado' }
+      ? { promedio:5, ajustado:5, total:0, etiqueta:'Destacado' }
       : calcularScore(p.resenas);
-    return { ...p, score };
+    const categoria = categoriaDeServicio(p.servicio);
+    return { ...p, score, categoria };
   });
-
-  generarSidebar();
+  poblarRubros();
 }
 
-function generarClave(fila) {
-  const n = normalizar(fila.nombre);
-  const d = normalizar(fila.dni);
-  const t = normalizar(fila.telefono);
-  if (d && d !== 'n/a') return n + '_dni_' + d;
-  if (t && t !== 'n/a') return n + '_tel_' + t.replace(/\D/g,'').slice(-8);
-  return n + '_emp_' + normalizar(fila.empresa);
+function generarClave(f) {
+  const n=normalizar(f.nombre), d=normalizar(f.dni), t=normalizar(f.telefono);
+  if(d&&d!=='n/a') return n+'_dni_'+d;
+  if(t&&t!=='n/a') return n+'_tel_'+t.replace(/\D/g,'').slice(-8);
+  return n+'_emp_'+normalizar(f.empresa);
 }
 
 function calcularScore(resenas) {
-  if (!resenas || resenas.length === 0) {
-    return { promedio: 0, total: 0, etiqueta: 'Sin datos', ajustado: 0 };
-  }
-  const total = resenas.length;
-  const suma = resenas.reduce((acc, r) => acc + (r.puntuacion || 0), 0);
-  const promedio = suma / total;
-  const priorN = 3, priorMean = 3.0;
-  const scoreAjustado = (priorN * priorMean + suma) / (priorN + total);
-  const negativas = resenas.filter(r => r.puntuacion <= 2).length;
-  const pctNegativo = negativas / total;
+  if (!resenas||resenas.length===0) return {promedio:0,total:0,etiqueta:'Sin datos',ajustado:0};
+  const total=resenas.length, suma=resenas.reduce((a,r)=>a+(r.puntuacion||0),0);
+  const promedio=suma/total, scoreAjustado=(3*3+suma)/(3+total);
+  const negativas=resenas.filter(r=>r.puntuacion<=2).length, pct=negativas/total;
   let etiqueta;
-  if (pctNegativo > 0.4)                              etiqueta = 'No Recomendable';
-  else if (pctNegativo > 0.2 || scoreAjustado < 2.8)  etiqueta = 'Malas Experiencias';
-  else if (scoreAjustado >= 4.2 && total >= 2)         etiqueta = 'Muy Recomendable';
-  else                                                  etiqueta = 'Recomendable';
-  return { promedio: Math.round(promedio*10)/10, ajustado: Math.round(scoreAjustado*10)/10, total, etiqueta };
+  if(pct>0.4) etiqueta='No Recomendable';
+  else if(pct>0.2||scoreAjustado<2.8) etiqueta='Malas Experiencias';
+  else if(scoreAjustado>=4.2&&total>=2) etiqueta='Muy Recomendable';
+  else etiqueta='Recomendable';
+  return {promedio:Math.round(promedio*10)/10, ajustado:Math.round(scoreAjustado*10)/10, total, etiqueta};
 }
 
-// ── SIDEBAR DE RUBROS ──────────────────────────────────────────────────────
-function generarSidebar() {
+// ── RUBROS DESPLEGABLE ─────────────────────────────────────────────────────
+function poblarRubros() {
+  const sel = document.getElementById('rubros-select');
+  // Contar por categoría
   const conteo = {};
-  todosLosProveedores.forEach(p => {
-    const r = p.servicio || 'Otros';
-    conteo[r] = (conteo[r] || 0) + 1;
-  });
-  const rubros = Object.entries(conteo).sort((a,b) => b[1] - a[1]);
-  const lista = document.getElementById('rubros-list');
-  const total = todosLosProveedores.length;
-  lista.innerHTML = `
-    <div class="rubro-item active" data-rubro="todos" onclick="setRubro(this)">
-      <span class="rubro-emoji">🏠</span>
-      <span class="rubro-label">Todos</span>
-      <span class="rubro-count">${total}</span>
-    </div>
-    ${rubros.map(([rubro, cnt]) => `
-      <div class="rubro-item" data-rubro="${rubro}" onclick="setRubro(this)">
-        <span class="rubro-emoji">${servicioEmoji(rubro)}</span>
-        <span class="rubro-label">${rubro}</span>
-        <span class="rubro-count">${cnt}</span>
-      </div>
-    `).join('')}
-  `;
-}
-
-function setRubro(el) {
-  document.querySelectorAll('.rubro-item').forEach(r => r.classList.remove('active'));
-  el.classList.add('active');
-  activeRubro = el.dataset.rubro;
-  openCard = null;
-  renderResults();
+  todosLosProveedores.forEach(p => { conteo[p.categoria] = (conteo[p.categoria]||0)+1; });
+  // Ordenar categorías con datos primero
+  const cats = CATEGORIAS.filter(c => conteo[c.label]).sort((a,b)=>(conteo[b.label]||0)-(conteo[a.label]||0));
+  sel.innerHTML = `<option value="todos">📂 Todos los rubros (${todosLosProveedores.length})</option>` +
+    cats.map(c => `<option value="${c.label}">${c.label} (${conteo[c.label]||0})</option>`).join('');
 }
 
 // ── RENDER ─────────────────────────────────────────────────────────────────
 function renderResults() {
   const query = normalizar(document.getElementById('search-input').value);
   const sortBy = document.getElementById('sort-select').value;
+  const rubroSel = document.getElementById('rubros-select').value;
   const container = document.getElementById('results-container');
 
   let filtrados = [...todosLosProveedores];
 
-  // Filtro por rubro (sidebar)
-  if (activeRubro !== 'todos') {
-    filtrados = filtrados.filter(p => p.servicio === activeRubro);
-  }
+  if (rubroSel !== 'todos') filtrados = filtrados.filter(p => p.categoria === rubroSel);
+  if (activeFilter !== 'todos') filtrados = filtrados.filter(p => p.score.etiqueta === activeFilter);
 
-  // Filtro por estado (chips superiores)
-  if (activeFilter !== 'todos') {
-    filtrados = filtrados.filter(p => p.score.etiqueta === activeFilter);
-  }
-
-  // Filtro por búsqueda
   if (query) {
-    const palabras = query.replace(/\s+/g,' ').trim().split(' ').filter(Boolean);
+    const palabras = query.trim().split(/\s+/).filter(Boolean);
     filtrados = filtrados.filter(p => {
-      const notasTexto = p.resenas.map(r => normalizar(r.notas) + ' ' + normalizar(r.recomendacion)).join(' ');
-      const telLimpio = (p.telefono || '').replace(/\D/g,'');
-      const dniLimpio = (p.dni || '').replace(/\D/g,'');
-      const texto = [p.nombre, p.empresa, p.servicio, p.telefono, telLimpio, p.dni, dniLimpio, notasTexto].map(normalizar).join(' ');
-      return palabras.every(w => texto.includes(w));
+      const notas = p.resenas.map(r=>normalizar(r.notas)+' '+normalizar(r.recomendacion)).join(' ');
+      const tel = (p.telefono||'').replace(/\D/g,'');
+      const txt = [p.nombre,p.empresa,p.servicio,p.telefono,tel,p.dni,notas].map(normalizar).join(' ');
+      return palabras.every(w=>txt.includes(w));
     });
   }
 
-  // Ordenamiento
-  const ordenEtiqueta = { 'Destacado': 5, 'Muy Recomendable': 4, 'Recomendable': 3, 'Malas Experiencias': 2, 'No Recomendable': 1, 'Sin datos': 0 };
-
-  if (sortBy === 'alfabetico') {
-    filtrados.sort((a, b) => {
-      // Destacados siempre primero aunque sea alfabético
-      if (a.destacado !== b.destacado) return a.destacado ? -1 : 1;
-      return a.nombre.localeCompare(b.nombre, 'es');
-    });
-  } else if (sortBy === 'puntuacion') {
-    filtrados.sort((a, b) => {
-      if (a.destacado !== b.destacado) return a.destacado ? -1 : 1;
-      return b.score.ajustado - a.score.ajustado || a.nombre.localeCompare(b.nombre, 'es');
-    });
+  const ord = {'Destacado':5,'Muy Recomendable':4,'Recomendable':3,'Malas Experiencias':2,'No Recomendable':1,'Sin datos':0};
+  if (sortBy==='alfabetico') {
+    filtrados.sort((a,b)=> a.destacado!==b.destacado ? (a.destacado?-1:1) : a.nombre.localeCompare(b.nombre,'es'));
+  } else if (sortBy==='puntuacion') {
+    filtrados.sort((a,b)=> a.destacado!==b.destacado ? (a.destacado?-1:1) : b.score.ajustado-a.score.ajustado||a.nombre.localeCompare(b.nombre,'es'));
   } else {
-    // "destacados primero": destacados → por etiqueta → por score
-    filtrados.sort((a, b) => {
-      if (a.destacado !== b.destacado) return a.destacado ? -1 : 1;
-      const diff = (ordenEtiqueta[b.score.etiqueta] || 0) - (ordenEtiqueta[a.score.etiqueta] || 0);
-      return diff !== 0 ? diff : b.score.ajustado - a.score.ajustado;
-    });
+    filtrados.sort((a,b)=> a.destacado!==b.destacado ? (a.destacado?-1:1) : (ord[b.score.etiqueta]||0)-(ord[a.score.etiqueta]||0)||b.score.ajustado-a.score.ajustado);
   }
 
   document.getElementById('stats-bar').textContent =
-    `${filtrados.length} proveedor${filtrados.length !== 1 ? 'es' : ''} encontrado${filtrados.length !== 1 ? 's' : ''}`;
+    `${filtrados.length} proveedor${filtrados.length!==1?'es':''} encontrado${filtrados.length!==1?'s':''}`;
 
-  if (filtrados.length === 0) {
-    container.innerHTML = `
-      <div class="empty-state">
-        <div class="icon">🔍</div>
-        <h3>Sin resultados</h3>
-        <p>Probá con otras palabras clave o cambiá el filtro</p>
-      </div>`;
+  if (filtrados.length===0) {
+    container.innerHTML=`<div class="empty-state"><div class="icon">🔍</div><h3>Sin resultados</h3><p>Probá con otras palabras o cambiá el filtro</p></div>`;
     return;
   }
 
-  container.innerHTML = filtrados.map((p, idx) => cardHTML(p, idx)).join('');
+  const destacados = filtrados.filter(p=>p.destacado);
+  const regulares  = filtrados.filter(p=>!p.destacado);
+
+  let html = '';
+  if (destacados.length) {
+    html += `<div class="destacados-section">
+      <div class="section-label">⭐ Destacados</div>
+      <div class="destacados-grid">${destacados.map(p=>cardHTML(p,true)).join('')}</div>
+    </div>`;
+  }
+  if (regulares.length) {
+    html += `<div class="regular-section" style="display:flex;flex-direction:column;gap:10px">
+      ${destacados.length?'<div class="section-label">Todos los proveedores</div>':''}
+      ${regulares.map(p=>cardHTML(p,false)).join('')}
+    </div>`;
+  }
+  container.innerHTML = html;
 }
 
-function cardHTML(p, idx) {
-  const { score } = p;
-  const esDestacado = p.destacado;
+function cardHTML(p, esDestacado) {
+  const {score} = p;
   const badgeClass = esDestacado ? 'badge-destacado' : badgeCSSClass(score.etiqueta);
-  const etiquetaVisible = esDestacado ? '⭐ Destacado' : score.etiqueta;
-  const estrellas = score.total > 0 ? renderEstrellas(score.promedio) : (esDestacado ? '★★★★★' : '—');
+  const etiquetaLabel = esDestacado ? '⭐ Destacado' : score.etiqueta;
+  const estrellas = score.total>0 ? renderEstrellas(score.promedio) : (esDestacado?'★★★★★':'');
   const emoji = servicioEmoji(p.servicio);
+  const telValido = p.telefono && !['n/a',''].includes(normalizar(p.telefono));
+  const dniValido = p.dni && !['n/a',''].includes(normalizar(p.dni));
+  const empresaValida = p.empresa && !['n/a',''].includes(normalizar(p.empresa)) && p.empresa!==p.nombre;
 
-  const resenas = p.resenas.map(r => `
+  const resenas = p.resenas.map(r=>`
     <div class="resena-item ${slugify(r.recomendacion)}">
       <div class="resena-top">
         <span class="resena-estrellas">${renderEstrellas(r.puntuacion)}</span>
-        <span class="badge ${badgeCSSClass(r.recomendacion)} resena-badge">${r.recomendacion || 'Sin etiqueta'}</span>
+        <span class="badge ${badgeCSSClass(r.recomendacion)}" style="font-size:.65rem">${r.recomendacion||''}</span>
       </div>
-      ${r.notas && r.notas !== 'N/A' && r.notas !== 'n/a' ? `<div class="resena-notas">"${r.notas}"</div>` : ''}
-    </div>
-  `).join('');
-
-  const telValido = p.telefono && p.telefono !== 'N/A' && p.telefono !== 'n/a' && p.telefono !== '';
-  const dniValido = p.dni && p.dni !== 'N/A' && p.dni !== 'n/a' && p.dni !== '';
-  const empresaValida = p.empresa && p.empresa !== 'N/A' && p.empresa !== p.nombre;
-
-  const contactoHTML = `
-    <div class="card-contacto">
-      ${telValido ? `<a class="contacto-item tel" href="tel:${p.telefono.replace(/\s/g,'')}">📞 ${p.telefono}</a>` : ''}
-      ${dniValido ? `<span class="contacto-item">🪪 ${p.dni}</span>` : ''}
-      ${empresaValida ? `<span class="contacto-item">🏢 ${p.empresa}</span>` : ''}
-    </div>
-  `;
-
-  const tieneResenas = p.resenas.length > 0;
+      ${r.notas&&!['n/a',''].includes(normalizar(r.notas))?`<div class="resena-notas">"${r.notas}"</div>`:''}
+    </div>`).join('');
 
   return `
-    <div class="proveedor-card${esDestacado ? ' destacado' : ''}">
+    <div class="proveedor-card${esDestacado?' destacado':''}">
       <div class="card-main" onclick="toggleCard(this.closest('.proveedor-card'))">
         <div class="card-avatar">${emoji}</div>
         <div class="card-info">
-          ${esDestacado ? '<div class="destacado-badge">⭐ Destacado</div>' : ''}
+          ${esDestacado?'<div class="destacado-badge">⭐ Destacado</div>':''}
           <div class="card-nombre">${p.nombre}</div>
-          <div class="card-empresa">${empresaValida ? p.empresa : p.servicio}</div>
-          <span class="card-servicio">${p.servicio}</span>
+          <div class="card-sub">${empresaValida?p.empresa:p.servicio}</div>
+          <span class="card-servicio-tag">${p.servicio}</span>
         </div>
         <div class="card-right">
-          <div class="badge ${badgeClass}">${etiquetaVisible}</div><br>
-          <div class="score-display">
-            <span class="stars">${estrellas}</span>
-          </div>
-          <div class="reviews-count">${score.total > 0 ? score.total + ' reseña' + (score.total !== 1 ? 's' : '') : ''}</div>
+          <div class="badge ${badgeClass}">${etiquetaLabel}</div><br>
+          ${estrellas?`<div class="score-stars">${estrellas}</div>`:''}
+          <div class="reviews-count">${score.total>0?score.total+' reseña'+(score.total!==1?'s':''):''}</div>
         </div>
       </div>
-      ${contactoHTML}
-      ${tieneResenas ? `
+      <div class="card-contacto">
+        ${telValido?`<a class="contacto-item tel" href="tel:${p.telefono.replace(/\s/g,'')}">📞 ${p.telefono}</a>`:''}
+        ${dniValido?`<span class="contacto-item">🪪 ${p.dni}</span>`:''}
+        ${empresaValida?`<span class="contacto-item">🏢 ${p.empresa}</span>`:''}
+      </div>
+      ${p.resenas.length?`
         <div class="card-resenas-toggle" onclick="toggleCard(this.closest('.proveedor-card'))">
           <span class="toggle-label">Ver reseñas ▾</span>
         </div>
         <div class="card-detail">
           <div class="resenas-title">Reseñas (${p.resenas.length})</div>
           ${resenas}
-        </div>
-      ` : ''}
-    </div>
-  `;
+        </div>`:''}
+    </div>`;
 }
 
 function toggleCard(el) {
   const detail = el.querySelector('.card-detail');
-  if (!detail) return;
+  if(!detail) return;
   const label = el.querySelector('.toggle-label');
   const isOpen = detail.classList.contains('open');
-  if (openCard && openCard !== detail) {
+  if(openCard&&openCard!==detail) {
     openCard.classList.remove('open');
-    const prevLabel = openCard.closest('.proveedor-card')?.querySelector('.toggle-label');
-    if (prevLabel) prevLabel.textContent = 'Ver reseñas ▾';
+    const prev = openCard.closest('.proveedor-card')?.querySelector('.toggle-label');
+    if(prev) prev.textContent='Ver reseñas ▾';
   }
-  detail.classList.toggle('open', !isOpen);
-  if (label) label.textContent = !isOpen ? 'Ocultar reseñas ▴' : 'Ver reseñas ▾';
+  detail.classList.toggle('open',!isOpen);
+  if(label) label.textContent = !isOpen?'Ocultar reseñas ▴':'Ver reseñas ▾';
   openCard = !isOpen ? detail : null;
 }
 
 function setFilter(chip) {
-  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
   chip.classList.add('active');
   activeFilter = chip.dataset.filter;
   openCard = null;
   renderResults();
 }
 
+// ── FORMULARIO ─────────────────────────────────────────────────────────────
+async function enviarFormulario() {
+  const nombre   = document.getElementById('f-nombre').value.trim();
+  const telefono = document.getElementById('f-telefono').value.trim();
+  const servicio = document.getElementById('f-servicio').value.trim();
+  const recomen  = document.querySelector('input[name="recomen"]:checked')?.value;
+  const puntuacion = document.querySelector('input[name="puntuacion"]:checked')?.value;
+  const vecino   = document.getElementById('f-vecino').value.trim();
+
+  const msg = document.getElementById('form-msg');
+  msg.style.display = 'none';
+
+  if (!nombre||!telefono||!servicio||!recomen||!puntuacion||!vecino) {
+    msg.textContent = '⚠️ Completá todos los campos obligatorios (*)';
+    msg.className = 'form-msg err'; msg.style.display = 'block'; return;
+  }
+
+  const barrio = document.querySelector('input[name="barrio"]:checked')?.value || 'No sé';
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true; btn.textContent = 'Enviando...';
+
+  const payload = {
+    action:     'saveRecomendacion',
+    password:   sessionStorage.getItem('ss_pwd'),
+    nombre,
+    empresa:    document.getElementById('f-empresa').value.trim(),
+    dni:        document.getElementById('f-dni').value.trim(),
+    telefono,
+    servicio,
+    recomendacion: recomen,
+    notas:      document.getElementById('f-notas').value.trim(),
+    puntuacion: parseInt(puntuacion),
+    barrio,
+    vecino,
+  };
+
+  try {
+    const res = await fetch(APPS_SCRIPT_URL + '?action=saveRecomendacion', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {'Content-Type':'application/json'}
+    });
+    const data = await res.json();
+    if (data.ok) {
+      document.getElementById('form-body').style.display = 'none';
+      document.getElementById('form-success').style.display = 'block';
+    } else {
+      throw new Error(data.error || 'Error desconocido');
+    }
+  } catch(e) {
+    msg.textContent = '❌ Error al enviar. Intentá de nuevo.';
+    msg.className = 'form-msg err'; msg.style.display = 'block';
+    btn.disabled = false; btn.textContent = 'Enviar recomendación';
+  }
+}
+
+function resetForm() {
+  document.getElementById('form-body').style.display = 'block';
+  document.getElementById('form-success').style.display = 'none';
+  document.getElementById('form-body').querySelectorAll('input:not([type=radio]),textarea').forEach(el=>el.value='');
+  document.querySelectorAll('input[type=radio]').forEach(r=>r.checked=false);
+  document.querySelector('input[name="barrio"][value="No sé"]').checked = true;
+  document.getElementById('btn-submit').disabled = false;
+  document.getElementById('btn-submit').textContent = 'Enviar recomendación';
+  document.getElementById('form-msg').style.display = 'none';
+}
+
 // ── HELPERS ────────────────────────────────────────────────────────────────
 function normalizar(txt) {
-  if (!txt) return '';
+  if(!txt) return '';
   return String(txt).toLowerCase().trim()
-    .replace(/á/g,'a').replace(/é/g,'e').replace(/í/g,'i')
-    .replace(/ó/g,'o').replace(/ú/g,'u').replace(/ü/g,'u');
+    .replace(/á/g,'a').replace(/é/g,'e').replace(/í/g,'i').replace(/ó/g,'o').replace(/ú/g,'u').replace(/ü/g,'u');
+}
+function slugify(txt){ return normalizar(txt||'').replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,''); }
+function renderEstrellas(n){ if(!n)return''; const l=Math.round(n); return'★'.repeat(l)+'☆'.repeat(5-l); }
+function badgeCSSClass(e){
+  return {'Destacado':'badge-destacado','Muy Recomendable':'badge-muy-recomendable','Recomendable':'badge-recomendable',
+    'Malas Experiencias':'badge-malas-experiencias','No Recomendable':'badge-no-recomendable','No Contratar':'badge-no-recomendable'}[e]||'badge-sin-datos';
+}
+function servicioEmoji(s){
+  if(!s)return'⚙️'; const v=normalizar(s);
+  if(v.includes('plom'))return'🔧'; if(v.includes('electr'))return'⚡'; if(v.includes('limp'))return'🧹';
+  if(v.includes('pint'))return'🖌️'; if(v.includes('jardin')||v.includes('pasto'))return'🌿';
+  if(v.includes('comid')||v.includes('delivery')||v.includes('empanada')||v.includes('pizza'))return'🍕';
+  if(v.includes('gas')||v.includes('calef'))return'🔥'; if(v.includes('piscina')||v.includes('pileta'))return'🏊';
+  if(v.includes('carpint'))return'🪵'; if(v.includes('alban')||v.includes('construc'))return'🏗️';
+  if(v.includes('segur')||v.includes('alarm'))return'🔒'; if(v.includes('mudanz'))return'📦';
+  if(v.includes('panad')||v.includes('torta')||v.includes('dulce'))return'🍰';
+  if(v.includes('sushi'))return'🍱'; if(v.includes('helad'))return'🍦';
+  return'⚙️';
 }
 
-function slugify(txt) {
-  return normalizar(txt || '').replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
-}
-
-function renderEstrellas(n) {
-  if (!n) return '☆☆☆☆☆';
-  const llenas = Math.round(n);
-  return '★'.repeat(llenas) + '☆'.repeat(5 - llenas);
-}
-
-function badgeCSSClass(etiqueta) {
-  const m = {
-    'Destacado':           'badge-destacado',
-    'Muy Recomendable':    'badge-muy-recomendable',
-    'Recomendable':        'badge-recomendable',
-    'Malas Experiencias':  'badge-malas-experiencias',
-    'No Recomendable':     'badge-no-recomendable',
-    'No Contratar':        'badge-no-recomendable', // compatibilidad con datos viejos
-  };
-  return m[etiqueta] || 'badge-sin-datos';
-}
-
-function servicioEmoji(servicio) {
-  if (!servicio) return '🔧';
-  const s = normalizar(servicio);
-  if (s.includes('plom')) return '🔧';
-  if (s.includes('electr')) return '⚡';
-  if (s.includes('limp')) return '🧹';
-  if (s.includes('pint')) return '🖌️';
-  if (s.includes('jardin') || s.includes('pasto')) return '🌿';
-  if (s.includes('comid') || s.includes('delivery') || s.includes('empanada') || s.includes('pizza')) return '🍕';
-  if (s.includes('gas') || s.includes('calef')) return '🔥';
-  if (s.includes('piscina') || s.includes('pileta')) return '🏊';
-  if (s.includes('carpint')) return '🪵';
-  if (s.includes('albañ') || s.includes('construc')) return '🏗️';
-  if (s.includes('segur') || s.includes('alarm')) return '🔒';
-  if (s.includes('mudanz')) return '📦';
-  return '⚙️';
-}
-
-// Auto-login si la sesión está activa
+// Auto-login
 window.addEventListener('load', () => {
   const pwd = sessionStorage.getItem('ss_pwd');
   if (pwd) {
-    document.getElementById('results-container').innerHTML = '<div class="loading"><div class="spinner"></div>Cargando proveedores...</div>';
-    fetchProveedores(pwd).then(data => {
-      if (!data.error) {
-        procesarDatos(data.proveedores || []);
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('app').style.display = 'block';
+    document.getElementById('results-container').innerHTML='<div class="loading"><div class="spinner"></div>Cargando...</div>';
+    fetchProveedores(pwd).then(data=>{
+      if(!data.error){
+        procesarDatos(data.proveedores||[]);
+        document.getElementById('login-screen').style.display='none';
+        document.getElementById('app').style.display='block';
         renderResults();
-      } else {
-        sessionStorage.removeItem('ss_pwd');
-      }
-    }).catch(() => sessionStorage.removeItem('ss_pwd'));
+      } else { sessionStorage.removeItem('ss_pwd'); }
+    }).catch(()=>sessionStorage.removeItem('ss_pwd'));
   }
 });
 </script>
