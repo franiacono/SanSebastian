@@ -348,7 +348,7 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 </div>
 
 <script>
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwltZ3NpUnDcV-4BezdsYGlCdU_eAOwFnq8qNnCJOwFUKaRr9IzBZ9ph75gox_epABBTQ/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby-hMCNa3ab2dR5gFJ9w6l7-K2eWOjopjT7DtkfbE26O8QwIjBJwiMKL_nzG4CZZsElaQ/exec';
 const ADMIN_PASSWORD  = 'admin2025';
 
 let todosLosProveedores = [], activeFilter = 'todos', openCard = null;
@@ -448,7 +448,7 @@ function procesarDatos(filas){
     const key=generarClave(f);
     if(!mapa[key])mapa[key]={nombre:f.nombre,empresa:f.empresa,dni:f.dni,telefono:f.telefono,servicio:f.servicio,destacado:false,resenas:[]};
     if(normalizar(f.recomendacion)==='publicidad'){mapa[key].destacado=true;}
-    else{mapa[key].resenas.push({recomendacion:f.recomendacion,notas:f.notas});}
+    else if(f.recomendacion){mapa[key].resenas.push({recomendacion:f.recomendacion,notas:f.notas});}
   });
   todosLosProveedores=Object.values(mapa).map(p=>{
     const score=p.destacado?{promedio:5,total:0,etiqueta:'Destacado',estrellas:5}:calcularScore(p.resenas);
