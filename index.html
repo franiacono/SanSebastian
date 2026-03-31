@@ -165,7 +165,32 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 .btn-secondary{padding:10px 20px;background:transparent;color:var(--verde);border:1.5px solid var(--verde);border-radius:10px;font-size:.88rem;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s}
 .btn-secondary:hover{background:var(--verde);color:white}
 
-/* ── RESPONSIVE ── */
+/* ── ADMIN ── */
+.admin-card{background:var(--white);border:1.5px solid var(--border);border-radius:14px;margin-bottom:12px;overflow:hidden}
+.admin-card-header{padding:14px 18px;display:flex;align-items:flex-start;gap:14px;cursor:default}
+.admin-info{flex:1;min-width:0}
+.admin-nombre{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--verde);font-weight:700}
+.admin-meta{font-size:.8rem;color:var(--muted);margin:3px 0 6px;display:flex;flex-wrap:wrap;gap:8px}
+.admin-meta span{display:flex;align-items:center;gap:3px}
+.admin-detalle{background:var(--crema);border-top:1px solid var(--crema2);padding:12px 18px;font-size:.83rem;line-height:1.6;color:var(--text)}
+.admin-detalle-row{display:flex;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+.admin-detalle-row strong{color:var(--muted);min-width:100px;flex-shrink:0}
+.admin-vecino{background:#fff8e1;border:1px solid #f0c040;border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.82rem}
+.admin-vecino strong{color:#b7770d;display:block;margin-bottom:2px}
+.admin-actions{display:flex;gap:8px;padding:12px 18px;border-top:1px solid var(--crema2);background:var(--crema);flex-wrap:wrap}
+.btn-aprobar{padding:8px 18px;background:var(--verde);color:white;border:none;border-radius:8px;font-size:.85rem;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;transition:background .2s}
+.btn-aprobar:hover{background:var(--verde2)}
+.btn-rechazar{padding:8px 18px;background:white;color:var(--rojo);border:1.5px solid var(--rojo);border-radius:8px;font-size:.85rem;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;transition:all .2s}
+.btn-rechazar:hover{background:var(--rojo);color:white}
+.btn-aprobar:disabled,.btn-rechazar:disabled{opacity:.5;cursor:not-allowed}
+.admin-empty{text-align:center;padding:50px;color:var(--muted)}
+.admin-empty .icon{font-size:2.5rem;margin-bottom:10px}
+.admin-badge{padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:600}
+.admin-badge.pendiente{background:#fff3cd;color:#856404}
+.admin-badge.aprobado{background:#d4edda;color:#155724}
+.admin-badge.rechazado{background:#fadbd8;color:var(--rojo)}
+
+
 @media(max-width:650px){
   .destacados-grid{grid-template-columns:1fr}
   .login-card{padding:36px 22px}
@@ -196,6 +221,7 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
       <div class="header-nav">
         <button class="nav-btn active" onclick="showPage('buscar',this)">🔍 <span class="label">Buscar</span></button>
         <button class="nav-btn" onclick="showPage('recomendar',this)">✍️ <span class="label">Recomendar</span></button>
+        <button class="nav-btn" id="nav-admin" style="display:none" onclick="showPage('admin',this)">🛠️ <span class="label">Admin</span></button>
         <button class="nav-btn" onclick="doLogout()">Salir</button>
       </div>
     </div>
@@ -234,8 +260,24 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
     <div id="results-container"></div>
   </div>
 
-  <!-- PÁGINA RECOMENDAR -->
-  <div class="page" id="page-recomendar">
+  <!-- PÁGINA ADMIN -->
+  <div class="page" id="page-admin">
+    <div style="max-width:900px;margin:0 auto">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <div>
+          <h2 style="font-family:'Playfair Display',serif;color:var(--verde);font-size:1.4rem">🛠️ Panel de Administración</h2>
+          <p style="color:var(--muted);font-size:.85rem">Recomendaciones pendientes de revisión</p>
+        </div>
+        <button class="nav-btn" style="background:var(--verde);border-color:var(--verde)" onclick="cargarPendientes()">↺ Actualizar</button>
+      </div>
+
+      <div id="admin-container">
+        <div class="loading"><div class="spinner"></div>Cargando pendientes...</div>
+      </div>
+    </div>
+  </div>
+
+
     <div class="form-page">
       <div class="form-card">
         <div class="form-header">
@@ -332,20 +374,13 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 
 <script>
 // ── CONFIG ────────────────────────────────────────────────────────────────
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyeJ4Ajg6UUDI9bgTQUr6fqgYiSuy3bW3X4Gw106wSDeH89Zy_cMKkIfD_ty_Bl7lp1Tg/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzKuzgXzhfDN0eu8eeaRyjyJxrGbr4qehxsNzh-Sf03c2bj4u3im78PehjeAsk0yboRqg/exec';
+const ADMIN_PASSWORD  = 'admin2025';  // ← Cambiá esto por tu contraseña de admin
 
 // ── ESTADO ────────────────────────────────────────────────────────────────
 let todosLosProveedores = [];
 let activeFilter = 'todos';
 let openCard = null;
-
-// ── NAVEGACIÓN ─────────────────────────────────────────────────────────────
-function showPage(page, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + page).classList.add('active');
-  if(btn) btn.classList.add('active');
-}
 
 // ── LOGIN ──────────────────────────────────────────────────────────────────
 function doLogin() {
@@ -362,6 +397,9 @@ function doLogin() {
       procesarDatos(data.proveedores || []);
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('app').style.display = 'block';
+      if (pwd === ADMIN_PASSWORD) {
+        document.getElementById('nav-admin').style.display = 'inline-flex';
+      }
       renderResults();
     }
   }).catch(() => {
@@ -627,11 +665,9 @@ async function enviarFormulario() {
   };
 
   try {
-    const res = await fetch(APPS_SCRIPT_URL + '?action=saveRecomendacion', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {'Content-Type':'application/json'}
-    });
+    // Usamos GET con parámetros para evitar el error de CORS de Apps Script
+    const params = new URLSearchParams(payload).toString();
+    const res = await fetch(APPS_SCRIPT_URL + '?' + params, { redirect: 'follow' });
     const data = await res.json();
     if (data.ok) {
       document.getElementById('form-body').style.display = 'none';
@@ -682,7 +718,112 @@ function servicioEmoji(s){
   return'⚙️';
 }
 
-// Auto-login
+// ── PANEL ADMIN ────────────────────────────────────────────────────────────
+function showPage(page, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(page === 'admin') cargarPendientes();
+}
+
+async function cargarPendientes() {
+  const container = document.getElementById('admin-container');
+  container.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando pendientes...</div>';
+  try {
+    const url = `${APPS_SCRIPT_URL}?action=getPendientes&password=${encodeURIComponent(sessionStorage.getItem('ss_pwd'))}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.error) { container.innerHTML = `<div class="admin-empty"><div class="icon">⚠️</div><p>${data.error}</p></div>`; return; }
+    renderPendientes(data.pendientes || []);
+  } catch(e) {
+    container.innerHTML = '<div class="admin-empty"><div class="icon">❌</div><p>Error al cargar. Intentá de nuevo.</p></div>';
+  }
+}
+
+function renderPendientes(rows) {
+  const container = document.getElementById('admin-container');
+  const pendientes = rows.filter(r => r.estado === 'Pendiente');
+  const procesados = rows.filter(r => r.estado !== 'Pendiente');
+
+  if (rows.length === 0) {
+    container.innerHTML = '<div class="admin-empty"><div class="icon">✅</div><h3>Todo al día</h3><p>No hay recomendaciones pendientes.</p></div>';
+    return;
+  }
+
+  let html = '';
+  if (pendientes.length) {
+    html += `<div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--naranja);margin-bottom:10px">⏳ Pendientes (${pendientes.length})</div>`;
+    html += pendientes.map((r,i) => adminCardHTML(r, i, true)).join('');
+  }
+  if (procesados.length) {
+    html += `<div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin:20px 0 10px">✔ Procesados recientemente</div>`;
+    html += procesados.slice(0,5).map((r,i) => adminCardHTML(r, i+1000, false)).join('');
+  }
+  container.innerHTML = html;
+}
+
+function adminCardHTML(r, idx, acciones) {
+  const stars = '★'.repeat(r.puntuacion||0) + '☆'.repeat(5-(r.puntuacion||0));
+  const badgeClass = r.estado==='Aprobado'?'aprobado':r.estado==='Rechazado'?'rechazado':'pendiente';
+  return `
+    <div class="admin-card" id="acard-${idx}">
+      <div class="admin-card-header">
+        <div style="font-size:2rem">${servicioEmoji(r.servicio)}</div>
+        <div class="admin-info">
+          <div class="admin-nombre">${r.nombre||'Sin nombre'}</div>
+          <div class="admin-meta">
+            <span>⚙️ ${r.servicio||'—'}</span>
+            ${r.telefono?`<span>📞 ${r.telefono}</span>`:''}
+            ${r.dni?`<span>🪪 ${r.dni}</span>`:''}
+            ${r.empresa?`<span>🏢 ${r.empresa}</span>`:''}
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <span style="color:#e0a800;font-size:.9rem">${stars}</span>
+            <span class="badge ${badgeCSSClass(r.recomendacion)}" style="font-size:.7rem">${r.recomendacion||''}</span>
+            <span class="admin-badge ${badgeClass}">${r.estado||'Pendiente'}</span>
+          </div>
+        </div>
+        <div style="font-size:.75rem;color:var(--muted);white-space:nowrap">${r.fecha ? new Date(r.fecha).toLocaleDateString('es-AR') : ''}</div>
+      </div>
+      <div class="admin-detalle">
+        ${r.notas?`<div class="admin-detalle-row"><strong>Notas:</strong><span>"${r.notas}"</span></div>`:''}
+        ${r.barrio?`<div class="admin-detalle-row"><strong>Del barrio:</strong><span>${r.barrio}</span></div>`:''}
+        ${r.vecino?`<div class="admin-vecino"><strong>🏠 Datos del vecino (confidencial):</strong>${r.vecino}</div>`:''}
+      </div>
+      ${acciones ? `
+      <div class="admin-actions">
+        <button class="btn-aprobar" id="btn-ap-${idx}" onclick="accionPendiente(${idx}, ${r.fila}, 'Aprobado')">✅ Aprobar y mover a Proveedores</button>
+        <button class="btn-rechazar" id="btn-re-${idx}" onclick="accionPendiente(${idx}, ${r.fila}, 'Rechazado')">❌ Rechazar</button>
+      </div>` : ''}
+    </div>`;
+}
+
+async function accionPendiente(idx, fila, accion) {
+  const btnAp = document.getElementById('btn-ap-'+idx);
+  const btnRe = document.getElementById('btn-re-'+idx);
+  if(btnAp) btnAp.disabled = true;
+  if(btnRe) btnRe.disabled = true;
+  if(btnAp) btnAp.textContent = accion==='Aprobado'?'Procesando...':'...';
+
+  try {
+    const url = `${APPS_SCRIPT_URL}?action=procesarPendiente&password=${encodeURIComponent(sessionStorage.getItem('ss_pwd'))}&fila=${fila}&accion=${encodeURIComponent(accion)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (data.ok) {
+      const card = document.getElementById('acard-'+idx);
+      if(card) {
+        card.style.opacity='0.5';
+        card.querySelector('.admin-actions').innerHTML =
+          `<span style="font-size:.85rem;color:${accion==='Aprobado'?'var(--verde-ok)':'var(--rojo)'}">
+            ${accion==='Aprobado'?'✅ Aprobado y movido a Proveedores':'❌ Rechazado'}
+          </span>`;
+      }
+    } else { alert('Error: ' + (data.error||'desconocido')); }
+  } catch(e) { alert('Error de conexión'); }
+}
+
+// ── AUTO-LOGIN
 window.addEventListener('load', () => {
   const pwd = sessionStorage.getItem('ss_pwd');
   if (pwd) {
@@ -692,6 +833,7 @@ window.addEventListener('load', () => {
         procesarDatos(data.proveedores||[]);
         document.getElementById('login-screen').style.display='none';
         document.getElementById('app').style.display='block';
+        if(pwd === ADMIN_PASSWORD) document.getElementById('nav-admin').style.display='inline-flex';
         renderResults();
       } else { sessionStorage.removeItem('ss_pwd'); }
     }).catch(()=>sessionStorage.removeItem('ss_pwd'));
