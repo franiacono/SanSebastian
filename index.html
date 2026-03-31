@@ -191,6 +191,29 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 .admin-badge.rechazado{background:#fadbd8;color:var(--rojo)}
 
 
+/* ── FOOTER CARD ── */
+.card-footer-actions{padding:8px 16px 12px;border-top:1px solid var(--crema2)}
+.btn-recomendar-card{background:transparent;border:1.5px solid var(--verde2);color:var(--verde);border-radius:8px;padding:6px 14px;font-size:.78rem;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s}
+.btn-recomendar-card:hover{background:var(--verde);color:white}
+
+/* ── MENSAJES ADMIN ── */
+.msg-admin-card{background:var(--white);border:1.5px solid var(--border);border-radius:14px;margin-bottom:10px;padding:16px 18px}
+.msg-admin-de{font-weight:600;color:var(--verde);margin-bottom:4px;font-size:.9rem}
+.msg-admin-meta{font-size:.78rem;color:var(--muted);margin-bottom:8px;display:flex;gap:12px;flex-wrap:wrap}
+.msg-admin-texto{font-size:.88rem;line-height:1.55;background:var(--crema);border-radius:8px;padding:10px 12px}
+
+/* ── BOTÓN FLOTANTE CONTACTO ── */
+.fab-contacto{position:fixed;bottom:24px;right:20px;background:var(--verde);color:white;border:none;border-radius:50px;padding:12px 18px;font-size:.85rem;font-family:'DM Sans',sans-serif;cursor:pointer;box-shadow:0 4px 16px rgba(45,80,22,.35);z-index:150;display:flex;align-items:center;gap:6px;transition:background .2s,transform .15s}
+.fab-contacto:hover{background:var(--verde2);transform:translateY(-2px)}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal-box{background:var(--crema);border-radius:16px;padding:28px;width:100%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal-box h3{font-family:'Playfair Display',serif;color:var(--verde);margin-bottom:6px;font-size:1.2rem}
+.modal-box>p{color:var(--muted);font-size:.83rem;margin-bottom:18px}
+.modal-close{float:right;background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--muted)}
+
 @media(max-width:650px){
   .destacados-grid{grid-template-columns:1fr}
   .login-card{padding:36px 22px}
@@ -201,8 +224,41 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 </head>
 <body>
 
-<!-- LOGIN -->
-<div id="login-screen">
+<!-- BOTÓN FLOTANTE CONTACTAR ADMIN -->
+<button class="fab-contacto" id="fab-contacto" style="display:none" onclick="abrirModalContacto()">
+  💬 Contactar admin
+</button>
+
+<!-- MODAL CONTACTO -->
+<div class="modal-overlay" id="modal-contacto" onclick="if(event.target===this)cerrarModalContacto()">
+  <div class="modal-box">
+    <button class="modal-close" onclick="cerrarModalContacto()">✕</button>
+    <h3>💬 Contactar al administrador</h3>
+    <p>Tu nombre, barrio y teléfono se enviarán junto con tu mensaje para que el admin pueda responderte.</p>
+    <div class="form-row" style="margin-bottom:12px">
+      <label style="font-size:.83rem;font-weight:500;margin-bottom:5px;display:block">Tu nombre completo <span style="color:var(--rojo)">*</span></label>
+      <input class="form-input" id="mc-nombre" placeholder="Nombre y apellido">
+    </div>
+    <div class="form-row" style="margin-bottom:12px">
+      <label style="font-size:.83rem;font-weight:500;margin-bottom:5px;display:block">Tu teléfono <span style="color:var(--rojo)">*</span></label>
+      <input class="form-input" id="mc-telefono" placeholder="11 2345-6789" type="tel">
+    </div>
+    <div class="form-row" style="margin-bottom:12px">
+      <label style="font-size:.83rem;font-weight:500;margin-bottom:5px;display:block">Barrio</label>
+      <input class="form-input" id="mc-barrio" value="San Sebastián - Pilar" readonly style="background:var(--crema);color:var(--muted)">
+    </div>
+    <div class="form-row" style="margin-bottom:16px">
+      <label style="font-size:.83rem;font-weight:500;margin-bottom:5px;display:block">Mensaje <span style="color:var(--rojo)">*</span></label>
+      <textarea class="form-textarea" id="mc-mensaje" placeholder="Escribí tu consulta o sugerencia..." style="min-height:90px"></textarea>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <button class="btn-submit" id="mc-btn" onclick="enviarMensajeAdmin()" style="width:auto;padding:11px 22px">Enviar mensaje</button>
+      <span id="mc-msg" style="font-size:.83rem;display:none"></span>
+    </div>
+  </div>
+</div>
+
+
   <div class="login-card">
     <div class="login-logo">🏡</div>
     <h1>San Sebastián</h1>
@@ -222,6 +278,7 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
         <button class="nav-btn active" onclick="showPage('buscar',this)">🔍 <span class="label">Buscar</span></button>
         <button class="nav-btn" onclick="showPage('recomendar',this)">✍️ <span class="label">Recomendar</span></button>
         <button class="nav-btn" id="nav-admin" style="display:none" onclick="showPage('admin',this)">🛠️ <span class="label">Admin</span></button>
+        <button class="nav-btn" id="nav-mensajes" style="display:none" onclick="showPage('mensajes',this)">💬 <span class="label">Mensajes</span> <span id="badge-mensajes" style="display:none;background:#e0a800;color:#fff;border-radius:10px;padding:0 5px;font-size:.7rem;margin-left:2px"></span></button>
         <button class="nav-btn" onclick="doLogout()">Salir</button>
       </div>
     </div>
@@ -270,12 +327,28 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
         </div>
         <button class="nav-btn" style="background:var(--verde);border-color:var(--verde)" onclick="cargarPendientes()">↺ Actualizar</button>
       </div>
-
       <div id="admin-container">
         <div class="loading"><div class="spinner"></div>Cargando pendientes...</div>
       </div>
     </div>
   </div>
+
+  <!-- PÁGINA MENSAJES -->
+  <div class="page" id="page-mensajes">
+    <div style="max-width:900px;margin:0 auto">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <div>
+          <h2 style="font-family:'Playfair Display',serif;color:var(--verde);font-size:1.4rem">💬 Mensajes de vecinos</h2>
+          <p style="color:var(--muted);font-size:.85rem">Consultas y sugerencias recibidas</p>
+        </div>
+        <button class="nav-btn" style="background:var(--verde);border-color:var(--verde)" onclick="cargarMensajes()">↺ Actualizar</button>
+      </div>
+      <div id="mensajes-container">
+        <div class="loading"><div class="spinner"></div>Cargando mensajes...</div>
+      </div>
+    </div>
+  </div>
+
 
 
     <div class="form-page">
@@ -374,7 +447,7 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 
 <script>
 // ── CONFIG ────────────────────────────────────────────────────────────────
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwZu2mxFlwKq5HhiphKw1VVx7Ltna_clIL4LsPnYl5GSoyKkxODUNQpjfgKjbXBaZfWxw/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby-hMCNa3ab2dR5gFJ9w6l7-K2eWOjopjT7DtkfbE26O8QwIjBJwiMKL_nzG4CZZsElaQ/exec';
 const ADMIN_PASSWORD  = 'admin2025';  // ← Cambiá esto por tu contraseña de admin
 
 // ── ESTADO ────────────────────────────────────────────────────────────────
@@ -399,6 +472,9 @@ function doLogin() {
       document.getElementById('app').style.display = 'block';
       if (pwd === ADMIN_PASSWORD) {
         document.getElementById('nav-admin').style.display = 'inline-flex';
+        document.getElementById('nav-mensajes').style.display = 'inline-flex';
+      } else {
+        document.getElementById('fab-contacto').style.display = 'flex';
       }
       renderResults();
     }
@@ -602,6 +678,9 @@ function cardHTML(p, esDestacado) {
           <div class="resenas-title">Reseñas (${p.resenas.length})</div>
           ${resenas}
         </div>`:''}
+      <div class="card-footer-actions">
+        <button class="btn-recomendar-card" onclick="recomendarDesdeCard(${JSON.stringify(p).replace(/"/g,'&quot;')})">✍️ Recomendar este proveedor</button>
+      </div>
     </div>`;
 }
 
@@ -725,6 +804,7 @@ function showPage(page, btn) {
   document.getElementById('page-' + page).classList.add('active');
   if(btn) btn.classList.add('active');
   if(page === 'admin') cargarPendientes();
+  if(page === 'mensajes') cargarMensajes();
 }
 
 async function cargarPendientes() {
@@ -784,7 +864,7 @@ function adminCardHTML(r, idx, acciones) {
             <span class="admin-badge ${badgeClass}">${r.estado||'Pendiente'}</span>
           </div>
         </div>
-        <div style="font-size:.75rem;color:var(--muted);white-space:nowrap">${r.fecha ? new Date(r.fecha).toLocaleDateString('es-AR') : ''}</div>
+        <div style="font-size:.75rem;color:var(--muted);white-space:nowrap">${formatFecha(r.fecha)}</div>
       </div>
       <div class="admin-detalle">
         ${r.notas?`<div class="admin-detalle-row"><strong>Notas:</strong><span>"${r.notas}"</span></div>`:''}
@@ -823,7 +903,95 @@ async function accionPendiente(idx, fila, accion) {
   } catch(e) { alert('Error de conexión'); }
 }
 
-// ── AUTO-LOGIN
+// ── CONTACTO ADMIN ─────────────────────────────────────────────────────────
+function abrirModalContacto() {
+  document.getElementById('modal-contacto').classList.add('open');
+}
+function cerrarModalContacto() {
+  document.getElementById('modal-contacto').classList.remove('open');
+  document.getElementById('mc-msg').style.display='none';
+  document.getElementById('mc-btn').disabled=false;
+  document.getElementById('mc-btn').textContent='Enviar mensaje';
+}
+async function enviarMensajeAdmin() {
+  const nombre   = document.getElementById('mc-nombre').value.trim();
+  const telefono = document.getElementById('mc-telefono').value.trim();
+  const mensaje  = document.getElementById('mc-mensaje').value.trim();
+  const msg      = document.getElementById('mc-msg');
+  if(!nombre||!telefono||!mensaje){
+    msg.textContent='⚠️ Completá todos los campos'; msg.style.color='var(--rojo)'; msg.style.display='block'; return;
+  }
+  const btn = document.getElementById('mc-btn');
+  btn.disabled=true; btn.textContent='Enviando...';
+  try {
+    const params = new URLSearchParams({
+      action:'saveMensaje', password:sessionStorage.getItem('ss_pwd'),
+      nombre, telefono, barrio:'San Sebastián - Pilar', mensaje
+    });
+    const res = await fetch(APPS_SCRIPT_URL+'?'+params, {redirect:'follow'});
+    const data = await res.json();
+    if(data.ok){
+      msg.textContent='✅ Mensaje enviado. El admin te contactará pronto.';
+      msg.style.color='var(--verde-ok)'; msg.style.display='block';
+      document.getElementById('mc-nombre').value='';
+      document.getElementById('mc-telefono').value='';
+      document.getElementById('mc-mensaje').value='';
+      btn.textContent='Enviado ✓';
+    } else { throw new Error(data.error); }
+  } catch(e){
+    msg.textContent='❌ Error al enviar. Intentá de nuevo.';
+    msg.style.color='var(--rojo)'; msg.style.display='block';
+    btn.disabled=false; btn.textContent='Enviar mensaje';
+  }
+}
+
+async function cargarMensajes() {
+  const container = document.getElementById('mensajes-container');
+  container.innerHTML='<div class="loading"><div class="spinner"></div>Cargando...</div>';
+  try {
+    const url=`${APPS_SCRIPT_URL}?action=getMensajes&password=${encodeURIComponent(sessionStorage.getItem('ss_pwd'))}`;
+    const res=await fetch(url);
+    const data=await res.json();
+    if(data.error){ container.innerHTML=`<div class="admin-empty"><div class="icon">⚠️</div><p>${data.error}</p></div>`; return; }
+    const msgs=data.mensajes||[];
+    if(!msgs.length){ container.innerHTML='<div class="admin-empty"><div class="icon">💬</div><h3>Sin mensajes</h3><p>Todavía no recibiste ningún mensaje de vecinos.</p></div>'; return; }
+    // Badge de cantidad
+    const badge=document.getElementById('badge-mensajes');
+    if(badge){ badge.textContent=msgs.length; badge.style.display='inline'; }
+    container.innerHTML = msgs.map(m=>`
+      <div class="msg-admin-card">
+        <div class="msg-admin-de">👤 ${m.nombre||'Sin nombre'}</div>
+        <div class="msg-admin-meta">
+          ${m.telefono?`<span>📞 <a href="tel:${m.telefono.replace(/\s/g,'')}" style="color:var(--verde)">${m.telefono}</a></span>`:''}
+          ${m.barrio?`<span>🏠 ${m.barrio}</span>`:''}
+          ${m.fecha?`<span>📅 ${formatFecha(m.fecha)}</span>`:''}
+        </div>
+        <div class="msg-admin-texto">${m.mensaje||''}</div>
+      </div>`).join('');
+  } catch(e){
+    container.innerHTML='<div class="admin-empty"><div class="icon">❌</div><p>Error al cargar mensajes.</p></div>';
+  }
+}
+
+
+  // Navegar a la página de recomendar y pre-llenar los datos
+  showPage('recomendar', document.querySelector('.nav-btn:nth-child(2)'));
+  setTimeout(() => {
+    document.getElementById('f-nombre').value   = p.nombre   || '';
+    document.getElementById('f-empresa').value  = p.empresa  || '';
+    document.getElementById('f-dni').value      = p.dni      || '';
+    document.getElementById('f-telefono').value = p.telefono || '';
+    document.getElementById('f-servicio').value = p.servicio || '';
+    // Scroll al formulario
+    document.getElementById('page-recomendar').scrollIntoView({behavior:'smooth'});
+  }, 50);
+}
+
+
+  try { const d = new Date(f); if(isNaN(d.getTime())) return ''; return d.toLocaleDateString('es-AR'); } catch(e){ return ''; }
+}
+
+
 window.addEventListener('load', () => {
   const pwd = sessionStorage.getItem('ss_pwd');
   if (pwd) {
@@ -833,7 +1001,12 @@ window.addEventListener('load', () => {
         procesarDatos(data.proveedores||[]);
         document.getElementById('login-screen').style.display='none';
         document.getElementById('app').style.display='block';
-        if(pwd === ADMIN_PASSWORD) document.getElementById('nav-admin').style.display='inline-flex';
+        if(pwd === ADMIN_PASSWORD) {
+          document.getElementById('nav-admin').style.display='inline-flex';
+          document.getElementById('nav-mensajes').style.display='inline-flex';
+        } else {
+          document.getElementById('fab-contacto').style.display='flex';
+        }
         renderResults();
       } else { sessionStorage.removeItem('ss_pwd'); }
     }).catch(()=>sessionStorage.removeItem('ss_pwd'));
