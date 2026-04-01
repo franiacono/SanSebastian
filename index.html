@@ -10,32 +10,32 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:var(--crema);color:var(--text);min-height:100vh}
 
-/* ── AUTH SCREENS ── */
+/* ── AUTH ── */
 .auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--verde);background-image:radial-gradient(ellipse at 20% 50%,rgba(74,124,47,.4) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(45,80,22,.6) 0%,transparent 50%)}
 .auth-card{background:var(--crema);border-radius:16px;padding:40px;width:100%;max-width:420px;box-shadow:0 24px 60px rgba(0,0,0,.3)}
 .auth-logo{width:60px;height:60px;background:var(--verde);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:26px}
 .auth-card h1{font-family:'Playfair Display',serif;font-size:1.7rem;color:var(--verde);text-align:center;margin-bottom:4px}
-.auth-card .subtitle{color:var(--muted);font-size:.88rem;text-align:center;margin-bottom:28px}
+.auth-subtitle{color:var(--muted);font-size:.88rem;text-align:center;margin-bottom:28px}
 .auth-divider{display:flex;align-items:center;gap:10px;margin:18px 0;color:var(--muted);font-size:.8rem}
 .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border)}
 .btn-google{width:100%;padding:12px;background:white;border:1.5px solid var(--border);border-radius:10px;font-size:.92rem;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:box-shadow .2s,border-color .2s;margin-bottom:10px}
 .btn-google:hover{box-shadow:0 2px 8px rgba(0,0,0,.12);border-color:#aaa}
 .btn-google img{width:20px;height:20px}
-.auth-form-row{margin-bottom:12px}
-.auth-form-row label{display:block;font-size:.82rem;font-weight:500;color:var(--text);margin-bottom:5px}
+.auth-row{margin-bottom:12px}
+.auth-row label{display:block;font-size:.82rem;font-weight:500;color:var(--text);margin-bottom:5px}
 .auth-input{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:.92rem;font-family:'DM Sans',sans-serif;background:white;color:var(--text);transition:border-color .2s}
 .auth-input:focus{outline:none;border-color:var(--verde2)}
-.auth-input:read-only{background:var(--crema);color:var(--muted)}
+.auth-input[readonly]{background:var(--crema);color:var(--muted)}
+.auth-select{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:.92rem;font-family:'DM Sans',sans-serif;background:white;color:var(--text);cursor:pointer}
+.auth-select:focus{outline:none;border-color:var(--verde2)}
 .btn-primary{width:100%;padding:13px;background:var(--verde);color:white;border:none;border-radius:10px;font-size:.95rem;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:background .2s;margin-top:4px}
 .btn-primary:hover{background:var(--verde2)}.btn-primary:disabled{opacity:.6;cursor:not-allowed}
 .auth-switch{text-align:center;font-size:.83rem;color:var(--muted);margin-top:16px}
-.auth-switch a{color:var(--verde);cursor:pointer;font-weight:500;text-decoration:none}
+.auth-switch a{color:var(--verde);cursor:pointer;font-weight:500}
 .auth-switch a:hover{text-decoration:underline}
 .auth-error{color:var(--rojo);font-size:.82rem;margin-top:8px;display:none;text-align:center}
-.auth-select{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:.92rem;font-family:'DM Sans',sans-serif;background:white;color:var(--text);cursor:pointer}
-.auth-select:focus{outline:none;border-color:var(--verde2)}
 
-/* ── APP SHELL ── */
+/* ── APP ── */
 #app{display:none}
 header{background:var(--verde);color:white;padding:0 20px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.2)}
 .header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:12px;height:60px}
@@ -45,10 +45,10 @@ header{background:var(--verde);color:white;padding:0 20px;position:sticky;top:0;
 .nav-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:white;padding:6px 13px;border-radius:20px;font-size:.8rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s;white-space:nowrap}
 .nav-btn:hover{background:rgba(255,255,255,.22)}
 .nav-btn.active{background:rgba(255,255,255,.9);color:var(--verde);font-weight:600}
-.user-avatar{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:600;cursor:pointer;overflow:hidden;flex-shrink:0}
+/* Avatar — solo visual, NO hace logout al hacer clic */
+.user-avatar{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:600;overflow:hidden;flex-shrink:0;cursor:default}
 .user-avatar img{width:100%;height:100%;object-fit:cover}
 
-/* ── PAGES ── */
 .page{display:none;max-width:1200px;margin:0 auto;padding:20px 16px 60px}
 .page.active{display:block}
 
@@ -110,13 +110,12 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 .resena-item{background:var(--crema);border-radius:8px;padding:10px 12px;margin-bottom:6px;border-left:3px solid var(--border)}
 .resena-item.recomendable{border-color:#1abc9c}
 .resena-item.no-recomendable{border-color:var(--rojo)}
-.resena-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.resena-top{margin-bottom:4px}
 .resena-notas{font-size:.83rem;color:var(--text);line-height:1.45;margin-top:4px}
 .card-footer-actions{padding:8px 16px 12px;border-top:1px solid var(--crema2)}
 .btn-recomendar-card{background:transparent;border:1.5px solid var(--verde2);color:var(--verde);border-radius:8px;padding:6px 14px;font-size:.78rem;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s}
 .btn-recomendar-card:hover{background:var(--verde);color:white}
 
-/* ── LOADING / EMPTY ── */
 .empty-state{text-align:center;padding:50px 20px;color:var(--muted)}
 .empty-state .icon{font-size:2.5rem;margin-bottom:10px}
 .empty-state h3{font-family:'Playfair Display',serif;color:var(--text);margin-bottom:5px}
@@ -135,11 +134,11 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 .form-section-title{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--verde);margin:20px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--crema2)}
 .form-row{margin-bottom:14px}
 .form-row label{display:block;font-size:.83rem;font-weight:500;color:var(--text);margin-bottom:5px}
-.form-row label .req{color:var(--rojo);margin-left:2px}
-.form-row label .opt{font-size:.75rem;color:var(--muted);font-weight:400;margin-left:4px}
-.form-input,.form-select,.form-textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:.92rem;font-family:'DM Sans',sans-serif;background:white;color:var(--text);transition:border-color .2s,box-shadow .2s}
+.form-row .req{color:var(--rojo);margin-left:2px}
+.form-row .opt{font-size:.75rem;color:var(--muted);font-weight:400;margin-left:4px}
+.form-input,.form-textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:.92rem;font-family:'DM Sans',sans-serif;background:white;color:var(--text);transition:border-color .2s,box-shadow .2s}
 .form-input:focus,.form-textarea:focus{outline:none;border-color:var(--verde2);box-shadow:0 0 0 3px rgba(74,124,47,.1)}
-.form-input:read-only{background:var(--crema);color:var(--muted)}
+.form-input[readonly]{background:var(--crema);color:var(--muted)}
 .form-textarea{resize:vertical;min-height:80px}
 .radio-group{display:flex;gap:8px;flex-wrap:wrap}
 .radio-opt{display:flex;align-items:center;gap:6px;padding:8px 14px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;font-size:.85rem;transition:all .2s}
@@ -169,9 +168,9 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 .admin-vecino{background:#fff8e1;border:1px solid #f0c040;border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.82rem}
 .admin-vecino strong{color:#b7770d;display:block;margin-bottom:2px}
 .admin-actions{display:flex;gap:8px;padding:12px 18px;border-top:1px solid var(--crema2);background:var(--crema);flex-wrap:wrap}
-.btn-aprobar{padding:8px 18px;background:var(--verde);color:white;border:none;border-radius:8px;font-size:.85rem;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500}
+.btn-aprobar{padding:8px 18px;background:var(--verde);color:white;border:none;border-radius:8px;font-size:.85rem;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;transition:background .2s}
 .btn-aprobar:hover{background:var(--verde2)}
-.btn-rechazar{padding:8px 18px;background:white;color:var(--rojo);border:1.5px solid var(--rojo);border-radius:8px;font-size:.85rem;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500}
+.btn-rechazar{padding:8px 18px;background:white;color:var(--rojo);border:1.5px solid var(--rojo);border-radius:8px;font-size:.85rem;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;transition:all .2s}
 .btn-rechazar:hover{background:var(--rojo);color:white}
 .btn-aprobar:disabled,.btn-rechazar:disabled{opacity:.5;cursor:not-allowed}
 .admin-empty{text-align:center;padding:50px;color:var(--muted)}
@@ -209,108 +208,80 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 </head>
 <body>
 
-<!-- ── PANTALLA LOGIN ── -->
+<!-- ── LOGIN ── -->
 <div id="screen-login" class="auth-screen">
   <div class="auth-card">
     <div class="auth-logo">🏡</div>
     <h1>San Sebastián</h1>
-    <p class="subtitle">Proveedores del barrio</p>
-
-    <button class="btn-google" onclick="loginConGoogle()">
+    <p class="auth-subtitle">Proveedores del barrio</p>
+    <button class="btn-google" id="btn-google-login">
       <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
       Continuar con Google
     </button>
-
     <div class="auth-divider">o con email</div>
-
-    <div class="auth-form-row">
-      <label>Email</label>
-      <input class="auth-input" type="email" id="li-email" placeholder="tu@email.com">
-    </div>
-    <div class="auth-form-row">
-      <label>Contraseña</label>
-      <input class="auth-input" type="password" id="li-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')loginConEmail()">
-    </div>
-    <button class="btn-primary" onclick="loginConEmail()">Ingresar</button>
+    <div class="auth-row"><label>Email</label><input class="auth-input" type="email" id="li-email" placeholder="tu@email.com"></div>
+    <div class="auth-row"><label>Contraseña</label><input class="auth-input" type="password" id="li-pass" placeholder="••••••••"></div>
+    <button class="btn-primary" id="btn-email-login">Ingresar</button>
     <p class="auth-error" id="li-error"></p>
-    <div class="auth-switch">¿No tenés cuenta? <a onclick="showScreen('screen-register')">Registrate</a></div>
+    <div class="auth-switch">¿No tenés cuenta? <a id="ir-registro">Registrate</a></div>
   </div>
 </div>
 
-<!-- ── PANTALLA REGISTRO ── -->
+<!-- ── REGISTRO ── -->
 <div id="screen-register" class="auth-screen" style="display:none">
   <div class="auth-card">
     <div class="auth-logo">🏡</div>
     <h1>Crear cuenta</h1>
-    <p class="subtitle">San Sebastián · Proveedores</p>
-
-    <button class="btn-google" onclick="loginConGoogle()">
+    <p class="auth-subtitle">San Sebastián · Proveedores</p>
+    <button class="btn-google" id="btn-google-reg">
       <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
       Registrarse con Google
     </button>
-
     <div class="auth-divider">o con email</div>
-
-    <div class="auth-form-row">
-      <label>Email</label>
-      <input class="auth-input" type="email" id="reg-email" placeholder="tu@email.com">
-    </div>
-    <div class="auth-form-row">
-      <label>Contraseña</label>
-      <input class="auth-input" type="password" id="reg-pass" placeholder="Mínimo 6 caracteres">
-    </div>
-    <button class="btn-primary" onclick="registrarConEmail()">Crear cuenta</button>
+    <div class="auth-row"><label>Email</label><input class="auth-input" type="email" id="reg-email" placeholder="tu@email.com"></div>
+    <div class="auth-row"><label>Contraseña</label><input class="auth-input" type="password" id="reg-pass" placeholder="Mínimo 6 caracteres"></div>
+    <button class="btn-primary" id="btn-email-reg">Crear cuenta</button>
     <p class="auth-error" id="reg-error"></p>
-    <div class="auth-switch">¿Ya tenés cuenta? <a onclick="showScreen('screen-login')">Iniciá sesión</a></div>
+    <div class="auth-switch">¿Ya tenés cuenta? <a id="ir-login">Iniciá sesión</a></div>
   </div>
 </div>
 
-<!-- ── PANTALLA COMPLETAR PERFIL (primera vez) ── -->
+<!-- ── COMPLETAR PERFIL ── -->
 <div id="screen-perfil" class="auth-screen" style="display:none">
   <div class="auth-card">
     <div class="auth-logo">👤</div>
     <h1>Completá tu perfil</h1>
-    <p class="subtitle">Solo la primera vez — nos ayuda a validar que sos vecino del barrio</p>
-
-    <div class="auth-form-row">
-      <label>Email</label>
-      <input class="auth-input" type="email" id="prf-email" readonly>
-    </div>
-    <div class="auth-form-row">
-      <label>Nombre y apellido *</label>
-      <input class="auth-input" type="text" id="prf-nombre" placeholder="Juan García">
-    </div>
-    <div class="auth-form-row">
+    <p class="auth-subtitle">Solo la primera vez</p>
+    <div class="auth-row"><label>Email</label><input class="auth-input" type="email" id="prf-email" readonly></div>
+    <div class="auth-row"><label>Nombre y apellido *</label><input class="auth-input" type="text" id="prf-nombre" placeholder="Juan García"></div>
+    <div class="auth-row">
       <label>Barrio *</label>
       <select class="auth-select" id="prf-barrio">
         <option value="">— Seleccioná tu barrio —</option>
         <option value="San Sebastián - Pilar">San Sebastián - Pilar</option>
       </select>
     </div>
-    <div class="auth-form-row">
-      <label>Teléfono *</label>
-      <input class="auth-input" type="tel" id="prf-tel" placeholder="11 2345-6789">
-    </div>
-    <button class="btn-primary" id="prf-btn" onclick="guardarPerfil()">Guardar y continuar</button>
+    <div class="auth-row"><label>Teléfono *</label><input class="auth-input" type="tel" id="prf-tel" placeholder="11 2345-6789"></div>
+    <button class="btn-primary" id="btn-guardar-perfil">Guardar y continuar</button>
     <p class="auth-error" id="prf-error"></p>
   </div>
 </div>
 
-<!-- ── FAB CONTACTO ── -->
-<button class="fab-contacto" id="fab-contacto" style="display:none" onclick="abrirModalContacto()">💬 Contactar admin</button>
+<!-- ── FAB ── -->
+<button class="fab-contacto" id="fab-contacto" style="display:none" id="fab-contacto">💬 Contactar admin</button>
 
 <!-- ── MODAL CONTACTO ── -->
-<div class="modal-overlay" id="modal-contacto" onclick="if(event.target===this)cerrarModalContacto()">
+<div class="modal-overlay" id="modal-contacto">
   <div class="modal-box">
-    <button class="modal-close" onclick="cerrarModalContacto()">✕</button>
+    <button class="modal-close" id="modal-close-btn">✕</button>
     <h3>💬 Contactar al administrador</h3>
     <p>El admin te responderá a tu email registrado.</p>
-    <div style="margin-bottom:12px">
+    <div style="margin-bottom:16px">
       <label style="font-size:.83rem;font-weight:500;margin-bottom:5px;display:block">Mensaje *</label>
-      <textarea class="form-textarea" id="mc-mensaje" placeholder="Escribí tu consulta..." style="min-height:100px;width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:.92rem;font-family:'DM Sans',sans-serif;background:white;resize:vertical"></textarea>
+      <textarea id="mc-mensaje" placeholder="Escribí tu consulta..." style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:.92rem;font-family:'DM Sans',sans-serif;background:white;resize:vertical;min-height:100px"></textarea>
     </div>
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-      <button class="btn-submit" id="mc-btn" onclick="enviarMensajeAdmin()" style="width:auto;padding:11px 22px">Enviar mensaje</button>
+      <button class="btn-submit" id="mc-btn" style="width:auto;padding:11px 22px">Enviar mensaje</button>
       <span id="mc-msg" style="font-size:.83rem;display:none"></span>
     </div>
   </div>
@@ -322,11 +293,12 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
     <div class="header-inner">
       <div class="header-title">Proveedores <span>San Sebastián · Pilar</span></div>
       <div class="header-nav">
-        <button class="nav-btn active" onclick="showPage('buscar',this)">🔍 <span class="label">Buscar</span></button>
-        <button class="nav-btn" onclick="showPage('recomendar',this)">✍️ <span class="label">Recomendar</span></button>
-        <button class="nav-btn" id="nav-admin" style="display:none" onclick="showPage('admin',this)">🛠️ <span class="label">Admin</span></button>
-        <button class="nav-btn" id="nav-mensajes" style="display:none" onclick="showPage('mensajes',this)">💬 <span class="label">Mensajes</span></button>
-        <div class="user-avatar" id="user-avatar" title="Cerrar sesión" onclick="doLogout()">👤</div>
+        <button class="nav-btn active" id="nav-buscar">🔍 <span class="label">Buscar</span></button>
+        <button class="nav-btn" id="nav-recomendar">✍️ <span class="label">Recomendar</span></button>
+        <button class="nav-btn" id="nav-admin" style="display:none">🛠️ <span class="label">Admin</span></button>
+        <button class="nav-btn" id="nav-mensajes" style="display:none">💬 <span class="label">Mensajes</span></button>
+        <button class="nav-btn" id="btn-salir">Salir</button>
+        <div class="user-avatar" id="user-avatar">👤</div>
       </div>
     </div>
   </header>
@@ -335,27 +307,25 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
     <div class="top-controls">
       <div class="search-wrap">
         <span class="search-icon">🔍</span>
-        <input type="search" id="search-input" placeholder="Nombre, servicio, teléfono, DNI..." oninput="renderResults()">
+        <input type="search" id="search-input" placeholder="Nombre, servicio, teléfono, DNI...">
       </div>
       <div class="rubros-select-wrap">
-        <select class="rubros-select" id="rubros-select" onchange="renderResults()">
-          <option value="todos">📂 Todos los rubros</option>
-        </select>
+        <select class="rubros-select" id="rubros-select"><option value="todos">📂 Todos los rubros</option></select>
         <span class="rubros-arrow">▾</span>
       </div>
-      <select class="sort-select" id="sort-select" onchange="renderResults()">
+      <select class="sort-select" id="sort-select">
         <option value="destacados">⭐ Destacados primero</option>
         <option value="puntuacion">★ Mayor puntuación</option>
         <option value="alfabetico">🔤 Alfabético</option>
       </select>
     </div>
     <div class="filter-chips">
-      <span class="chip active" data-filter="todos" onclick="setFilter(this)">Todos</span>
-      <span class="chip" data-filter="Destacado" onclick="setFilter(this)">⭐ Destacados</span>
-      <span class="chip" data-filter="Muy Recomendable" onclick="setFilter(this)">💚 Muy recomendables</span>
-      <span class="chip" data-filter="Recomendable" onclick="setFilter(this)">👍 Recomendables</span>
-      <span class="chip" data-filter="Malas Experiencias" onclick="setFilter(this)">⚠️ Malas experiencias</span>
-      <span class="chip" data-filter="No Recomendable" onclick="setFilter(this)">🚫 No recomendables</span>
+      <span class="chip active" data-filter="todos">Todos</span>
+      <span class="chip" data-filter="Destacado">⭐ Destacados</span>
+      <span class="chip" data-filter="Muy Recomendable">💚 Muy recomendables</span>
+      <span class="chip" data-filter="Recomendable">👍 Recomendables</span>
+      <span class="chip" data-filter="Malas Experiencias">⚠️ Malas experiencias</span>
+      <span class="chip" data-filter="No Recomendable">🚫 No recomendables</span>
     </div>
     <div class="stats-bar" id="stats-bar"></div>
     <div id="results-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
@@ -368,10 +338,7 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
           <h2>✍️ Recomendá un Proveedor</h2>
           <p style="opacity:.85;font-size:.88rem">Tu opinión ayuda a toda la comunidad</p>
         </div>
-        <div class="form-disclaimer">
-          <strong>🔒 Privacidad</strong>
-          Tu email se registra de forma confidencial para validar que la recomendación proviene de un vecino del barrio y evitar duplicados.
-        </div>
+        <div class="form-disclaimer"><strong>🔒 Privacidad</strong>Tu email se registra de forma confidencial para validar que la recomendación proviene de un vecino y evitar duplicados.</div>
         <div class="form-body" id="form-body">
           <div class="form-section-title">Datos del proveedor</div>
           <div class="form-row"><label>Nombre del proveedor <span class="req">*</span></label><input class="form-input" id="f-nombre" placeholder="Nombre completo o razón social"></div>
@@ -396,14 +363,11 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
             </div>
           </div>
           <div class="form-row"><label>Notas <span class="opt">(links, Instagram, etc.)</span></label><textarea class="form-textarea" id="f-notas" placeholder="Contanos tu experiencia..."></textarea></div>
-          <div class="form-section-title">Tu identidad (no visible para otros vecinos)</div>
-          <div class="form-row">
-            <label>Email</label>
-            <input class="form-input" id="f-email" readonly>
-          </div>
+          <div class="form-section-title">Tu identidad (confidencial)</div>
+          <div class="form-row"><label>Email (no editable)</label><input class="form-input" id="f-email" readonly></div>
           <div class="form-row"><label>Nombre, área y lote <span class="req">*</span></label><textarea class="form-textarea" id="f-vecino" placeholder="Ej: Juan García, Sector A, Lote 42" style="min-height:60px"></textarea></div>
           <div class="form-submit-row">
-            <button class="btn-submit" id="btn-submit" onclick="enviarFormulario()">Enviar recomendación</button>
+            <button class="btn-submit" id="btn-submit">Enviar recomendación</button>
             <span class="form-msg" id="form-msg"></span>
           </div>
         </div>
@@ -411,7 +375,7 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
           <div class="icon">✅</div>
           <h3>¡Gracias por tu recomendación!</h3>
           <p>Fue recibida y será revisada antes de publicarse.</p>
-          <button class="btn-secondary" onclick="resetForm()">Enviar otra recomendación</button>
+          <button class="btn-secondary" id="btn-otra-rec">Enviar otra recomendación</button>
         </div>
       </div>
     </div>
@@ -421,7 +385,7 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
     <div style="max-width:900px;margin:0 auto">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
         <div><h2 style="font-family:'Playfair Display',serif;color:var(--verde);font-size:1.4rem">🛠️ Panel de Administración</h2><p style="color:var(--muted);font-size:.85rem">Recomendaciones pendientes</p></div>
-        <button class="nav-btn" style="background:var(--verde);border-color:var(--verde)" onclick="cargarPendientes()">↺ Actualizar</button>
+        <button class="nav-btn" id="btn-actualizar-admin" style="background:var(--verde);border-color:var(--verde)">↺ Actualizar</button>
       </div>
       <div id="admin-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
     </div>
@@ -431,22 +395,22 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
     <div style="max-width:900px;margin:0 auto">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
         <div><h2 style="font-family:'Playfair Display',serif;color:var(--verde);font-size:1.4rem">💬 Mensajes de vecinos</h2></div>
-        <button class="nav-btn" style="background:var(--verde);border-color:var(--verde)" onclick="cargarMensajes()">↺ Actualizar</button>
+        <button class="nav-btn" id="btn-actualizar-mensajes" style="background:var(--verde);border-color:var(--verde)">↺ Actualizar</button>
       </div>
       <div id="mensajes-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
     </div>
   </div>
 </div>
 
-<!-- Firebase SDK -->
 <script type="module">
-import { initializeApp }                          from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { initializeApp }       from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup,
          createUserWithEmailAndPassword, signInWithEmailAndPassword,
-         onAuthStateChanged, signOut }             from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+         onAuthStateChanged, signOut }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
-// ── CONFIG ────────────────────────────────────────────────────────────────
-const FIREBASE_CONFIG = {
+// ── CONFIG ─────────────────────────────────────────────────────────────────
+const FB_CONFIG = {
   apiKey:            "AIzaSyD6mlr7bcFRIR8QMg875jFVgAvaNhIipYA",
   authDomain:        "sansebastian-proveedores.firebaseapp.com",
   projectId:         "sansebastian-proveedores",
@@ -454,284 +418,289 @@ const FIREBASE_CONFIG = {
   messagingSenderId: "502507789799",
   appId:             "1:502507789799:web:18c23d38e2d6f657f6f142",
 };
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyRSb3Fv2jZofGImGJxd7G12Sy2VC3w-ITfEWzJ3YPrOzBZzVLgkhzhsVRARmKVYaUMCg/exec';
-const ADMIN_EMAILS    = ['francisco.iacono@gmail.com']; // ← tu email de admin
-const VECINAL_PWD     = 'sansebastian2025'; // contraseña que usa el script para validar
+const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbyRSb3Fv2jZofGImGJxd7G12Sy2VC3w-ITfEWzJ3YPrOzBZzVLgkhzhsVRARmKVYaUMCg/exec';
+const SCRIPT_PWD   = 'sansebastian2025';
+const ADMIN_EMAILS = ['francisco.iacono@gmail.com']; // ← tu email
 
-// ── FIREBASE INIT ─────────────────────────────────────────────────────────
-const fbApp  = initializeApp(FIREBASE_CONFIG);
-const auth   = getAuth(fbApp);
-const gprov  = new GoogleAuthProvider();
+// ── FIREBASE ───────────────────────────────────────────────────────────────
+const fbApp = initializeApp(FB_CONFIG);
+const auth  = getAuth(fbApp);
+const gprov = new GoogleAuthProvider();
 
-// ── ESTADO GLOBAL ─────────────────────────────────────────────────────────
-let currentUser    = null;  // objeto Firebase user
-let perfilUsuario  = null;  // datos guardados en el Sheet (nombre, barrio, tel)
-let todosLosProveedores = [];
-let activeFilter   = 'todos';
-let openCard       = null;
+// ── ESTADO ─────────────────────────────────────────────────────────────────
+let currentUser   = null;
+let perfilUsuario = null;
+let proveedores   = [];
+let activeFilter  = 'todos';
+let openCard      = null;
 
-// ── HELPERS ───────────────────────────────────────────────────────────────
+// ── HELPERS ────────────────────────────────────────────────────────────────
 const norm = t => { if(!t)return ''; return String(t).toLowerCase().trim().replace(/á/g,'a').replace(/é/g,'e').replace(/í/g,'i').replace(/ó/g,'o').replace(/ú/g,'u').replace(/ü/g,'u'); };
 const slugify = t => norm(t||'').replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
-const stars   = n => { if(!n)return ''; const l=Math.round(n); return '★'.repeat(l)+'☆'.repeat(5-l); };
-const badgeClass = e => ({'Destacado':'badge-destacado','Muy Recomendable':'badge-muy-recomendable','Recomendable':'badge-recomendable','Malas Experiencias':'badge-malas-experiencias','No Recomendable':'badge-no-recomendable','No Contratar':'badge-no-recomendable'})[e]||'badge-sin-datos';
-const svcEmoji = s => { if(!s)return '⚙️'; const v=norm(s); if(v.includes('plom'))return '🔧'; if(v.includes('electr'))return '⚡'; if(v.includes('limp'))return '🧹'; if(v.includes('pint'))return '🖌️'; if(v.includes('jardin')||v.includes('pasto'))return '🌿'; if(v.includes('comid')||v.includes('delivery')||v.includes('empanada')||v.includes('pizza'))return '🍕'; if(v.includes('gas')||v.includes('calef'))return '🔥'; if(v.includes('piscina')||v.includes('pileta'))return '🏊'; if(v.includes('carpint'))return '🪵'; if(v.includes('alban')||v.includes('construc'))return '🏗️'; if(v.includes('segur')||v.includes('alarm'))return '🔒'; if(v.includes('mudanz'))return '📦'; if(v.includes('panad')||v.includes('torta'))return '🍰'; if(v.includes('sushi'))return '🍱'; if(v.includes('helad'))return '🍦'; return '⚙️'; };
+const starsHtml = n => { if(!n)return ''; const l=Math.round(n); return '★'.repeat(l)+'☆'.repeat(5-l); };
+const badgeCls = e => ({'Destacado':'badge-destacado','Muy Recomendable':'badge-muy-recomendable','Recomendable':'badge-recomendable','Malas Experiencias':'badge-malas-experiencias','No Recomendable':'badge-no-recomendable','No Contratar':'badge-no-recomendable'})[e]||'badge-sin-datos';
+const emoji = s => { if(!s)return '⚙️'; const v=norm(s); if(v.includes('plom'))return '🔧'; if(v.includes('electr'))return '⚡'; if(v.includes('limp'))return '🧹'; if(v.includes('pint'))return '🖌️'; if(v.includes('jardin')||v.includes('pasto'))return '🌿'; if(v.includes('comid')||v.includes('delivery')||v.includes('empanada')||v.includes('pizza'))return '🍕'; if(v.includes('gas')||v.includes('calef'))return '🔥'; if(v.includes('piscina')||v.includes('pileta'))return '🏊'; if(v.includes('carpint'))return '🪵'; if(v.includes('alban')||v.includes('construc'))return '🏗️'; if(v.includes('segur')||v.includes('alarm'))return '🔒'; if(v.includes('mudanz'))return '📦'; if(v.includes('panad')||v.includes('torta'))return '🍰'; if(v.includes('sushi'))return '🍱'; if(v.includes('helad'))return '🍦'; return '⚙️'; };
 const fmtFecha = f => { try { const d=new Date(f); return isNaN(d)?'':d.toLocaleDateString('es-AR'); } catch(e){return '';} };
-const apiGet = params => fetch(APPS_SCRIPT_URL+'?'+new URLSearchParams({...params,password:VECINAL_PWD})).then(r=>r.json());
+const apiGet = p => fetch(SCRIPT_URL+'?'+new URLSearchParams({...p, password:SCRIPT_PWD})).then(r=>r.json());
+const errMsg = code => ({'auth/email-already-in-use':'Este email ya está registrado.','auth/invalid-email':'Email inválido.','auth/wrong-password':'Contraseña incorrecta.','auth/user-not-found':'No existe cuenta con ese email.','auth/weak-password':'Contraseña de al menos 6 caracteres.','auth/popup-closed-by-user':'Cerraste el popup.','auth/network-request-failed':'Error de red.','auth/invalid-credential':'Email o contraseña incorrectos.'})[code]||'Error al autenticar. Intentá de nuevo.';
+const showErr = (id, msg) => { const e=document.getElementById(id); e.textContent=msg; e.style.display='block'; };
+const hideScreens = () => ['screen-login','screen-register','screen-perfil'].forEach(id=>{document.getElementById(id).style.display='none';});
 
-// Exponer funciones al scope global para los onclick del HTML
-window.showScreen          = showScreen;
-window.loginConGoogle      = loginConGoogle;
-window.loginConEmail       = loginConEmail;
-window.registrarConEmail   = registrarConEmail;
-window.guardarPerfil       = guardarPerfil;
-window.doLogout            = doLogout;
-window.showPage            = showPage;
-window.setFilter           = setFilter;
-window.toggleCard          = toggleCard;
-window.recomendarDesdeCard = recomendarDesdeCard;
-window.enviarFormulario    = enviarFormulario;
-window.resetForm           = resetForm;
-window.cargarPendientes    = cargarPendientes;
-window.accionPendiente     = accionPendiente;
-window.cargarMensajes      = cargarMensajes;
-window.abrirModalContacto  = abrirModalContacto;
-window.cerrarModalContacto = cerrarModalContacto;
-window.enviarMensajeAdmin  = enviarMensajeAdmin;
-
-// ── PANTALLAS AUTH ─────────────────────────────────────────────────────────
-function showScreen(id) {
-  ['screen-login','screen-register','screen-perfil'].forEach(s => {
-    document.getElementById(s).style.display = s===id ? 'flex' : 'none';
-  });
-}
-
-// ── FIREBASE AUTH ──────────────────────────────────────────────────────────
-async function loginConGoogle() {
-  try {
-    await signInWithPopup(auth, gprov);
-    // onAuthStateChanged se encarga del resto
-  } catch(e) {
-    mostrarAuthError('li-error', traducirError(e.code));
-  }
-}
-async function loginConEmail() {
-  const email = document.getElementById('li-email').value.trim();
-  const pass  = document.getElementById('li-pass').value;
-  if (!email||!pass) { mostrarAuthError('li-error','Completá email y contraseña'); return; }
-  try {
-    await signInWithEmailAndPassword(auth, email, pass);
-  } catch(e) {
-    mostrarAuthError('li-error', traducirError(e.code));
-  }
-}
-async function registrarConEmail() {
-  const email = document.getElementById('reg-email').value.trim();
-  const pass  = document.getElementById('reg-pass').value;
-  if (!email||!pass) { mostrarAuthError('reg-error','Completá email y contraseña'); return; }
-  if (pass.length < 6) { mostrarAuthError('reg-error','La contraseña debe tener al menos 6 caracteres'); return; }
-  try {
-    await createUserWithEmailAndPassword(auth, email, pass);
-  } catch(e) {
-    mostrarAuthError('reg-error', traducirError(e.code));
-  }
-}
-function mostrarAuthError(id, msg) {
-  const el = document.getElementById(id);
-  el.textContent = msg; el.style.display = 'block';
-}
-function traducirError(code) {
-  const m = {
-    'auth/email-already-in-use':    'Este email ya está registrado.',
-    'auth/invalid-email':           'Email inválido.',
-    'auth/wrong-password':          'Contraseña incorrecta.',
-    'auth/user-not-found':          'No existe una cuenta con ese email.',
-    'auth/weak-password':           'La contraseña debe tener al menos 6 caracteres.',
-    'auth/popup-closed-by-user':    'Cerraste el popup de Google.',
-    'auth/network-request-failed':  'Error de red. Revisá tu conexión.',
-    'auth/invalid-credential':      'Email o contraseña incorrectos.',
-  };
-  return m[code] || 'Error al autenticar. Intentá de nuevo.';
-}
-async function doLogout() {
-  await signOut(auth);
-  currentUser = null; perfilUsuario = null;
-  location.reload();
-}
-
-// ── PERFIL ─────────────────────────────────────────────────────────────────
-async function guardarPerfil() {
-  const nombre = document.getElementById('prf-nombre').value.trim();
-  const barrio = document.getElementById('prf-barrio').value;
-  const tel    = document.getElementById('prf-tel').value.trim();
-  if (!nombre||!barrio||!tel) { mostrarAuthError('prf-error','Completá todos los campos'); return; }
-  const btn = document.getElementById('prf-btn'); btn.disabled=true; btn.textContent='Guardando...';
-  try {
-    await apiGet({ action:'saveUsuario', uid:currentUser.uid, email:currentUser.email, nombre, barrio, telefono:tel });
-    perfilUsuario = { nombre, barrio, telefono:tel, email:currentUser.email };
-    entrarALaApp();
-  } catch(e) {
-    mostrarAuthError('prf-error','Error al guardar. Intentá de nuevo.');
-    btn.disabled=false; btn.textContent='Guardar y continuar';
-  }
-}
-
-// ── AUTH STATE LISTENER ────────────────────────────────────────────────────
+// ── AUTH STATE ─────────────────────────────────────────────────────────────
 onAuthStateChanged(auth, async user => {
   if (!user) {
-    showScreen('screen-login');
+    // No logueado — mostrar login, ocultar app
+    document.getElementById('app').style.display = 'none';
+    hideScreens();
+    document.getElementById('screen-login').style.display = 'flex';
     return;
   }
   currentUser = user;
-  // Ocultar pantallas auth
-  ['screen-login','screen-register','screen-perfil'].forEach(s =>
-    document.getElementById(s).style.display='none');
-  // Buscar perfil en el Sheet
+  hideScreens(); // ocultar todas las pantallas auth
+  // Buscar perfil
   try {
     const data = await apiGet({ action:'getUsuario', uid:user.uid });
-    if (data.usuario) {
+    if (data.usuario && data.usuario.nombre) {
       perfilUsuario = data.usuario;
       entrarALaApp();
     } else {
-      // Primera vez — pedir perfil
+      // Primera vez: pedir perfil — ocultar app hasta completar
+      document.getElementById('app').style.display = 'none';
       document.getElementById('prf-email').value = user.email || '';
-      // Si vino de Google, pre-llenar nombre
       if (user.displayName) document.getElementById('prf-nombre').value = user.displayName;
-      showScreen('screen-perfil');
+      document.getElementById('screen-perfil').style.display = 'flex';
     }
   } catch(e) {
-    // Error de red — entrar igual sin perfil
+    // Error de red — entrar igual
     entrarALaApp();
+  }
+});
+
+// ── BOTONES AUTH ───────────────────────────────────────────────────────────
+document.getElementById('btn-google-login').addEventListener('click', async () => {
+  try { await signInWithPopup(auth, gprov); }
+  catch(e) { showErr('li-error', errMsg(e.code)); }
+});
+document.getElementById('btn-google-reg').addEventListener('click', async () => {
+  try { await signInWithPopup(auth, gprov); }
+  catch(e) { showErr('reg-error', errMsg(e.code)); }
+});
+document.getElementById('btn-email-login').addEventListener('click', async () => {
+  const email=document.getElementById('li-email').value.trim();
+  const pass=document.getElementById('li-pass').value;
+  if(!email||!pass){showErr('li-error','Completá email y contraseña');return;}
+  try { await signInWithEmailAndPassword(auth, email, pass); }
+  catch(e) { showErr('li-error', errMsg(e.code)); }
+});
+document.getElementById('li-pass').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('btn-email-login').click(); });
+document.getElementById('btn-email-reg').addEventListener('click', async () => {
+  const email=document.getElementById('reg-email').value.trim();
+  const pass=document.getElementById('reg-pass').value;
+  if(!email||!pass){showErr('reg-error','Completá email y contraseña');return;}
+  if(pass.length<6){showErr('reg-error','Mínimo 6 caracteres');return;}
+  try { await createUserWithEmailAndPassword(auth, email, pass); }
+  catch(e) { showErr('reg-error', errMsg(e.code)); }
+});
+document.getElementById('ir-registro').addEventListener('click', () => { document.getElementById('screen-login').style.display='none'; document.getElementById('screen-register').style.display='flex'; });
+document.getElementById('ir-login').addEventListener('click', () => { document.getElementById('screen-register').style.display='none'; document.getElementById('screen-login').style.display='flex'; });
+
+// ── GUARDAR PERFIL ─────────────────────────────────────────────────────────
+document.getElementById('btn-guardar-perfil').addEventListener('click', async () => {
+  const nombre = document.getElementById('prf-nombre').value.trim();
+  const barrio = document.getElementById('prf-barrio').value;
+  const tel    = document.getElementById('prf-tel').value.trim();
+  if (!nombre||!barrio||!tel) { showErr('prf-error','Completá todos los campos'); return; }
+  const btn = document.getElementById('btn-guardar-perfil');
+  btn.disabled = true; btn.textContent = 'Guardando...';
+  try {
+    await apiGet({ action:'saveUsuario', uid:currentUser.uid, email:currentUser.email, nombre, barrio, telefono:tel });
+    perfilUsuario = { nombre, barrio, telefono:tel, email:currentUser.email };
+    document.getElementById('screen-perfil').style.display = 'none';
+    entrarALaApp();
+  } catch(e) {
+    showErr('prf-error','Error al guardar. Intentá de nuevo.');
+    btn.disabled=false; btn.textContent='Guardar y continuar';
   }
 });
 
 // ── ENTRAR A LA APP ────────────────────────────────────────────────────────
 function entrarALaApp() {
+  hideScreens();
+  document.getElementById('app').style.display = 'block';
   const isAdmin = ADMIN_EMAILS.includes((currentUser?.email||'').toLowerCase());
-  document.getElementById('app').style.display='block';
   // Avatar
   const av = document.getElementById('user-avatar');
-  if (currentUser?.photoURL) av.innerHTML=`<img src="${currentUser.photoURL}">`;
+  if (currentUser?.photoURL) av.innerHTML=`<img src="${currentUser.photoURL}" alt="">`;
   else av.textContent = (perfilUsuario?.nombre||currentUser?.email||'?')[0].toUpperCase();
-  av.title = (perfilUsuario?.nombre||currentUser?.email||'') + ' · Clic para salir';
-  // Botones admin
+  // Tabs
   if (isAdmin) {
     document.getElementById('nav-admin').style.display='inline-flex';
     document.getElementById('nav-mensajes').style.display='inline-flex';
   } else {
     document.getElementById('fab-contacto').style.display='flex';
   }
-  // Pre-llenar email en formulario de recomendación
+  // Pre-llenar email en formulario
   document.getElementById('f-email').value = currentUser?.email || '';
-  // Cargar proveedores
+  // Cargar datos
   cargarProveedores();
   // Refresh al volver a la pestaña
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') cargarProveedores();
-  });
+  }, { once: false });
 }
+
+// ── NAVEGACIÓN ─────────────────────────────────────────────────────────────
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + pageId).classList.add('active');
+  document.getElementById('nav-' + pageId)?.classList.add('active');
+  if (pageId==='admin')    cargarPendientes();
+  if (pageId==='mensajes') cargarMensajes();
+}
+document.getElementById('nav-buscar').addEventListener('click',    () => showPage('buscar'));
+document.getElementById('nav-recomendar').addEventListener('click', () => showPage('recomendar'));
+document.getElementById('nav-admin').addEventListener('click',      () => showPage('admin'));
+document.getElementById('nav-mensajes').addEventListener('click',   () => showPage('mensajes'));
+document.getElementById('btn-salir').addEventListener('click', async () => {
+  await signOut(auth);
+  location.reload();
+});
+
+// ── FILTROS Y BÚSQUEDA ─────────────────────────────────────────────────────
+document.getElementById('search-input').addEventListener('input',   () => renderResults());
+document.getElementById('rubros-select').addEventListener('change', () => renderResults());
+document.getElementById('sort-select').addEventListener('change',   () => renderResults());
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    activeFilter = chip.dataset.filter;
+    openCard = null;
+    renderResults();
+  });
+});
 
 // ── DATOS ──────────────────────────────────────────────────────────────────
 async function cargarProveedores() {
   try {
     const data = await apiGet({ action:'getProveedores' });
-    if (!data.error) {
-      procesarDatos(data.proveedores||[]);
-      renderResults();
-    }
+    if (!data.error) { procesarDatos(data.proveedores||[]); renderResults(); }
   } catch(e) { console.error('Error cargando proveedores', e); }
 }
 
-const CATEGORIAS=[
-  {label:'🍕 Comida & Delivery',keywords:['comid','delivery','empanada','pizza','panad','sushi','helad','restau','catering','alfajor','torta','dulce','miel']},
-  {label:'🧹 Limpieza',keywords:['limp','cleaning']},
-  {label:'🌿 Jardín & Pileta',keywords:['jardin','pasto','poda','paisaj','pileta','piscina','arbol']},
-  {label:'🔧 Plomería & Gas',keywords:['plom','gas','calef','termotanque','calefon','sanitari']},
-  {label:'⚡ Electricidad',keywords:['electr','luminaria']},
-  {label:'🖌️ Pintura & Construcción',keywords:['pint','alban','construc','refacci','obra','revoque','yeso']},
-  {label:'🪵 Carpintería',keywords:['carpint','mader','mueble','puerta','ventana']},
-  {label:'🔒 Seguridad',keywords:['segur','alarm','camara','cctv','cerraj']},
-  {label:'📦 Mudanza & Fletes',keywords:['mudanz','flete','transporte']},
-  {label:'🏠 Hogar & Varios',keywords:[]},
+const CATS = [
+  {label:'🍕 Comida & Delivery',kw:['comid','delivery','empanada','pizza','panad','sushi','helad','restau','catering','alfajor','torta','dulce','miel']},
+  {label:'🧹 Limpieza',kw:['limp','cleaning']},
+  {label:'🌿 Jardín & Pileta',kw:['jardin','pasto','poda','paisaj','pileta','piscina','arbol']},
+  {label:'🔧 Plomería & Gas',kw:['plom','gas','calef','termotanque','calefon','sanitari']},
+  {label:'⚡ Electricidad',kw:['electr','luminaria']},
+  {label:'🖌️ Pintura & Construcción',kw:['pint','alban','construc','refacci','obra','revoque','yeso']},
+  {label:'🪵 Carpintería',kw:['carpint','mader','mueble','puerta','ventana']},
+  {label:'🔒 Seguridad',kw:['segur','alarm','camara','cctv','cerraj']},
+  {label:'📦 Mudanza & Fletes',kw:['mudanz','flete','transporte']},
+  {label:'🏠 Hogar & Varios',kw:[]},
 ];
-function catDeServicio(s){const v=norm(s||'');for(const c of CATEGORIAS){if(c.keywords.length&&c.keywords.some(k=>v.includes(k)))return c.label}return '🏠 Hogar & Varios'}
+const catDe = s => { const v=norm(s||''); for(const c of CATS){if(c.kw.length&&c.kw.some(k=>v.includes(k)))return c.label;} return '🏠 Hogar & Varios'; };
 
-function procesarDatos(filas){
-  const mapa={};
-  filas.forEach(f=>{
-    const key=genKey(f);
-    if(!mapa[key])mapa[key]={nombre:f.nombre,empresa:f.empresa,dni:f.dni,telefono:f.telefono,servicio:f.servicio,destacado:false,resenas:[]};
-    if(norm(f.recomendacion)==='publicidad')mapa[key].destacado=true;
-    else if(f.recomendacion)mapa[key].resenas.push({recomendacion:f.recomendacion,notas:f.notas});
+function procesarDatos(filas) {
+  const mapa = {};
+  filas.forEach(f => {
+    const key = genKey(f);
+    if (!mapa[key]) mapa[key] = {nombre:f.nombre,empresa:f.empresa,dni:f.dni,telefono:f.telefono,servicio:f.servicio,destacado:false,resenas:[]};
+    if (norm(f.recomendacion)==='publicidad') mapa[key].destacado = true;
+    else if (f.recomendacion) mapa[key].resenas.push({recomendacion:f.recomendacion,notas:f.notas});
   });
-  todosLosProveedores=Object.values(mapa).map(p=>{
-    const score=p.destacado?{promedio:5,total:0,etiqueta:'Destacado',estrellas:5}:calcScore(p.resenas);
-    return{...p,score,categoria:catDeServicio(p.servicio)};
-  });
+  proveedores = Object.values(mapa).map(p => ({
+    ...p,
+    score: p.destacado ? {promedio:5,total:0,etiqueta:'Destacado',estrellas:5} : calcScore(p.resenas),
+    categoria: catDe(p.servicio),
+  }));
   poblarRubros();
 }
-function genKey(f){const n=norm(f.nombre),d=norm(f.dni),t=norm(f.telefono);if(d&&d!=='n/a')return n+'_d_'+d;if(t&&t!=='n/a')return n+'_t_'+t.replace(/\D/g,'').slice(-8);return n+'_e_'+norm(f.empresa)}
-function calcScore(r){
-  if(!r||!r.length)return{promedio:0,total:0,etiqueta:'Sin datos',estrellas:0};
-  const total=r.length,pos=r.filter(x=>norm(x.recomendacion)==='recomendable').length,neg=total-pos,pct=pos/total;
-  const est=Math.max(1,Math.round(pct*4+1));
+
+function genKey(f) { const n=norm(f.nombre),d=norm(f.dni),t=norm(f.telefono); if(d&&d!=='n/a')return n+'_d_'+d; if(t&&t!=='n/a')return n+'_t_'+t.replace(/\D/g,'').slice(-8); return n+'_e_'+norm(f.empresa); }
+
+function calcScore(r) {
+  if (!r||!r.length) return {promedio:0,total:0,etiqueta:'Sin datos',estrellas:0};
+  const total=r.length, pos=r.filter(x=>norm(x.recomendacion)==='recomendable').length, neg=total-pos, pct=pos/total;
+  const est = Math.max(1,Math.round(pct*4+1));
   let et;
-  if(neg>=3)et='No Recomendable';
-  else if(neg>0&&neg<pos)et='Malas Experiencias';
-  else if(neg>=pos&&neg>0)et='No Recomendable';
-  else if(pos>=5&&neg===0)et='Muy Recomendable';
-  else if(pos>=5&&pct>=0.9)et='Muy Recomendable';
+  if(neg>=3) et='No Recomendable';
+  else if(neg>0&&neg<pos) et='Malas Experiencias';
+  else if(neg>=pos&&neg>0) et='No Recomendable';
+  else if(pos>=5&&pct>=0.9) et='Muy Recomendable';
+  else if(pos>=5&&neg===0) et='Muy Recomendable';
   else et='Recomendable';
-  return{promedio:Math.round(pct*4+1),total,etiqueta:et,estrellas:est};
+  return {promedio:Math.round(pct*4+1),total,etiqueta:et,estrellas:est};
 }
-function poblarRubros(){
+
+function poblarRubros() {
   const sel=document.getElementById('rubros-select');
-  const cnt={};todosLosProveedores.forEach(p=>{cnt[p.categoria]=(cnt[p.categoria]||0)+1});
-  const cats=CATEGORIAS.filter(c=>cnt[c.label]).sort((a,b)=>(cnt[b.label]||0)-(cnt[a.label]||0));
-  sel.innerHTML=`<option value="todos">📂 Todos los rubros (${todosLosProveedores.length})</option>`+cats.map(c=>`<option value="${c.label}">${c.label} (${cnt[c.label]})</option>`).join('');
+  const cnt={}; proveedores.forEach(p=>{cnt[p.categoria]=(cnt[p.categoria]||0)+1;});
+  const cats=CATS.filter(c=>cnt[c.label]).sort((a,b)=>(cnt[b.label]||0)-(cnt[a.label]||0));
+  sel.innerHTML=`<option value="todos">📂 Todos los rubros (${proveedores.length})</option>`+cats.map(c=>`<option value="${c.label}">${c.label} (${cnt[c.label]})</option>`).join('');
 }
 
 // ── RENDER ─────────────────────────────────────────────────────────────────
-function renderResults(){
-  const q=norm(document.getElementById('search-input').value);
-  const srt=document.getElementById('sort-select').value;
-  const rub=document.getElementById('rubros-select').value;
-  const cont=document.getElementById('results-container');
-  let fil=[...todosLosProveedores];
-  if(rub!=='todos')fil=fil.filter(p=>p.categoria===rub);
-  if(activeFilter!=='todos')fil=fil.filter(p=>p.score.etiqueta===activeFilter);
-  if(q){const ws=q.trim().split(/\s+/).filter(Boolean);fil=fil.filter(p=>{const nt=p.resenas.map(r=>norm(r.notas)+' '+norm(r.recomendacion)).join(' ');const tel=(p.telefono||'').replace(/\D/g,'');const tx=[p.nombre,p.empresa,p.servicio,p.telefono,tel,p.dni,nt].map(norm).join(' ');return ws.every(w=>tx.includes(w));});}
-  const ord={Destacado:5,'Muy Recomendable':4,Recomendable:3,'Malas Experiencias':2,'No Recomendable':1,'Sin datos':0};
-  if(srt==='alfabetico')fil.sort((a,b)=>a.destacado!==b.destacado?(a.destacado?-1:1):a.nombre.localeCompare(b.nombre,'es'));
-  else if(srt==='puntuacion')fil.sort((a,b)=>a.destacado!==b.destacado?(a.destacado?-1:1):b.score.estrellas-a.score.estrellas||a.nombre.localeCompare(b.nombre,'es'));
+function renderResults() {
+  const q   = norm(document.getElementById('search-input').value);
+  const srt = document.getElementById('sort-select').value;
+  const rub = document.getElementById('rubros-select').value;
+  const cont= document.getElementById('results-container');
+
+  let fil = [...proveedores];
+  if (rub !== 'todos')      fil = fil.filter(p => p.categoria === rub);
+  if (activeFilter !== 'todos') fil = fil.filter(p => p.score.etiqueta === activeFilter);
+  if (q) {
+    const ws = q.trim().split(/\s+/).filter(Boolean);
+    fil = fil.filter(p => {
+      const nt  = p.resenas.map(r=>norm(r.notas)+' '+norm(r.recomendacion)).join(' ');
+      const tel = (p.telefono||'').replace(/\D/g,'');
+      const tx  = [p.nombre,p.empresa,p.servicio,p.telefono,tel,p.dni,nt].map(norm).join(' ');
+      return ws.every(w => tx.includes(w));
+    });
+  }
+  const ord = {Destacado:5,'Muy Recomendable':4,Recomendable:3,'Malas Experiencias':2,'No Recomendable':1,'Sin datos':0};
+  if (srt==='alfabetico') fil.sort((a,b)=>a.destacado!==b.destacado?(a.destacado?-1:1):a.nombre.localeCompare(b.nombre,'es'));
+  else if (srt==='puntuacion') fil.sort((a,b)=>a.destacado!==b.destacado?(a.destacado?-1:1):b.score.estrellas-a.score.estrellas||a.nombre.localeCompare(b.nombre,'es'));
   else fil.sort((a,b)=>a.destacado!==b.destacado?(a.destacado?-1:1):(ord[b.score.etiqueta]||0)-(ord[a.score.etiqueta]||0)||b.score.estrellas-a.score.estrellas);
-  document.getElementById('stats-bar').textContent=`${fil.length} proveedor${fil.length!==1?'es':''} encontrado${fil.length!==1?'s':''}`;
-  if(!fil.length){cont.innerHTML=`<div class="empty-state"><div class="icon">🔍</div><h3>Sin resultados</h3><p>Probá con otras palabras</p></div>`;return;}
-  const dest=fil.filter(p=>p.destacado),reg=fil.filter(p=>!p.destacado);
+
+  document.getElementById('stats-bar').textContent = `${fil.length} proveedor${fil.length!==1?'es':''} encontrado${fil.length!==1?'s':''}`;
+
+  if (!fil.length) { cont.innerHTML=`<div class="empty-state"><div class="icon">🔍</div><h3>Sin resultados</h3><p>Probá con otras palabras</p></div>`; return; }
+  const dest=fil.filter(p=>p.destacado), reg=fil.filter(p=>!p.destacado);
   let html='';
-  if(dest.length)html+=`<div class="destacados-section"><div class="section-label">⭐ Destacados</div><div class="destacados-grid">${dest.map(p=>cardHTML(p,true)).join('')}</div></div>`;
-  if(reg.length)html+=`<div class="regular-section" style="display:flex;flex-direction:column;gap:10px">${dest.length?'<div class="section-label">Todos los proveedores</div>':''}${reg.map(p=>cardHTML(p,false)).join('')}</div>`;
-  cont.innerHTML=html;
+  if (dest.length) html+=`<div class="destacados-section"><div class="section-label">⭐ Destacados</div><div class="destacados-grid">${dest.map(p=>cardHTML(p,true)).join('')}</div></div>`;
+  if (reg.length)  html+=`<div class="regular-section" style="display:flex;flex-direction:column;gap:10px">${dest.length?'<div class="section-label">Todos los proveedores</div>':''}${reg.map(p=>cardHTML(p,false)).join('')}</div>`;
+  cont.innerHTML = html;
+
+  // Eventos de cards — usando delegación para no usar onclick inline
+  cont.querySelectorAll('.card-main, .card-resenas-toggle').forEach(el => {
+    el.addEventListener('click', e => { e.stopPropagation(); toggleCard(el.closest('.proveedor-card')); });
+  });
+  cont.querySelectorAll('.btn-recomendar-card').forEach(btn => {
+    btn.addEventListener('click', e => { e.stopPropagation(); recomendarDesdeCard(btn.dataset.p); });
+  });
 }
 
-function cardHTML(p,isDest){
-  const {score}=p;
-  const bc=isDest?'badge-destacado':badgeClass(score.etiqueta);
-  const el=isDest?'⭐ Destacado':score.etiqueta;
-  const st=score.total>0?stars(score.estrellas):(isDest?'★★★★★':'');
-  const emoji=svcEmoji(p.servicio);
-  const telOk=p.telefono&&!['n/a',''].includes(norm(p.telefono));
-  const dniOk=p.dni&&!['n/a',''].includes(norm(p.dni));
-  const empOk=p.empresa&&!['n/a',''].includes(norm(p.empresa))&&p.empresa!==p.nombre;
-  const pJ=JSON.stringify({nombre:p.nombre,empresa:p.empresa,dni:p.dni,telefono:p.telefono,servicio:p.servicio});
-  const pE=pJ.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
-  const resHtml=p.resenas.map(r=>`<div class="resena-item ${slugify(r.recomendacion)}"><div class="resena-top"><span class="badge ${badgeClass(r.recomendacion)}" style="font-size:.72rem">${r.recomendacion||''}</span></div>${r.notas&&!['n/a',''].includes(norm(r.notas))?`<div class="resena-notas">"${r.notas}"</div>`:''}</div>`).join('');
-  const toggle=p.resenas.length?`<div class="card-resenas-toggle" onclick="toggleCard(this.closest('.proveedor-card'))"><span class="toggle-label">Ver reseñas (${p.resenas.length}) ▾</span></div><div class="card-detail"><div class="resenas-title">Reseñas</div>${resHtml}</div>`:'';
+function cardHTML(p, isDest) {
+  const sc = p.score;
+  const bc = isDest ? 'badge-destacado' : badgeCls(sc.etiqueta);
+  const el = isDest ? '⭐ Destacado' : sc.etiqueta;
+  const st = sc.total>0 ? starsHtml(sc.estrellas) : (isDest?'★★★★★':'');
+  const em = emoji(p.servicio);
+  const telOk = p.telefono&&!['n/a',''].includes(norm(p.telefono));
+  const dniOk = p.dni&&!['n/a',''].includes(norm(p.dni));
+  const empOk = p.empresa&&!['n/a',''].includes(norm(p.empresa))&&p.empresa!==p.nombre;
+  const pData = JSON.stringify({nombre:p.nombre,empresa:p.empresa,dni:p.dni,telefono:p.telefono,servicio:p.servicio});
+  const resHtml = p.resenas.map(r=>`<div class="resena-item ${slugify(r.recomendacion)}"><div class="resena-top"><span class="badge ${badgeCls(r.recomendacion)}" style="font-size:.72rem">${r.recomendacion||''}</span></div>${r.notas&&!['n/a',''].includes(norm(r.notas))?`<div class="resena-notas">"${r.notas}"</div>`:''}</div>`).join('');
+  const toggle = p.resenas.length ? `<div class="card-resenas-toggle"><span class="toggle-label">Ver reseñas (${p.resenas.length}) ▾</span></div><div class="card-detail"><div class="resenas-title">Reseñas</div>${resHtml}</div>` : '';
   return `<div class="proveedor-card${isDest?' destacado':''}">
-    <div class="card-main" onclick="toggleCard(this.closest('.proveedor-card'))">
-      <div class="card-avatar">${emoji}</div>
+    <div class="card-main">
+      <div class="card-avatar">${em}</div>
       <div class="card-info">${isDest?'<div class="destacado-badge">⭐ Destacado</div>':''}<div class="card-nombre">${p.nombre}</div><div class="card-sub">${empOk?p.empresa:p.servicio}</div><span class="card-servicio-tag">${p.servicio}</span></div>
-      <div class="card-right"><div class="badge ${bc}">${el}</div><br>${st?`<div class="score-stars">${st}</div>`:''}<div class="reviews-count">${score.total>0?score.total+' reseña'+(score.total!==1?'s':''):''}</div></div>
+      <div class="card-right"><div class="badge ${bc}">${el}</div><br>${st?`<div class="score-stars">${st}</div>`:''}<div class="reviews-count">${sc.total>0?sc.total+' reseña'+(sc.total!==1?'s':''):''}</div></div>
     </div>
     <div class="card-contacto">
       ${telOk?`<a class="contacto-item tel" href="tel:${p.telefono.replace(/\s/g,'')}">📞 ${p.telefono}</a>`:''}
@@ -739,27 +708,24 @@ function cardHTML(p,isDest){
       ${empOk?`<span class="contacto-item">🏢 ${p.empresa}</span>`:''}
     </div>
     ${toggle}
-    <div class="card-footer-actions"><button class="btn-recomendar-card" onclick="event.stopPropagation();recomendarDesdeCard('${pE}')">✍️ Recomendar este proveedor</button></div>
+    <div class="card-footer-actions"><button class="btn-recomendar-card" data-p='${pData.replace(/'/g,"&apos;")}'>✍️ Recomendar este proveedor</button></div>
   </div>`;
 }
 
-function toggleCard(el){
-  const det=el.querySelector('.card-detail');if(!det)return;
-  const lbl=el.querySelector('.toggle-label');const isOpen=det.classList.contains('open');
+function toggleCard(el) {
+  const det=el.querySelector('.card-detail'); if(!det)return;
+  const lbl=el.querySelector('.toggle-label');
+  const isOpen=det.classList.contains('open');
   if(openCard&&openCard!==det){openCard.classList.remove('open');const prev=openCard.closest('.proveedor-card')?.querySelector('.toggle-label');if(prev)prev.textContent=prev.textContent.replace('▴','▾').replace('Ocultar','Ver');}
   det.classList.toggle('open',!isOpen);
   if(lbl)lbl.textContent=!isOpen?`Ocultar reseñas ▴`:`Ver reseñas (${det.querySelectorAll('.resena-item').length}) ▾`;
   openCard=!isOpen?det:null;
 }
-function setFilter(chip){document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));chip.classList.add('active');activeFilter=chip.dataset.filter;openCard=null;renderResults();}
 
 // ── RECOMENDAR DESDE CARD ──────────────────────────────────────────────────
-function recomendarDesdeCard(pStr){
-  let p;try{p=JSON.parse(pStr.replace(/&quot;/g,'"'));}catch(e){return;}
-  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));
-  document.getElementById('page-recomendar').classList.add('active');
-  document.querySelector('.nav-btn:nth-child(2)').classList.add('active');
+function recomendarDesdeCard(pStr) {
+  let p; try{p=JSON.parse(pStr);}catch(e){return;}
+  showPage('recomendar');
   setTimeout(()=>{
     ['nombre','empresa','dni','telefono','servicio'].forEach(k=>document.getElementById('f-'+k).value=p[k]||'');
     document.getElementById('page-recomendar').scrollIntoView({behavior:'smooth'});
@@ -767,52 +733,45 @@ function recomendarDesdeCard(pStr){
 }
 
 // ── FORMULARIO ─────────────────────────────────────────────────────────────
-async function enviarFormulario(){
-  const nombre=document.getElementById('f-nombre').value.trim();
-  const telefono=document.getElementById('f-telefono').value.trim();
-  const servicio=document.getElementById('f-servicio').value.trim();
-  const recomen=document.querySelector('input[name="recomen"]:checked')?.value;
-  const vecino=document.getElementById('f-vecino').value.trim();
-  const msg=document.getElementById('form-msg');msg.style.display='none';
+document.getElementById('btn-submit').addEventListener('click', async () => {
+  const nombre   = document.getElementById('f-nombre').value.trim();
+  const telefono = document.getElementById('f-telefono').value.trim();
+  const servicio = document.getElementById('f-servicio').value.trim();
+  const recomen  = document.querySelector('input[name="recomen"]:checked')?.value;
+  const vecino   = document.getElementById('f-vecino').value.trim();
+  const msg      = document.getElementById('form-msg');
+  msg.style.display='none';
   if(!nombre||!telefono||!servicio||!recomen||!vecino){msg.textContent='⚠️ Completá todos los campos obligatorios (*)';msg.className='form-msg err';msg.style.display='block';return;}
-  const btn=document.getElementById('btn-submit');btn.disabled=true;btn.textContent='Verificando...';
-  // Chequear duplicado en frontend
-  try{
+  const btn=document.getElementById('btn-submit'); btn.disabled=true; btn.textContent='Verificando...';
+  try {
     const dup=await apiGet({action:'checkDuplicado',uid:currentUser.uid,email:currentUser.email,nombre,telefono});
     if(dup.duplicado){msg.textContent='⚠️ Ya enviaste una recomendación para este proveedor.';msg.className='form-msg err';msg.style.display='block';btn.disabled=false;btn.textContent='Enviar recomendación';return;}
-  }catch(e){/* si falla el check, seguir igual */}
+  } catch(e) { /* si falla el check, seguir */ }
   btn.textContent='Enviando...';
   const barrio=document.querySelector('input[name="barrio"]:checked')?.value||'No sé';
   const payload={action:'saveRecomendacion',nombre,empresa:document.getElementById('f-empresa').value.trim(),dni:document.getElementById('f-dni').value.trim(),telefono,servicio,recomendacion:recomen,notas:document.getElementById('f-notas').value.trim(),barrio,vecino,uid:currentUser.uid,email:currentUser.email};
   try{
-    const res=await fetch(APPS_SCRIPT_URL+'?'+new URLSearchParams({...payload,password:VECINAL_PWD}),{redirect:'follow'});
+    const res=await fetch(SCRIPT_URL+'?'+new URLSearchParams({...payload,password:SCRIPT_PWD}),{redirect:'follow'});
     const data=await res.json();
     if(data.ok){document.getElementById('form-body').style.display='none';document.getElementById('form-success').style.display='block';}
     else if(data.error==='duplicado'){msg.textContent='⚠️ Ya enviaste una recomendación para este proveedor.';msg.className='form-msg err';msg.style.display='block';btn.disabled=false;btn.textContent='Enviar recomendación';}
     else throw new Error(data.error);
   }catch(e){msg.textContent='❌ Error al enviar. Intentá de nuevo.';msg.className='form-msg err';msg.style.display='block';btn.disabled=false;btn.textContent='Enviar recomendación';}
-}
-function resetForm(){
-  document.getElementById('form-body').style.display='block';document.getElementById('form-success').style.display='none';
+});
+document.getElementById('btn-otra-rec').addEventListener('click', () => {
+  document.getElementById('form-body').style.display='block';
+  document.getElementById('form-success').style.display='none';
   ['f-nombre','f-empresa','f-dni','f-telefono','f-servicio','f-notas','f-vecino'].forEach(id=>document.getElementById(id).value='');
   document.querySelectorAll('input[type=radio]').forEach(r=>r.checked=false);
   document.querySelector('input[name="barrio"][value="No sé"]').checked=true;
   document.getElementById('f-email').value=currentUser?.email||'';
-  document.getElementById('btn-submit').disabled=false;document.getElementById('btn-submit').textContent='Enviar recomendación';
+  document.getElementById('btn-submit').disabled=false;
+  document.getElementById('btn-submit').textContent='Enviar recomendación';
   document.getElementById('form-msg').style.display='none';
-}
-
-// ── NAVEGACIÓN ─────────────────────────────────────────────────────────────
-function showPage(page,btn){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('page-'+page).classList.add('active');
-  if(btn)btn.classList.add('active');
-  if(page==='admin')cargarPendientes();
-  if(page==='mensajes')cargarMensajes();
-}
+});
 
 // ── ADMIN ──────────────────────────────────────────────────────────────────
+document.getElementById('btn-actualizar-admin').addEventListener('click', cargarPendientes);
 async function cargarPendientes(){
   const c=document.getElementById('admin-container');c.innerHTML='<div class="loading"><div class="spinner"></div>Cargando...</div>';
   try{const r=await apiGet({action:'getPendientes'});if(r.error){c.innerHTML=`<div class="admin-empty"><div class="icon">⚠️</div><p>${r.error}</p></div>`;return;}renderPendientes(r.pendientes||[]);}
@@ -826,14 +785,16 @@ function renderPendientes(rows){
   if(pend.length){html+=`<div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--naranja);margin-bottom:10px">⏳ Pendientes (${pend.length})</div>`;html+=pend.map((r,i)=>adminCardHTML(r,i,true)).join('');}
   if(proc.length){html+=`<div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin:20px 0 10px">✔ Procesados recientemente</div>`;html+=proc.slice(0,5).map((r,i)=>adminCardHTML(r,i+1000,false)).join('');}
   c.innerHTML=html;
+  c.querySelectorAll('.btn-aprobar').forEach(btn=>btn.addEventListener('click',()=>accionPendiente(btn.dataset.idx,btn.dataset.fila,'Aprobado')));
+  c.querySelectorAll('.btn-rechazar').forEach(btn=>btn.addEventListener('click',()=>accionPendiente(btn.dataset.idx,btn.dataset.fila,'Rechazado')));
 }
 function adminCardHTML(r,idx,acc){
   const bc=r.estado==='Aprobado'?'aprobado':r.estado==='Rechazado'?'rechazado':'pendiente';
   return `<div class="admin-card" id="acard-${idx}">
-    <div class="admin-card-header"><div style="font-size:2rem">${svcEmoji(r.servicio)}</div>
+    <div class="admin-card-header"><div style="font-size:2rem">${emoji(r.servicio)}</div>
       <div class="admin-info"><div class="admin-nombre">${r.nombre||'Sin nombre'}</div>
         <div class="admin-meta"><span>⚙️ ${r.servicio||'—'}</span>${r.telefono?`<span>📞 ${r.telefono}</span>`:''}</div>
-        <div style="display:flex;gap:8px"><span class="badge ${badgeClass(r.recomendacion)}" style="font-size:.7rem">${r.recomendacion||''}</span><span class="admin-badge ${bc}">${r.estado||'Pendiente'}</span></div>
+        <div style="display:flex;gap:8px"><span class="badge ${badgeCls(r.recomendacion)}" style="font-size:.7rem">${r.recomendacion||''}</span><span class="admin-badge ${bc}">${r.estado||'Pendiente'}</span></div>
       </div>
     </div>
     <div class="admin-detalle">
@@ -841,36 +802,37 @@ function adminCardHTML(r,idx,acc){
       ${r.vecino?`<div class="admin-vecino"><strong>🏠 Quien informa:</strong> ${r.vecino}</div>`:''}
     </div>
     ${acc?`<div class="admin-actions">
-      <button class="btn-aprobar" id="btn-ap-${idx}" onclick="accionPendiente(${idx},${r.fila},'Aprobado')">✅ Aprobar</button>
-      <button class="btn-rechazar" id="btn-re-${idx}" onclick="accionPendiente(${idx},${r.fila},'Rechazado')">❌ Rechazar</button>
+      <button class="btn-aprobar" data-idx="${idx}" data-fila="${r.fila}">✅ Aprobar</button>
+      <button class="btn-rechazar" data-idx="${idx}" data-fila="${r.fila}">❌ Rechazar</button>
     </div>`:''}
   </div>`;
 }
 async function accionPendiente(idx,fila,accion){
-  const bA=document.getElementById('btn-ap-'+idx),bR=document.getElementById('btn-re-'+idx);
-  if(bA)bA.disabled=true;if(bR)bR.disabled=true;if(bA)bA.textContent='...';
+  const card=document.getElementById('acard-'+idx);
+  card.querySelectorAll('button').forEach(b=>b.disabled=true);
   try{
-    const r=await apiGet({action:'procesarPendiente',fila,accion});
-    const d=r;
-    if(d.ok){const card=document.getElementById('acard-'+idx);if(card){card.style.opacity='.5';card.querySelector('.admin-actions').innerHTML=`<span style="font-size:.85rem;color:${accion==='Aprobado'?'var(--verde-ok)':'var(--rojo)'}">${accion==='Aprobado'?'✅ Aprobado':'❌ Rechazado'}</span>`;}}
+    const d=await apiGet({action:'procesarPendiente',fila,accion});
+    if(d.ok){card.style.opacity='.5';card.querySelector('.admin-actions').innerHTML=`<span style="font-size:.85rem;color:${accion==='Aprobado'?'var(--verde-ok)':'var(--rojo)'}">${accion==='Aprobado'?'✅ Aprobado':'❌ Rechazado'}</span>`;}
     else alert('Error: '+(d.error||'desconocido'));
   }catch(e){alert('Error de conexión');}
 }
 
 // ── MENSAJES ───────────────────────────────────────────────────────────────
-function abrirModalContacto(){document.getElementById('modal-contacto').classList.add('open');}
-function cerrarModalContacto(){document.getElementById('modal-contacto').classList.remove('open');document.getElementById('mc-msg').style.display='none';document.getElementById('mc-btn').disabled=false;document.getElementById('mc-btn').textContent='Enviar mensaje';}
-async function enviarMensajeAdmin(){
+document.getElementById('btn-actualizar-mensajes').addEventListener('click', cargarMensajes);
+document.getElementById('fab-contacto').addEventListener('click', () => { document.getElementById('modal-contacto').classList.add('open'); });
+document.getElementById('modal-close-btn').addEventListener('click', () => { document.getElementById('modal-contacto').classList.remove('open'); });
+document.getElementById('modal-contacto').addEventListener('click', e => { if(e.target===e.currentTarget)e.currentTarget.classList.remove('open'); });
+document.getElementById('mc-btn').addEventListener('click', async () => {
   const mensaje=document.getElementById('mc-mensaje').value.trim();
-  const msg=document.getElementById('mc-msg');
-  if(!mensaje){msg.textContent='⚠️ Escribí un mensaje';msg.style.color='var(--rojo)';msg.style.display='block';return;}
+  const msgEl=document.getElementById('mc-msg');
+  if(!mensaje){msgEl.textContent='⚠️ Escribí un mensaje';msgEl.style.color='var(--rojo)';msgEl.style.display='block';return;}
   const btn=document.getElementById('mc-btn');btn.disabled=true;btn.textContent='Enviando...';
   try{
     const r=await apiGet({action:'saveMensaje',nombre:perfilUsuario?.nombre||currentUser?.email||'',email:currentUser?.email||'',telefono:perfilUsuario?.telefono||'',barrio:perfilUsuario?.barrio||'San Sebastián - Pilar',mensaje});
-    if(r.ok){msg.textContent='✅ Mensaje enviado.';msg.style.color='var(--verde-ok)';msg.style.display='block';document.getElementById('mc-mensaje').value='';btn.textContent='Enviado ✓';}
+    if(r.ok){msgEl.textContent='✅ Mensaje enviado.';msgEl.style.color='var(--verde-ok)';msgEl.style.display='block';document.getElementById('mc-mensaje').value='';btn.textContent='Enviado ✓';}
     else throw new Error(r.error);
-  }catch(e){msg.textContent='❌ Error al enviar.';msg.style.color='var(--rojo)';msg.style.display='block';btn.disabled=false;btn.textContent='Enviar mensaje';}
-}
+  }catch(e){msgEl.textContent='❌ Error al enviar.';msgEl.style.color='var(--rojo)';msgEl.style.display='block';btn.disabled=false;btn.textContent='Enviar mensaje';}
+});
 async function cargarMensajes(){
   const c=document.getElementById('mensajes-container');c.innerHTML='<div class="loading"><div class="spinner"></div>Cargando...</div>';
   try{
@@ -886,7 +848,7 @@ async function cargarMensajes(){
         ${m.fecha?`<span>📅 ${fmtFecha(m.fecha)}</span>`:''}
       </div>
       <div class="msg-admin-texto">${m.mensaje||''}</div>
-      ${m.email?`<a class="btn-responder" href="mailto:${m.email}?subject=Re: Consulta San Sebastián Proveedores">📧 Responder</a>`:''}
+      ${m.email?`<a class="btn-responder" href="mailto:${m.email}?subject=Re: Consulta Proveedores San Sebastián">📧 Responder</a>`:''}
     </div>`).join('');
   }catch(e){c.innerHTML='<div class="admin-empty"><div class="icon">❌</div><p>Error al cargar.</p></div>';}
 }
