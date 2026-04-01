@@ -9,52 +9,77 @@
 :root{--verde:#2d5016;--verde2:#4a7c2f;--crema:#f5f0e8;--crema2:#ede6d6;--text:#1a1a1a;--muted:#6b6b5a;--border:#d4c9b0;--white:#ffffff;--rojo:#c0392b;--naranja:#d35400;--verde-ok:#27ae60;--verde-ex:#1e8449}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:var(--crema);color:var(--text);min-height:100vh}
-#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--verde);background-image:radial-gradient(ellipse at 20% 50%,rgba(74,124,47,.4) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(45,80,22,.6) 0%,transparent 50%)}
-.login-card{background:var(--crema);border-radius:16px;padding:48px 40px;width:100%;max-width:400px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.3)}
-.login-logo{width:64px;height:64px;background:var(--verde);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px}
-.login-card h1{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--verde);margin-bottom:4px}
-.login-card>p{color:var(--muted);font-size:.9rem;margin-bottom:32px}
-.login-card input{width:100%;padding:14px 16px;border:2px solid var(--border);border-radius:10px;font-size:1rem;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);margin-bottom:12px;transition:border-color .2s;text-align:center;letter-spacing:2px}
-.login-card input:focus{outline:none;border-color:var(--verde2)}
-.btn-primary{width:100%;padding:14px;background:var(--verde);color:var(--white);border:none;border-radius:10px;font-size:1rem;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:background .2s,transform .1s}
-.btn-primary:hover{background:var(--verde2)}.btn-primary:active{transform:scale(.98)}.btn-primary:disabled{opacity:.6;cursor:not-allowed}
-.login-error{color:var(--rojo);font-size:.85rem;margin-top:10px;display:none}
+
+/* ── AUTH SCREENS ── */
+.auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--verde);background-image:radial-gradient(ellipse at 20% 50%,rgba(74,124,47,.4) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(45,80,22,.6) 0%,transparent 50%)}
+.auth-card{background:var(--crema);border-radius:16px;padding:40px;width:100%;max-width:420px;box-shadow:0 24px 60px rgba(0,0,0,.3)}
+.auth-logo{width:60px;height:60px;background:var(--verde);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:26px}
+.auth-card h1{font-family:'Playfair Display',serif;font-size:1.7rem;color:var(--verde);text-align:center;margin-bottom:4px}
+.auth-card .subtitle{color:var(--muted);font-size:.88rem;text-align:center;margin-bottom:28px}
+.auth-divider{display:flex;align-items:center;gap:10px;margin:18px 0;color:var(--muted);font-size:.8rem}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.btn-google{width:100%;padding:12px;background:white;border:1.5px solid var(--border);border-radius:10px;font-size:.92rem;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:box-shadow .2s,border-color .2s;margin-bottom:10px}
+.btn-google:hover{box-shadow:0 2px 8px rgba(0,0,0,.12);border-color:#aaa}
+.btn-google img{width:20px;height:20px}
+.auth-form-row{margin-bottom:12px}
+.auth-form-row label{display:block;font-size:.82rem;font-weight:500;color:var(--text);margin-bottom:5px}
+.auth-input{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:.92rem;font-family:'DM Sans',sans-serif;background:white;color:var(--text);transition:border-color .2s}
+.auth-input:focus{outline:none;border-color:var(--verde2)}
+.auth-input:read-only{background:var(--crema);color:var(--muted)}
+.btn-primary{width:100%;padding:13px;background:var(--verde);color:white;border:none;border-radius:10px;font-size:.95rem;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:background .2s;margin-top:4px}
+.btn-primary:hover{background:var(--verde2)}.btn-primary:disabled{opacity:.6;cursor:not-allowed}
+.auth-switch{text-align:center;font-size:.83rem;color:var(--muted);margin-top:16px}
+.auth-switch a{color:var(--verde);cursor:pointer;font-weight:500;text-decoration:none}
+.auth-switch a:hover{text-decoration:underline}
+.auth-error{color:var(--rojo);font-size:.82rem;margin-top:8px;display:none;text-align:center}
+.auth-select{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:.92rem;font-family:'DM Sans',sans-serif;background:white;color:var(--text);cursor:pointer}
+.auth-select:focus{outline:none;border-color:var(--verde2)}
+
+/* ── APP SHELL ── */
 #app{display:none}
-header{background:var(--verde);color:var(--white);padding:0 20px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+header{background:var(--verde);color:white;padding:0 20px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.2)}
 .header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:12px;height:60px}
 .header-title{font-family:'Playfair Display',serif;font-size:1.15rem;flex:1}
 .header-title span{font-size:.75rem;font-weight:300;opacity:.8;display:block}
-.header-nav{display:flex;gap:6px}
+.header-nav{display:flex;gap:6px;align-items:center}
 .nav-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:white;padding:6px 13px;border-radius:20px;font-size:.8rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s;white-space:nowrap}
 .nav-btn:hover{background:rgba(255,255,255,.22)}
 .nav-btn.active{background:rgba(255,255,255,.9);color:var(--verde);font-weight:600}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:600;cursor:pointer;overflow:hidden;flex-shrink:0}
+.user-avatar img{width:100%;height:100%;object-fit:cover}
+
+/* ── PAGES ── */
 .page{display:none;max-width:1200px;margin:0 auto;padding:20px 16px 60px}
 .page.active{display:block}
+
+/* ── SEARCH ── */
 .top-controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;align-items:center}
 .search-wrap{flex:1;min-width:200px;position:relative}
-.search-wrap input{width:100%;padding:12px 16px 12px 42px;border:2px solid var(--border);border-radius:12px;font-size:.95rem;font-family:'DM Sans',sans-serif;background:var(--white);transition:border-color .2s,box-shadow .2s}
+.search-wrap input{width:100%;padding:12px 16px 12px 42px;border:2px solid var(--border);border-radius:12px;font-size:.95rem;font-family:'DM Sans',sans-serif;background:white;transition:border-color .2s,box-shadow .2s}
 .search-wrap input:focus{outline:none;border-color:var(--verde2);box-shadow:0 0 0 3px rgba(74,124,47,.1)}
 .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1rem;pointer-events:none}
 .rubros-select-wrap{position:relative}
-.rubros-select{padding:11px 36px 11px 14px;border:2px solid var(--border);border-radius:12px;font-size:.88rem;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);cursor:pointer;appearance:none;-webkit-appearance:none;min-width:170px}
+.rubros-select{padding:11px 36px 11px 14px;border:2px solid var(--border);border-radius:12px;font-size:.88rem;font-family:'DM Sans',sans-serif;background:white;color:var(--text);cursor:pointer;appearance:none;-webkit-appearance:none;min-width:170px}
 .rubros-select:focus{outline:none;border-color:var(--verde2)}
 .rubros-arrow{position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--muted);font-size:.8rem}
-.sort-select{padding:11px 14px;border:2px solid var(--border);border-radius:12px;font-size:.88rem;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);cursor:pointer}
+.sort-select{padding:11px 14px;border:2px solid var(--border);border-radius:12px;font-size:.88rem;font-family:'DM Sans',sans-serif;background:white;color:var(--text);cursor:pointer}
 .sort-select:focus{outline:none;border-color:var(--verde2)}
 .filter-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-.chip{padding:5px 12px;border:1.5px solid var(--border);border-radius:20px;font-size:.78rem;cursor:pointer;background:var(--white);color:var(--muted);transition:all .2s;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.chip{padding:5px 12px;border:1.5px solid var(--border);border-radius:20px;font-size:.78rem;cursor:pointer;background:white;color:var(--muted);transition:all .2s;font-family:'DM Sans',sans-serif;white-space:nowrap}
 .chip:hover{border-color:var(--verde2);color:var(--verde)}
 .chip.active{background:var(--verde);border-color:var(--verde);color:white}
 .stats-bar{font-size:.82rem;color:var(--muted);margin-bottom:12px}
+
+/* ── CARDS ── */
 .destacados-section{margin-bottom:24px}
 .section-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:#b7770d;margin-bottom:10px;display:flex;align-items:center;gap:6px}
 .section-label::after{content:'';flex:1;height:1px;background:#f0c040;opacity:.5}
 .regular-section .section-label{color:var(--muted)}
 .regular-section .section-label::after{background:var(--border)}
 .destacados-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.proveedor-card{background:var(--white);border-radius:14px;border:1.5px solid var(--border);overflow:hidden;transition:box-shadow .2s,transform .15s}
+.proveedor-card{background:white;border-radius:14px;border:1.5px solid var(--border);overflow:hidden;transition:box-shadow .2s,transform .15s}
 .proveedor-card:hover{box-shadow:0 6px 20px rgba(45,80,22,.11);transform:translateY(-1px)}
-.proveedor-card.destacado{border-color:#f0c040;background:linear-gradient(135deg,#fffef5,var(--white))}
+.proveedor-card.destacado{border-color:#f0c040;background:linear-gradient(135deg,#fffef5,white)}
 .card-main{padding:14px 16px;display:flex;align-items:flex-start;gap:12px;cursor:pointer}
 .card-avatar{width:42px;height:42px;border-radius:50%;background:var(--crema2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;border:2px solid var(--border)}
 .card-info{flex:1;min-width:0}
@@ -74,7 +99,7 @@ header{background:var(--verde);color:var(--white);padding:0 20px;position:sticky
 .reviews-count{font-size:.7rem;color:var(--muted)}
 .card-contacto{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 12px}
 .contacto-item{font-size:.77rem;color:var(--muted);background:var(--crema);border:1px solid var(--border);border-radius:20px;padding:3px 10px;display:inline-flex;align-items:center;gap:3px}
-a.contacto-item.tel{color:var(--verde);text-decoration:none;border-color:rgba(74,124,47,.4);background:rgba(74,124,47,.06);font-weight:500;transition:background .2s}
+a.contacto-item.tel{color:var(--verde);text-decoration:none;border-color:rgba(74,124,47,.4);background:rgba(74,124,47,.06);font-weight:500}
 a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 .card-resenas-toggle{padding:7px 16px;border-top:1px solid var(--crema2);cursor:pointer;transition:background .15s}
 .card-resenas-toggle:hover{background:var(--crema)}
@@ -84,23 +109,24 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 .resenas-title{font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:8px;padding-top:10px}
 .resena-item{background:var(--crema);border-radius:8px;padding:10px 12px;margin-bottom:6px;border-left:3px solid var(--border)}
 .resena-item.recomendable{border-color:#1abc9c}
-.resena-item.muy-recomendable{border-color:var(--verde-ok)}
-.resena-item.malas-experiencias{border-color:var(--naranja)}
-.resena-item.no-recomendable,.resena-item.no-contratar{border-color:var(--rojo)}
+.resena-item.no-recomendable{border-color:var(--rojo)}
 .resena-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
-.resena-estrellas{font-size:.82rem;color:#e0a800}
-.resena-notas{font-size:.83rem;color:var(--text);line-height:1.45}
+.resena-notas{font-size:.83rem;color:var(--text);line-height:1.45;margin-top:4px}
 .card-footer-actions{padding:8px 16px 12px;border-top:1px solid var(--crema2)}
 .btn-recomendar-card{background:transparent;border:1.5px solid var(--verde2);color:var(--verde);border-radius:8px;padding:6px 14px;font-size:.78rem;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s}
 .btn-recomendar-card:hover{background:var(--verde);color:white}
+
+/* ── LOADING / EMPTY ── */
 .empty-state{text-align:center;padding:50px 20px;color:var(--muted)}
 .empty-state .icon{font-size:2.5rem;margin-bottom:10px}
 .empty-state h3{font-family:'Playfair Display',serif;color:var(--text);margin-bottom:5px}
 .loading{text-align:center;padding:50px;color:var(--muted)}
 .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--verde);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── FORMULARIO ── */
 .form-page{max-width:680px;margin:0 auto}
-.form-card{background:var(--white);border-radius:16px;border:1.5px solid var(--border);overflow:hidden}
+.form-card{background:white;border-radius:16px;border:1.5px solid var(--border);overflow:hidden}
 .form-header{background:var(--verde);color:white;padding:24px 28px}
 .form-header h2{font-family:'Playfair Display',serif;font-size:1.5rem;margin-bottom:6px}
 .form-disclaimer{background:#f0f7ec;border:1px solid rgba(74,124,47,.25);border-radius:10px;padding:12px 16px;margin:20px 28px 0;font-size:.8rem;color:var(--muted);line-height:1.55}
@@ -111,13 +137,10 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 .form-row label{display:block;font-size:.83rem;font-weight:500;color:var(--text);margin-bottom:5px}
 .form-row label .req{color:var(--rojo);margin-left:2px}
 .form-row label .opt{font-size:.75rem;color:var(--muted);font-weight:400;margin-left:4px}
-.form-input,.form-select,.form-textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:.92rem;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);transition:border-color .2s,box-shadow .2s}
-.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--verde2);box-shadow:0 0 0 3px rgba(74,124,47,.1)}
+.form-input,.form-select,.form-textarea{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:.92rem;font-family:'DM Sans',sans-serif;background:white;color:var(--text);transition:border-color .2s,box-shadow .2s}
+.form-input:focus,.form-textarea:focus{outline:none;border-color:var(--verde2);box-shadow:0 0 0 3px rgba(74,124,47,.1)}
+.form-input:read-only{background:var(--crema);color:var(--muted)}
 .form-textarea{resize:vertical;min-height:80px}
-.star-rating{display:flex;gap:6px;flex-direction:row-reverse;justify-content:flex-end}
-.star-rating input{display:none}
-.star-rating label{font-size:1.8rem;cursor:pointer;color:#ddd;transition:color .15s}
-.star-rating input:checked~label,.star-rating label:hover,.star-rating label:hover~label{color:#e0a800}
 .radio-group{display:flex;gap:8px;flex-wrap:wrap}
 .radio-opt{display:flex;align-items:center;gap:6px;padding:8px 14px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;font-size:.85rem;transition:all .2s}
 .radio-opt:hover{border-color:var(--verde2)}
@@ -135,20 +158,20 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 .form-success p{color:var(--muted);margin-bottom:20px}
 .btn-secondary{padding:10px 20px;background:transparent;color:var(--verde);border:1.5px solid var(--verde);border-radius:10px;font-size:.88rem;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s}
 .btn-secondary:hover{background:var(--verde);color:white}
-.admin-card{background:var(--white);border:1.5px solid var(--border);border-radius:14px;margin-bottom:12px;overflow:hidden}
+
+/* ── ADMIN ── */
+.admin-card{background:white;border:1.5px solid var(--border);border-radius:14px;margin-bottom:12px;overflow:hidden}
 .admin-card-header{padding:14px 18px;display:flex;align-items:flex-start;gap:14px}
 .admin-info{flex:1;min-width:0}
 .admin-nombre{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--verde);font-weight:700}
 .admin-meta{font-size:.8rem;color:var(--muted);margin:3px 0 6px;display:flex;flex-wrap:wrap;gap:8px}
-.admin-detalle{background:var(--crema);border-top:1px solid var(--crema2);padding:12px 18px;font-size:.83rem;line-height:1.6;color:var(--text)}
-.admin-detalle-row{display:flex;gap:8px;margin-bottom:4px;flex-wrap:wrap}
-.admin-detalle-row strong{color:var(--muted);min-width:100px;flex-shrink:0}
+.admin-detalle{background:var(--crema);border-top:1px solid var(--crema2);padding:12px 18px;font-size:.83rem;line-height:1.6}
 .admin-vecino{background:#fff8e1;border:1px solid #f0c040;border-radius:8px;padding:10px 12px;margin-top:8px;font-size:.82rem}
 .admin-vecino strong{color:#b7770d;display:block;margin-bottom:2px}
 .admin-actions{display:flex;gap:8px;padding:12px 18px;border-top:1px solid var(--crema2);background:var(--crema);flex-wrap:wrap}
-.btn-aprobar{padding:8px 18px;background:var(--verde);color:white;border:none;border-radius:8px;font-size:.85rem;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;transition:background .2s}
+.btn-aprobar{padding:8px 18px;background:var(--verde);color:white;border:none;border-radius:8px;font-size:.85rem;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500}
 .btn-aprobar:hover{background:var(--verde2)}
-.btn-rechazar{padding:8px 18px;background:white;color:var(--rojo);border:1.5px solid var(--rojo);border-radius:8px;font-size:.85rem;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;transition:all .2s}
+.btn-rechazar{padding:8px 18px;background:white;color:var(--rojo);border:1.5px solid var(--rojo);border-radius:8px;font-size:.85rem;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500}
 .btn-rechazar:hover{background:var(--rojo);color:white}
 .btn-aprobar:disabled,.btn-rechazar:disabled{opacity:.5;cursor:not-allowed}
 .admin-empty{text-align:center;padding:50px;color:var(--muted)}
@@ -157,12 +180,16 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 .admin-badge.pendiente{background:#fff3cd;color:#856404}
 .admin-badge.aprobado{background:#d4edda;color:#155724}
 .admin-badge.rechazado{background:#fadbd8;color:var(--rojo)}
-.msg-admin-card{background:var(--white);border:1.5px solid var(--border);border-radius:14px;margin-bottom:10px;padding:16px 18px}
+
+/* ── MENSAJES ── */
+.msg-admin-card{background:white;border:1.5px solid var(--border);border-radius:14px;margin-bottom:10px;padding:16px 18px}
 .msg-admin-de{font-weight:600;color:var(--verde);margin-bottom:4px;font-size:.9rem}
-.msg-admin-meta{font-size:.78rem;color:var(--muted);margin-bottom:8px;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.msg-admin-meta{font-size:.78rem;color:var(--muted);margin-bottom:8px;display:flex;gap:12px;flex-wrap:wrap}
 .msg-admin-texto{font-size:.88rem;line-height:1.55;background:var(--crema);border-radius:8px;padding:10px 12px;margin-bottom:10px}
-.btn-responder{padding:7px 16px;background:var(--verde);color:white;border:none;border-radius:8px;font-size:.8rem;font-family:'DM Sans',sans-serif;cursor:pointer;transition:background .2s;text-decoration:none;display:inline-block}
+.btn-responder{padding:7px 16px;background:var(--verde);color:white;border:none;border-radius:8px;font-size:.8rem;font-family:'DM Sans',sans-serif;cursor:pointer;text-decoration:none;display:inline-block}
 .btn-responder:hover{background:var(--verde2)}
+
+/* ── FAB + MODAL ── */
 .fab-contacto{position:fixed;bottom:24px;right:20px;background:var(--verde);color:white;border:none;border-radius:50px;padding:12px 18px;font-size:.85rem;font-family:'DM Sans',sans-serif;cursor:pointer;box-shadow:0 4px 16px rgba(45,80,22,.35);z-index:150;display:flex;align-items:center;gap:6px;transition:background .2s,transform .15s}
 .fab-contacto:hover{background:var(--verde2);transform:translateY(-2px)}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:center;justify-content:center;padding:20px}
@@ -171,9 +198,10 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 .modal-box h3{font-family:'Playfair Display',serif;color:var(--verde);margin-bottom:6px;font-size:1.2rem}
 .modal-box>p{color:var(--muted);font-size:.83rem;margin-bottom:18px}
 .modal-close{float:right;background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--muted)}
+
 @media(max-width:650px){
   .destacados-grid{grid-template-columns:1fr}
-  .login-card{padding:36px 22px}
+  .auth-card{padding:30px 20px}
   .form-body,.form-header,.form-disclaimer{padding-left:18px;padding-right:18px}
   .header-nav .nav-btn span.label{display:none}
 }
@@ -181,32 +209,105 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 </head>
 <body>
 
+<!-- ── PANTALLA LOGIN ── -->
+<div id="screen-login" class="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">🏡</div>
+    <h1>San Sebastián</h1>
+    <p class="subtitle">Proveedores del barrio</p>
+
+    <button class="btn-google" onclick="loginConGoogle()">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+      Continuar con Google
+    </button>
+
+    <div class="auth-divider">o con email</div>
+
+    <div class="auth-form-row">
+      <label>Email</label>
+      <input class="auth-input" type="email" id="li-email" placeholder="tu@email.com">
+    </div>
+    <div class="auth-form-row">
+      <label>Contraseña</label>
+      <input class="auth-input" type="password" id="li-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')loginConEmail()">
+    </div>
+    <button class="btn-primary" onclick="loginConEmail()">Ingresar</button>
+    <p class="auth-error" id="li-error"></p>
+    <div class="auth-switch">¿No tenés cuenta? <a onclick="showScreen('screen-register')">Registrate</a></div>
+  </div>
+</div>
+
+<!-- ── PANTALLA REGISTRO ── -->
+<div id="screen-register" class="auth-screen" style="display:none">
+  <div class="auth-card">
+    <div class="auth-logo">🏡</div>
+    <h1>Crear cuenta</h1>
+    <p class="subtitle">San Sebastián · Proveedores</p>
+
+    <button class="btn-google" onclick="loginConGoogle()">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+      Registrarse con Google
+    </button>
+
+    <div class="auth-divider">o con email</div>
+
+    <div class="auth-form-row">
+      <label>Email</label>
+      <input class="auth-input" type="email" id="reg-email" placeholder="tu@email.com">
+    </div>
+    <div class="auth-form-row">
+      <label>Contraseña</label>
+      <input class="auth-input" type="password" id="reg-pass" placeholder="Mínimo 6 caracteres">
+    </div>
+    <button class="btn-primary" onclick="registrarConEmail()">Crear cuenta</button>
+    <p class="auth-error" id="reg-error"></p>
+    <div class="auth-switch">¿Ya tenés cuenta? <a onclick="showScreen('screen-login')">Iniciá sesión</a></div>
+  </div>
+</div>
+
+<!-- ── PANTALLA COMPLETAR PERFIL (primera vez) ── -->
+<div id="screen-perfil" class="auth-screen" style="display:none">
+  <div class="auth-card">
+    <div class="auth-logo">👤</div>
+    <h1>Completá tu perfil</h1>
+    <p class="subtitle">Solo la primera vez — nos ayuda a validar que sos vecino del barrio</p>
+
+    <div class="auth-form-row">
+      <label>Email</label>
+      <input class="auth-input" type="email" id="prf-email" readonly>
+    </div>
+    <div class="auth-form-row">
+      <label>Nombre y apellido *</label>
+      <input class="auth-input" type="text" id="prf-nombre" placeholder="Juan García">
+    </div>
+    <div class="auth-form-row">
+      <label>Barrio *</label>
+      <select class="auth-select" id="prf-barrio">
+        <option value="">— Seleccioná tu barrio —</option>
+        <option value="San Sebastián - Pilar">San Sebastián - Pilar</option>
+      </select>
+    </div>
+    <div class="auth-form-row">
+      <label>Teléfono *</label>
+      <input class="auth-input" type="tel" id="prf-tel" placeholder="11 2345-6789">
+    </div>
+    <button class="btn-primary" id="prf-btn" onclick="guardarPerfil()">Guardar y continuar</button>
+    <p class="auth-error" id="prf-error"></p>
+  </div>
+</div>
+
+<!-- ── FAB CONTACTO ── -->
 <button class="fab-contacto" id="fab-contacto" style="display:none" onclick="abrirModalContacto()">💬 Contactar admin</button>
 
+<!-- ── MODAL CONTACTO ── -->
 <div class="modal-overlay" id="modal-contacto" onclick="if(event.target===this)cerrarModalContacto()">
   <div class="modal-box">
     <button class="modal-close" onclick="cerrarModalContacto()">✕</button>
     <h3>💬 Contactar al administrador</h3>
-    <p>Completá el formulario y el admin te responderá a tu email.</p>
-    <div class="form-row" style="margin-bottom:12px">
-      <label style="font-size:.83rem;font-weight:500;margin-bottom:5px;display:block">Tu nombre completo <span style="color:var(--rojo)">*</span></label>
-      <input class="form-input" id="mc-nombre" placeholder="Nombre y apellido">
-    </div>
-    <div class="form-row" style="margin-bottom:12px">
-      <label style="font-size:.83rem;font-weight:500;margin-bottom:5px;display:block">Tu email <span style="color:var(--rojo)">*</span></label>
-      <input class="form-input" id="mc-email" placeholder="tu@email.com" type="email">
-    </div>
-    <div class="form-row" style="margin-bottom:12px">
-      <label style="font-size:.83rem;font-weight:500;margin-bottom:5px;display:block">Tu teléfono <span style="color:var(--muted);font-size:.75rem">(opcional)</span></label>
-      <input class="form-input" id="mc-telefono" placeholder="11 2345-6789" type="tel">
-    </div>
-    <div class="form-row" style="margin-bottom:12px">
-      <label style="font-size:.83rem;font-weight:500;margin-bottom:5px;display:block">Barrio</label>
-      <input class="form-input" id="mc-barrio" value="San Sebastián - Pilar" readonly style="background:var(--crema);color:var(--muted)">
-    </div>
-    <div class="form-row" style="margin-bottom:16px">
-      <label style="font-size:.83rem;font-weight:500;margin-bottom:5px;display:block">Mensaje <span style="color:var(--rojo)">*</span></label>
-      <textarea class="form-textarea" id="mc-mensaje" placeholder="Escribí tu consulta o sugerencia..." style="min-height:90px"></textarea>
+    <p>El admin te responderá a tu email registrado.</p>
+    <div style="margin-bottom:12px">
+      <label style="font-size:.83rem;font-weight:500;margin-bottom:5px;display:block">Mensaje *</label>
+      <textarea class="form-textarea" id="mc-mensaje" placeholder="Escribí tu consulta..." style="min-height:100px;width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:.92rem;font-family:'DM Sans',sans-serif;background:white;resize:vertical"></textarea>
     </div>
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
       <button class="btn-submit" id="mc-btn" onclick="enviarMensajeAdmin()" style="width:auto;padding:11px 22px">Enviar mensaje</button>
@@ -215,17 +316,7 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
   </div>
 </div>
 
-<div id="login-screen">
-  <div class="login-card">
-    <div class="login-logo">🏡</div>
-    <h1>San Sebastián</h1>
-    <p>Proveedores del barrio · Ingresá con tu contraseña vecinal</p>
-    <input type="password" id="pwd-input" placeholder="Contraseña" autocomplete="current-password">
-    <button class="btn-primary" id="login-btn" onclick="doLogin()">Ingresar</button>
-    <p class="login-error" id="login-error">Contraseña incorrecta. Intentá de nuevo.</p>
-  </div>
-</div>
-
+<!-- ── APP ── -->
 <div id="app">
   <header>
     <div class="header-inner">
@@ -234,8 +325,8 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
         <button class="nav-btn active" onclick="showPage('buscar',this)">🔍 <span class="label">Buscar</span></button>
         <button class="nav-btn" onclick="showPage('recomendar',this)">✍️ <span class="label">Recomendar</span></button>
         <button class="nav-btn" id="nav-admin" style="display:none" onclick="showPage('admin',this)">🛠️ <span class="label">Admin</span></button>
-        <button class="nav-btn" id="nav-mensajes" style="display:none" onclick="showPage('mensajes',this)">💬 <span class="label">Mensajes</span> <span id="badge-mensajes" style="display:none;background:#e0a800;color:#fff;border-radius:10px;padding:0 5px;font-size:.7rem;margin-left:2px"></span></button>
-        <button class="nav-btn" onclick="doLogout()">Salir</button>
+        <button class="nav-btn" id="nav-mensajes" style="display:none" onclick="showPage('mensajes',this)">💬 <span class="label">Mensajes</span></button>
+        <div class="user-avatar" id="user-avatar" title="Cerrar sesión" onclick="doLogout()">👤</div>
       </div>
     </div>
   </header>
@@ -267,7 +358,7 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
       <span class="chip" data-filter="No Recomendable" onclick="setFilter(this)">🚫 No recomendables</span>
     </div>
     <div class="stats-bar" id="stats-bar"></div>
-    <div id="results-container"></div>
+    <div id="results-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
   </div>
 
   <div class="page" id="page-recomendar">
@@ -275,23 +366,23 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
       <div class="form-card">
         <div class="form-header">
           <h2>✍️ Recomendá un Proveedor</h2>
-          <p style="opacity:.85;font-size:.88rem">Tu opinión ayuda a toda la comunidad de San Sebastián</p>
+          <p style="opacity:.85;font-size:.88rem">Tu opinión ayuda a toda la comunidad</p>
         </div>
         <div class="form-disclaimer">
           <strong>🔒 Privacidad</strong>
-          Este formulario no recopila ninguna información personal más allá de los datos que completás voluntariamente. Tu información será tratada con total confidencialidad y no será compartida ni utilizada para ningún otro fin.
+          Tu email se registra de forma confidencial para validar que la recomendación proviene de un vecino del barrio y evitar duplicados.
         </div>
         <div class="form-body" id="form-body">
           <div class="form-section-title">Datos del proveedor</div>
           <div class="form-row"><label>Nombre del proveedor <span class="req">*</span></label><input class="form-input" id="f-nombre" placeholder="Nombre completo o razón social"></div>
-          <div class="form-row"><label>Empresa <span class="opt">(opcional)</span></label><input class="form-input" id="f-empresa" placeholder="Nombre de la empresa o emprendimiento"></div>
+          <div class="form-row"><label>Empresa <span class="opt">(opcional)</span></label><input class="form-input" id="f-empresa" placeholder="Nombre de la empresa"></div>
           <div class="form-row"><label>DNI <span class="opt">(opcional)</span></label><input class="form-input" id="f-dni" placeholder="Solo números, sin puntos"></div>
           <div class="form-row"><label>Teléfono del proveedor <span class="req">*</span></label><input class="form-input" id="f-telefono" placeholder="Ej: 11 2345-6789" type="tel"></div>
           <div class="form-row"><label>Tipo de servicio <span class="req">*</span></label><input class="form-input" id="f-servicio" placeholder="Ej: Plomería, Limpieza, Empanadas..."></div>
           <div class="form-row">
             <label>¿Es del barrio?</label>
             <div class="radio-group">
-              <label class="radio-opt"><input type="radio" name="barrio" value="Sí"> Sí, vive en el barrio</label>
+              <label class="radio-opt"><input type="radio" name="barrio" value="Sí"> Sí</label>
               <label class="radio-opt"><input type="radio" name="barrio" value="No"> No</label>
               <label class="radio-opt"><input type="radio" name="barrio" value="No sé" checked> No sé</label>
             </div>
@@ -304,13 +395,13 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
               <label class="radio-opt mal"><input type="radio" name="recomen" value="No Recomendable"> 🚫 No Recomendable</label>
             </div>
           </div>
+          <div class="form-row"><label>Notas <span class="opt">(links, Instagram, etc.)</span></label><textarea class="form-textarea" id="f-notas" placeholder="Contanos tu experiencia..."></textarea></div>
+          <div class="form-section-title">Tu identidad (no visible para otros vecinos)</div>
           <div class="form-row">
-            <label>Notas <span class="opt">(puede incluir links, Instagram, etc.)</span></label>
-            <textarea class="form-textarea" id="f-notas" placeholder="Contanos tu experiencia, horarios, links útiles..."></textarea>
+            <label>Email</label>
+            <input class="form-input" id="f-email" readonly>
           </div>
-          <div class="form-section-title">Tus datos (confidenciales)</div>
-          <p style="font-size:.82rem;color:var(--muted);margin-bottom:12px">Solo se usan para validar que la recomendación proviene de un vecino del barrio.</p>
-          <div class="form-row"><label>Nombre, Área, Lote y Teléfono <span class="req">*</span></label><textarea class="form-textarea" id="f-vecino" placeholder="Ej: Juan García, Sector A, Lote 42, Tel: 11 2345-6789" style="min-height:64px"></textarea></div>
+          <div class="form-row"><label>Nombre, área y lote <span class="req">*</span></label><textarea class="form-textarea" id="f-vecino" placeholder="Ej: Juan García, Sector A, Lote 42" style="min-height:60px"></textarea></div>
           <div class="form-submit-row">
             <button class="btn-submit" id="btn-submit" onclick="enviarFormulario()">Enviar recomendación</button>
             <span class="form-msg" id="form-msg"></span>
@@ -319,7 +410,7 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
         <div class="form-success" id="form-success">
           <div class="icon">✅</div>
           <h3>¡Gracias por tu recomendación!</h3>
-          <p>Tu aporte fue recibido y será revisado antes de publicarse.</p>
+          <p>Fue recibida y será revisada antes de publicarse.</p>
           <button class="btn-secondary" onclick="resetForm()">Enviar otra recomendación</button>
         </div>
       </div>
@@ -329,7 +420,7 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
   <div class="page" id="page-admin">
     <div style="max-width:900px;margin:0 auto">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
-        <div><h2 style="font-family:'Playfair Display',serif;color:var(--verde);font-size:1.4rem">🛠️ Panel de Administración</h2><p style="color:var(--muted);font-size:.85rem">Recomendaciones pendientes de revisión</p></div>
+        <div><h2 style="font-family:'Playfair Display',serif;color:var(--verde);font-size:1.4rem">🛠️ Panel de Administración</h2><p style="color:var(--muted);font-size:.85rem">Recomendaciones pendientes</p></div>
         <button class="nav-btn" style="background:var(--verde);border-color:var(--verde)" onclick="cargarPendientes()">↺ Actualizar</button>
       </div>
       <div id="admin-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
@@ -339,7 +430,7 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
   <div class="page" id="page-mensajes">
     <div style="max-width:900px;margin:0 auto">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
-        <div><h2 style="font-family:'Playfair Display',serif;color:var(--verde);font-size:1.4rem">💬 Mensajes de vecinos</h2><p style="color:var(--muted);font-size:.85rem">Consultas y sugerencias recibidas</p></div>
+        <div><h2 style="font-family:'Playfair Display',serif;color:var(--verde);font-size:1.4rem">💬 Mensajes de vecinos</h2></div>
         <button class="nav-btn" style="background:var(--verde);border-color:var(--verde)" onclick="cargarMensajes()">↺ Actualizar</button>
       </div>
       <div id="mensajes-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
@@ -347,86 +438,210 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
   </div>
 </div>
 
-<script>
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwltZ3NpUnDcV-4BezdsYGlCdU_eAOwFnq8qNnCJOwFUKaRr9IzBZ9ph75gox_epABBTQ/exec';
-const ADMIN_PASSWORD  = 'admin2025';
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp }                          from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup,
+         createUserWithEmailAndPassword, signInWithEmailAndPassword,
+         onAuthStateChanged, signOut }             from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
-let todosLosProveedores = [], activeFilter = 'todos', openCard = null;
+// ── CONFIG ────────────────────────────────────────────────────────────────
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyD6mlr7bcFRIR8QMg875jFVgAvaNhIipYA",
+  authDomain:        "sansebastian-proveedores.firebaseapp.com",
+  projectId:         "sansebastian-proveedores",
+  storageBucket:     "sansebastian-proveedores.firebasestorage.app",
+  messagingSenderId: "502507789799",
+  appId:             "1:502507789799:web:18c23d38e2d6f657f6f142",
+};
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyRSb3Fv2jZofGImGJxd7G12Sy2VC3w-ITfEWzJ3YPrOzBZzVLgkhzhsVRARmKVYaUMCg/exec';
+const ADMIN_EMAILS    = ['francisco.iacono@gmail.com']; // ← tu email de admin
+const VECINAL_PWD     = 'sansebastian2025'; // contraseña que usa el script para validar
 
-// ── HELPERS ────────────────────────────────────────────────────────────────
-function normalizar(t){if(!t)return '';return String(t).toLowerCase().trim().replace(/á/g,'a').replace(/é/g,'e').replace(/í/g,'i').replace(/ó/g,'o').replace(/ú/g,'u').replace(/ü/g,'u')}
-function slugify(t){return normalizar(t||'').replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'')}
-function renderEstrellas(n){if(!n)return '';const l=Math.round(n);return '★'.repeat(l)+'☆'.repeat(5-l)}
-function badgeCSSClass(e){return({'Destacado':'badge-destacado','Muy Recomendable':'badge-muy-recomendable','Recomendable':'badge-recomendable','Malas Experiencias':'badge-malas-experiencias','No Recomendable':'badge-no-recomendable','No Contratar':'badge-no-recomendable'})[e]||'badge-sin-datos'}
-function servicioEmoji(s){if(!s)return '⚙️';const v=normalizar(s);if(v.includes('plom'))return '🔧';if(v.includes('electr'))return '⚡';if(v.includes('limp'))return '🧹';if(v.includes('pint'))return '🖌️';if(v.includes('jardin')||v.includes('pasto'))return '🌿';if(v.includes('comid')||v.includes('delivery')||v.includes('empanada')||v.includes('pizza'))return '🍕';if(v.includes('gas')||v.includes('calef'))return '🔥';if(v.includes('piscina')||v.includes('pileta'))return '🏊';if(v.includes('carpint'))return '🪵';if(v.includes('alban')||v.includes('construc'))return '🏗️';if(v.includes('segur')||v.includes('alarm'))return '🔒';if(v.includes('mudanz'))return '📦';if(v.includes('panad')||v.includes('torta')||v.includes('dulce'))return '🍰';if(v.includes('sushi'))return '🍱';if(v.includes('helad'))return '🍦';return '⚙️'}
-function formatFecha(f){try{const d=new Date(f);if(isNaN(d.getTime()))return '';return d.toLocaleDateString('es-AR')}catch(e){return ''}}
+// ── FIREBASE INIT ─────────────────────────────────────────────────────────
+const fbApp  = initializeApp(FIREBASE_CONFIG);
+const auth   = getAuth(fbApp);
+const gprov  = new GoogleAuthProvider();
 
-// ── LÓGICA DE CALIFICACIÓN ─────────────────────────────────────────────────
-// Entrada: array de reseñas con campo "recomendacion" = "Recomendable" | "No Recomendable"
-// Reglas acordadas:
-//  - 3+ negativas → No Recomendable (sin importar positivas)
-//  - 1-2 negativas, negativas < positivas → Malas Experiencias
-//  - 90%+ positivas Y 5+ positivas → Muy Recomendable
-//  - ≥5 positivas Y 0 negativas → Muy Recomendable
-//  - resto con mayoría positiva → Recomendable
-//  - negativas >= positivas → No Recomendable
-// Estrellas: porcentaje de aprobación mapeado a 1-5
-function calcularScore(resenas) {
-  if (!resenas || resenas.length === 0)
-    return { promedio: 0, total: 0, etiqueta: 'Sin datos', estrellas: 0 };
+// ── ESTADO GLOBAL ─────────────────────────────────────────────────────────
+let currentUser    = null;  // objeto Firebase user
+let perfilUsuario  = null;  // datos guardados en el Sheet (nombre, barrio, tel)
+let todosLosProveedores = [];
+let activeFilter   = 'todos';
+let openCard       = null;
 
-  const total     = resenas.length;
-  const positivas = resenas.filter(r => normalizar(r.recomendacion) === 'recomendable').length;
-  const negativas = total - positivas;
-  const pctPos    = positivas / total; // 0..1
+// ── HELPERS ───────────────────────────────────────────────────────────────
+const norm = t => { if(!t)return ''; return String(t).toLowerCase().trim().replace(/á/g,'a').replace(/é/g,'e').replace(/í/g,'i').replace(/ó/g,'o').replace(/ú/g,'u').replace(/ü/g,'u'); };
+const slugify = t => norm(t||'').replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+const stars   = n => { if(!n)return ''; const l=Math.round(n); return '★'.repeat(l)+'☆'.repeat(5-l); };
+const badgeClass = e => ({'Destacado':'badge-destacado','Muy Recomendable':'badge-muy-recomendable','Recomendable':'badge-recomendable','Malas Experiencias':'badge-malas-experiencias','No Recomendable':'badge-no-recomendable','No Contratar':'badge-no-recomendable'})[e]||'badge-sin-datos';
+const svcEmoji = s => { if(!s)return '⚙️'; const v=norm(s); if(v.includes('plom'))return '🔧'; if(v.includes('electr'))return '⚡'; if(v.includes('limp'))return '🧹'; if(v.includes('pint'))return '🖌️'; if(v.includes('jardin')||v.includes('pasto'))return '🌿'; if(v.includes('comid')||v.includes('delivery')||v.includes('empanada')||v.includes('pizza'))return '🍕'; if(v.includes('gas')||v.includes('calef'))return '🔥'; if(v.includes('piscina')||v.includes('pileta'))return '🏊'; if(v.includes('carpint'))return '🪵'; if(v.includes('alban')||v.includes('construc'))return '🏗️'; if(v.includes('segur')||v.includes('alarm'))return '🔒'; if(v.includes('mudanz'))return '📦'; if(v.includes('panad')||v.includes('torta'))return '🍰'; if(v.includes('sushi'))return '🍱'; if(v.includes('helad'))return '🍦'; return '⚙️'; };
+const fmtFecha = f => { try { const d=new Date(f); return isNaN(d)?'':d.toLocaleDateString('es-AR'); } catch(e){return '';} };
+const apiGet = params => fetch(APPS_SCRIPT_URL+'?'+new URLSearchParams({...params,password:VECINAL_PWD})).then(r=>r.json());
 
-  // Estrellas: 100% pos = 5★, 0% = 1★ (mínimo 1 si hay alguna reseña)
-  const estrellas = Math.max(1, Math.round(pctPos * 4 + 1));
+// Exponer funciones al scope global para los onclick del HTML
+window.showScreen          = showScreen;
+window.loginConGoogle      = loginConGoogle;
+window.loginConEmail       = loginConEmail;
+window.registrarConEmail   = registrarConEmail;
+window.guardarPerfil       = guardarPerfil;
+window.doLogout            = doLogout;
+window.showPage            = showPage;
+window.setFilter           = setFilter;
+window.toggleCard          = toggleCard;
+window.recomendarDesdeCard = recomendarDesdeCard;
+window.enviarFormulario    = enviarFormulario;
+window.resetForm           = resetForm;
+window.cargarPendientes    = cargarPendientes;
+window.accionPendiente     = accionPendiente;
+window.cargarMensajes      = cargarMensajes;
+window.abrirModalContacto  = abrirModalContacto;
+window.cerrarModalContacto = cerrarModalContacto;
+window.enviarMensajeAdmin  = enviarMensajeAdmin;
 
-  let etiqueta;
-  if (negativas >= 3) {
-    etiqueta = 'No Recomendable';
-  } else if (negativas > 0 && negativas < positivas) {
-    etiqueta = 'Malas Experiencias';
-  } else if (negativas >= positivas && negativas > 0) {
-    etiqueta = 'No Recomendable';
-  } else if (positivas >= 5 && negativas === 0) {
-    etiqueta = 'Muy Recomendable';
-  } else if (positivas >= 5 && pctPos >= 0.9) {
-    etiqueta = 'Muy Recomendable';
-  } else {
-    etiqueta = 'Recomendable';
-  }
-
-  return { promedio: Math.round(pctPos * 4 + 1), total, etiqueta, estrellas };
+// ── PANTALLAS AUTH ─────────────────────────────────────────────────────────
+function showScreen(id) {
+  ['screen-login','screen-register','screen-perfil'].forEach(s => {
+    document.getElementById(s).style.display = s===id ? 'flex' : 'none';
+  });
 }
 
-// ── LOGIN ──────────────────────────────────────────────────────────────────
-function doLogin(){
-  const pwd=document.getElementById('pwd-input').value.trim();
-  if(!pwd)return;
-  const btn=document.getElementById('login-btn'),errEl=document.getElementById('login-error');
-  btn.disabled=true;btn.textContent='Verificando...';errEl.style.display='none';
-  fetchProveedores(pwd).then(data=>{
-    if(data.error==='unauthorized'){
-      errEl.textContent='Contraseña incorrecta. Intentá de nuevo.';errEl.style.display='block';
-      btn.disabled=false;btn.textContent='Ingresar';
+// ── FIREBASE AUTH ──────────────────────────────────────────────────────────
+async function loginConGoogle() {
+  try {
+    await signInWithPopup(auth, gprov);
+    // onAuthStateChanged se encarga del resto
+  } catch(e) {
+    mostrarAuthError('li-error', traducirError(e.code));
+  }
+}
+async function loginConEmail() {
+  const email = document.getElementById('li-email').value.trim();
+  const pass  = document.getElementById('li-pass').value;
+  if (!email||!pass) { mostrarAuthError('li-error','Completá email y contraseña'); return; }
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch(e) {
+    mostrarAuthError('li-error', traducirError(e.code));
+  }
+}
+async function registrarConEmail() {
+  const email = document.getElementById('reg-email').value.trim();
+  const pass  = document.getElementById('reg-pass').value;
+  if (!email||!pass) { mostrarAuthError('reg-error','Completá email y contraseña'); return; }
+  if (pass.length < 6) { mostrarAuthError('reg-error','La contraseña debe tener al menos 6 caracteres'); return; }
+  try {
+    await createUserWithEmailAndPassword(auth, email, pass);
+  } catch(e) {
+    mostrarAuthError('reg-error', traducirError(e.code));
+  }
+}
+function mostrarAuthError(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg; el.style.display = 'block';
+}
+function traducirError(code) {
+  const m = {
+    'auth/email-already-in-use':    'Este email ya está registrado.',
+    'auth/invalid-email':           'Email inválido.',
+    'auth/wrong-password':          'Contraseña incorrecta.',
+    'auth/user-not-found':          'No existe una cuenta con ese email.',
+    'auth/weak-password':           'La contraseña debe tener al menos 6 caracteres.',
+    'auth/popup-closed-by-user':    'Cerraste el popup de Google.',
+    'auth/network-request-failed':  'Error de red. Revisá tu conexión.',
+    'auth/invalid-credential':      'Email o contraseña incorrectos.',
+  };
+  return m[code] || 'Error al autenticar. Intentá de nuevo.';
+}
+async function doLogout() {
+  await signOut(auth);
+  currentUser = null; perfilUsuario = null;
+  location.reload();
+}
+
+// ── PERFIL ─────────────────────────────────────────────────────────────────
+async function guardarPerfil() {
+  const nombre = document.getElementById('prf-nombre').value.trim();
+  const barrio = document.getElementById('prf-barrio').value;
+  const tel    = document.getElementById('prf-tel').value.trim();
+  if (!nombre||!barrio||!tel) { mostrarAuthError('prf-error','Completá todos los campos'); return; }
+  const btn = document.getElementById('prf-btn'); btn.disabled=true; btn.textContent='Guardando...';
+  try {
+    await apiGet({ action:'saveUsuario', uid:currentUser.uid, email:currentUser.email, nombre, barrio, telefono:tel });
+    perfilUsuario = { nombre, barrio, telefono:tel, email:currentUser.email };
+    entrarALaApp();
+  } catch(e) {
+    mostrarAuthError('prf-error','Error al guardar. Intentá de nuevo.');
+    btn.disabled=false; btn.textContent='Guardar y continuar';
+  }
+}
+
+// ── AUTH STATE LISTENER ────────────────────────────────────────────────────
+onAuthStateChanged(auth, async user => {
+  if (!user) {
+    showScreen('screen-login');
+    return;
+  }
+  currentUser = user;
+  // Ocultar pantallas auth
+  ['screen-login','screen-register','screen-perfil'].forEach(s =>
+    document.getElementById(s).style.display='none');
+  // Buscar perfil en el Sheet
+  try {
+    const data = await apiGet({ action:'getUsuario', uid:user.uid });
+    if (data.usuario) {
+      perfilUsuario = data.usuario;
+      entrarALaApp();
     } else {
-      sessionStorage.setItem('ss_pwd',pwd);
+      // Primera vez — pedir perfil
+      document.getElementById('prf-email').value = user.email || '';
+      // Si vino de Google, pre-llenar nombre
+      if (user.displayName) document.getElementById('prf-nombre').value = user.displayName;
+      showScreen('screen-perfil');
+    }
+  } catch(e) {
+    // Error de red — entrar igual sin perfil
+    entrarALaApp();
+  }
+});
+
+// ── ENTRAR A LA APP ────────────────────────────────────────────────────────
+function entrarALaApp() {
+  const isAdmin = ADMIN_EMAILS.includes((currentUser?.email||'').toLowerCase());
+  document.getElementById('app').style.display='block';
+  // Avatar
+  const av = document.getElementById('user-avatar');
+  if (currentUser?.photoURL) av.innerHTML=`<img src="${currentUser.photoURL}">`;
+  else av.textContent = (perfilUsuario?.nombre||currentUser?.email||'?')[0].toUpperCase();
+  av.title = (perfilUsuario?.nombre||currentUser?.email||'') + ' · Clic para salir';
+  // Botones admin
+  if (isAdmin) {
+    document.getElementById('nav-admin').style.display='inline-flex';
+    document.getElementById('nav-mensajes').style.display='inline-flex';
+  } else {
+    document.getElementById('fab-contacto').style.display='flex';
+  }
+  // Pre-llenar email en formulario de recomendación
+  document.getElementById('f-email').value = currentUser?.email || '';
+  // Cargar proveedores
+  cargarProveedores();
+  // Refresh al volver a la pestaña
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') cargarProveedores();
+  });
+}
+
+// ── DATOS ──────────────────────────────────────────────────────────────────
+async function cargarProveedores() {
+  try {
+    const data = await apiGet({ action:'getProveedores' });
+    if (!data.error) {
       procesarDatos(data.proveedores||[]);
-      document.getElementById('login-screen').style.display='none';
-      document.getElementById('app').style.display='block';
-      if(pwd===ADMIN_PASSWORD){document.getElementById('nav-admin').style.display='inline-flex';document.getElementById('nav-mensajes').style.display='inline-flex';}
-      else{document.getElementById('fab-contacto').style.display='flex';}
       renderResults();
     }
-  }).catch(()=>{errEl.textContent='Error de conexión.';errEl.style.display='block';btn.disabled=false;btn.textContent='Ingresar';});
+  } catch(e) { console.error('Error cargando proveedores', e); }
 }
-document.getElementById('pwd-input').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
-function doLogout(){sessionStorage.removeItem('ss_pwd');location.reload()}
-function fetchProveedores(pw){return fetch(`${APPS_SCRIPT_URL}?action=getProveedores&password=${encodeURIComponent(pw)}`).then(r=>r.json())}
 
-// ── CATEGORÍAS ─────────────────────────────────────────────────────────────
 const CATEGORIAS=[
   {label:'🍕 Comida & Delivery',keywords:['comid','delivery','empanada','pizza','panad','sushi','helad','restau','catering','alfajor','torta','dulce','miel']},
   {label:'🧹 Limpieza',keywords:['limp','cleaning']},
@@ -439,147 +654,114 @@ const CATEGORIAS=[
   {label:'📦 Mudanza & Fletes',keywords:['mudanz','flete','transporte']},
   {label:'🏠 Hogar & Varios',keywords:[]},
 ];
-function categoriaDeServicio(s){const v=normalizar(s||'');for(const c of CATEGORIAS){if(c.keywords.length&&c.keywords.some(k=>v.includes(k)))return c.label}return '🏠 Hogar & Varios'}
+function catDeServicio(s){const v=norm(s||'');for(const c of CATEGORIAS){if(c.keywords.length&&c.keywords.some(k=>v.includes(k)))return c.label}return '🏠 Hogar & Varios'}
 
-// ── PROCESAR DATOS ─────────────────────────────────────────────────────────
 function procesarDatos(filas){
   const mapa={};
   filas.forEach(f=>{
-    const key=generarClave(f);
+    const key=genKey(f);
     if(!mapa[key])mapa[key]={nombre:f.nombre,empresa:f.empresa,dni:f.dni,telefono:f.telefono,servicio:f.servicio,destacado:false,resenas:[]};
-    if(normalizar(f.recomendacion)==='publicidad'){mapa[key].destacado=true;}
-    else if(f.recomendacion){mapa[key].resenas.push({recomendacion:f.recomendacion,notas:f.notas});}
+    if(norm(f.recomendacion)==='publicidad')mapa[key].destacado=true;
+    else if(f.recomendacion)mapa[key].resenas.push({recomendacion:f.recomendacion,notas:f.notas});
   });
   todosLosProveedores=Object.values(mapa).map(p=>{
-    const score=p.destacado?{promedio:5,total:0,etiqueta:'Destacado',estrellas:5}:calcularScore(p.resenas);
-    return{...p,score,categoria:categoriaDeServicio(p.servicio)};
+    const score=p.destacado?{promedio:5,total:0,etiqueta:'Destacado',estrellas:5}:calcScore(p.resenas);
+    return{...p,score,categoria:catDeServicio(p.servicio)};
   });
   poblarRubros();
 }
-function generarClave(f){const n=normalizar(f.nombre),d=normalizar(f.dni),t=normalizar(f.telefono);if(d&&d!=='n/a')return n+'_dni_'+d;if(t&&t!=='n/a')return n+'_tel_'+t.replace(/\D/g,'').slice(-8);return n+'_emp_'+normalizar(f.empresa)}
-
-// ── RUBROS ─────────────────────────────────────────────────────────────────
+function genKey(f){const n=norm(f.nombre),d=norm(f.dni),t=norm(f.telefono);if(d&&d!=='n/a')return n+'_d_'+d;if(t&&t!=='n/a')return n+'_t_'+t.replace(/\D/g,'').slice(-8);return n+'_e_'+norm(f.empresa)}
+function calcScore(r){
+  if(!r||!r.length)return{promedio:0,total:0,etiqueta:'Sin datos',estrellas:0};
+  const total=r.length,pos=r.filter(x=>norm(x.recomendacion)==='recomendable').length,neg=total-pos,pct=pos/total;
+  const est=Math.max(1,Math.round(pct*4+1));
+  let et;
+  if(neg>=3)et='No Recomendable';
+  else if(neg>0&&neg<pos)et='Malas Experiencias';
+  else if(neg>=pos&&neg>0)et='No Recomendable';
+  else if(pos>=5&&neg===0)et='Muy Recomendable';
+  else if(pos>=5&&pct>=0.9)et='Muy Recomendable';
+  else et='Recomendable';
+  return{promedio:Math.round(pct*4+1),total,etiqueta:et,estrellas:est};
+}
 function poblarRubros(){
   const sel=document.getElementById('rubros-select');
-  const conteo={};todosLosProveedores.forEach(p=>{conteo[p.categoria]=(conteo[p.categoria]||0)+1});
-  const cats=CATEGORIAS.filter(c=>conteo[c.label]).sort((a,b)=>(conteo[b.label]||0)-(conteo[a.label]||0));
-  sel.innerHTML=`<option value="todos">📂 Todos los rubros (${todosLosProveedores.length})</option>`+cats.map(c=>`<option value="${c.label}">${c.label} (${conteo[c.label]||0})</option>`).join('');
+  const cnt={};todosLosProveedores.forEach(p=>{cnt[p.categoria]=(cnt[p.categoria]||0)+1});
+  const cats=CATEGORIAS.filter(c=>cnt[c.label]).sort((a,b)=>(cnt[b.label]||0)-(cnt[a.label]||0));
+  sel.innerHTML=`<option value="todos">📂 Todos los rubros (${todosLosProveedores.length})</option>`+cats.map(c=>`<option value="${c.label}">${c.label} (${cnt[c.label]})</option>`).join('');
 }
 
 // ── RENDER ─────────────────────────────────────────────────────────────────
 function renderResults(){
-  const query=normalizar(document.getElementById('search-input').value);
-  const sortBy=document.getElementById('sort-select').value;
-  const rubroSel=document.getElementById('rubros-select').value;
-  const container=document.getElementById('results-container');
+  const q=norm(document.getElementById('search-input').value);
+  const srt=document.getElementById('sort-select').value;
+  const rub=document.getElementById('rubros-select').value;
+  const cont=document.getElementById('results-container');
   let fil=[...todosLosProveedores];
-  if(rubroSel!=='todos')fil=fil.filter(p=>p.categoria===rubroSel);
+  if(rub!=='todos')fil=fil.filter(p=>p.categoria===rub);
   if(activeFilter!=='todos')fil=fil.filter(p=>p.score.etiqueta===activeFilter);
-  if(query){
-    const words=query.trim().split(/\s+/).filter(Boolean);
-    fil=fil.filter(p=>{
-      const notas=p.resenas.map(r=>normalizar(r.notas)+' '+normalizar(r.recomendacion)).join(' ');
-      const tel=(p.telefono||'').replace(/\D/g,'');
-      const txt=[p.nombre,p.empresa,p.servicio,p.telefono,tel,p.dni,notas].map(normalizar).join(' ');
-      return words.every(w=>txt.includes(w));
-    });
-  }
+  if(q){const ws=q.trim().split(/\s+/).filter(Boolean);fil=fil.filter(p=>{const nt=p.resenas.map(r=>norm(r.notas)+' '+norm(r.recomendacion)).join(' ');const tel=(p.telefono||'').replace(/\D/g,'');const tx=[p.nombre,p.empresa,p.servicio,p.telefono,tel,p.dni,nt].map(norm).join(' ');return ws.every(w=>tx.includes(w));});}
   const ord={Destacado:5,'Muy Recomendable':4,Recomendable:3,'Malas Experiencias':2,'No Recomendable':1,'Sin datos':0};
-  if(sortBy==='alfabetico')fil.sort((a,b)=>a.destacado!==b.destacado?(a.destacado?-1:1):a.nombre.localeCompare(b.nombre,'es'));
-  else if(sortBy==='puntuacion')fil.sort((a,b)=>a.destacado!==b.destacado?(a.destacado?-1:1):b.score.estrellas-a.score.estrellas||a.nombre.localeCompare(b.nombre,'es'));
+  if(srt==='alfabetico')fil.sort((a,b)=>a.destacado!==b.destacado?(a.destacado?-1:1):a.nombre.localeCompare(b.nombre,'es'));
+  else if(srt==='puntuacion')fil.sort((a,b)=>a.destacado!==b.destacado?(a.destacado?-1:1):b.score.estrellas-a.score.estrellas||a.nombre.localeCompare(b.nombre,'es'));
   else fil.sort((a,b)=>a.destacado!==b.destacado?(a.destacado?-1:1):(ord[b.score.etiqueta]||0)-(ord[a.score.etiqueta]||0)||b.score.estrellas-a.score.estrellas);
   document.getElementById('stats-bar').textContent=`${fil.length} proveedor${fil.length!==1?'es':''} encontrado${fil.length!==1?'s':''}`;
-  if(!fil.length){container.innerHTML=`<div class="empty-state"><div class="icon">🔍</div><h3>Sin resultados</h3><p>Probá con otras palabras o cambiá el filtro</p></div>`;return}
+  if(!fil.length){cont.innerHTML=`<div class="empty-state"><div class="icon">🔍</div><h3>Sin resultados</h3><p>Probá con otras palabras</p></div>`;return;}
   const dest=fil.filter(p=>p.destacado),reg=fil.filter(p=>!p.destacado);
   let html='';
   if(dest.length)html+=`<div class="destacados-section"><div class="section-label">⭐ Destacados</div><div class="destacados-grid">${dest.map(p=>cardHTML(p,true)).join('')}</div></div>`;
   if(reg.length)html+=`<div class="regular-section" style="display:flex;flex-direction:column;gap:10px">${dest.length?'<div class="section-label">Todos los proveedores</div>':''}${reg.map(p=>cardHTML(p,false)).join('')}</div>`;
-  container.innerHTML=html;
+  cont.innerHTML=html;
 }
 
-function cardHTML(p,esDestacado){
+function cardHTML(p,isDest){
   const {score}=p;
-  const badgeClass=esDestacado?'badge-destacado':badgeCSSClass(score.etiqueta);
-  const etiquetaLabel=esDestacado?'⭐ Destacado':score.etiqueta;
-  const estrellas=score.total>0?renderEstrellas(score.estrellas):(esDestacado?'★★★★★':'');
-  const emoji=servicioEmoji(p.servicio);
-  const telValido=p.telefono&&!['n/a',''].includes(normalizar(p.telefono));
-  const dniValido=p.dni&&!['n/a',''].includes(normalizar(p.dni));
-  const empresaValida=p.empresa&&!['n/a',''].includes(normalizar(p.empresa))&&p.empresa!==p.nombre;
-  // JSON seguro para el onclick
-  const pJson=JSON.stringify({nombre:p.nombre,empresa:p.empresa,dni:p.dni,telefono:p.telefono,servicio:p.servicio});
-  const pEsc=pJson.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
-
-  const resenas=p.resenas.map(r=>`
-    <div class="resena-item ${slugify(r.recomendacion)}">
-      <div class="resena-top">
-        <span class="badge ${badgeCSSClass(r.recomendacion)}" style="font-size:.72rem">${r.recomendacion||''}</span>
-      </div>
-      ${r.notas&&!['n/a',''].includes(normalizar(r.notas))?`<div class="resena-notas" style="margin-top:4px">"${r.notas}"</div>`:''}`+`</div>`).join('');
-
-  // Reseñas visibles para todos (incluyendo destacados)
-  const toggleSection=p.resenas.length?`
-    <div class="card-resenas-toggle" onclick="toggleCard(this.closest('.proveedor-card'))">
-      <span class="toggle-label">Ver reseñas (${p.resenas.length}) ▾</span>
-    </div>
-    <div class="card-detail">
-      <div class="resenas-title">Reseñas (${p.resenas.length})</div>
-      ${resenas}
-    </div>`:'';
-
-  return `<div class="proveedor-card${esDestacado?' destacado':''}">
+  const bc=isDest?'badge-destacado':badgeClass(score.etiqueta);
+  const el=isDest?'⭐ Destacado':score.etiqueta;
+  const st=score.total>0?stars(score.estrellas):(isDest?'★★★★★':'');
+  const emoji=svcEmoji(p.servicio);
+  const telOk=p.telefono&&!['n/a',''].includes(norm(p.telefono));
+  const dniOk=p.dni&&!['n/a',''].includes(norm(p.dni));
+  const empOk=p.empresa&&!['n/a',''].includes(norm(p.empresa))&&p.empresa!==p.nombre;
+  const pJ=JSON.stringify({nombre:p.nombre,empresa:p.empresa,dni:p.dni,telefono:p.telefono,servicio:p.servicio});
+  const pE=pJ.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+  const resHtml=p.resenas.map(r=>`<div class="resena-item ${slugify(r.recomendacion)}"><div class="resena-top"><span class="badge ${badgeClass(r.recomendacion)}" style="font-size:.72rem">${r.recomendacion||''}</span></div>${r.notas&&!['n/a',''].includes(norm(r.notas))?`<div class="resena-notas">"${r.notas}"</div>`:''}</div>`).join('');
+  const toggle=p.resenas.length?`<div class="card-resenas-toggle" onclick="toggleCard(this.closest('.proveedor-card'))"><span class="toggle-label">Ver reseñas (${p.resenas.length}) ▾</span></div><div class="card-detail"><div class="resenas-title">Reseñas</div>${resHtml}</div>`:'';
+  return `<div class="proveedor-card${isDest?' destacado':''}">
     <div class="card-main" onclick="toggleCard(this.closest('.proveedor-card'))">
       <div class="card-avatar">${emoji}</div>
-      <div class="card-info">
-        ${esDestacado?'<div class="destacado-badge">⭐ Destacado</div>':''}
-        <div class="card-nombre">${p.nombre}</div>
-        <div class="card-sub">${empresaValida?p.empresa:p.servicio}</div>
-        <span class="card-servicio-tag">${p.servicio}</span>
-      </div>
-      <div class="card-right">
-        <div class="badge ${badgeClass}">${etiquetaLabel}</div><br>
-        ${estrellas?`<div class="score-stars">${estrellas}</div>`:''}
-        <div class="reviews-count">${score.total>0?score.total+' reseña'+(score.total!==1?'s':''):''}</div>
-      </div>
+      <div class="card-info">${isDest?'<div class="destacado-badge">⭐ Destacado</div>':''}<div class="card-nombre">${p.nombre}</div><div class="card-sub">${empOk?p.empresa:p.servicio}</div><span class="card-servicio-tag">${p.servicio}</span></div>
+      <div class="card-right"><div class="badge ${bc}">${el}</div><br>${st?`<div class="score-stars">${st}</div>`:''}<div class="reviews-count">${score.total>0?score.total+' reseña'+(score.total!==1?'s':''):''}</div></div>
     </div>
     <div class="card-contacto">
-      ${telValido?`<a class="contacto-item tel" href="tel:${p.telefono.replace(/\s/g,'')}">📞 ${p.telefono}</a>`:''}
-      ${dniValido?`<span class="contacto-item">🪪 ${p.dni}</span>`:''}
-      ${empresaValida?`<span class="contacto-item">🏢 ${p.empresa}</span>`:''}
+      ${telOk?`<a class="contacto-item tel" href="tel:${p.telefono.replace(/\s/g,'')}">📞 ${p.telefono}</a>`:''}
+      ${dniOk?`<span class="contacto-item">🪪 ${p.dni}</span>`:''}
+      ${empOk?`<span class="contacto-item">🏢 ${p.empresa}</span>`:''}
     </div>
-    ${toggleSection}
-    <div class="card-footer-actions">
-      <button class="btn-recomendar-card" onclick="event.stopPropagation();recomendarDesdeCard('${pEsc}')">✍️ Recomendar este proveedor</button>
-    </div>
+    ${toggle}
+    <div class="card-footer-actions"><button class="btn-recomendar-card" onclick="event.stopPropagation();recomendarDesdeCard('${pE}')">✍️ Recomendar este proveedor</button></div>
   </div>`;
 }
 
 function toggleCard(el){
-  const detail=el.querySelector('.card-detail');if(!detail)return;
-  const label=el.querySelector('.toggle-label');
-  const isOpen=detail.classList.contains('open');
-  if(openCard&&openCard!==detail){openCard.classList.remove('open');const prev=openCard.closest('.proveedor-card')?.querySelector('.toggle-label');if(prev)prev.textContent=prev.textContent.replace('▴','▾').replace('Ocultar','Ver');}
-  detail.classList.toggle('open',!isOpen);
-  if(label){const n=p=>p.resenas?p.resenas.length:0;label.textContent=!isOpen?`Ocultar reseñas ▴`:`Ver reseñas ${detail.querySelectorAll('.resena-item').length>0?'('+detail.querySelectorAll('.resena-item').length+') ':'' }▾`;}
-  openCard=!isOpen?detail:null;
+  const det=el.querySelector('.card-detail');if(!det)return;
+  const lbl=el.querySelector('.toggle-label');const isOpen=det.classList.contains('open');
+  if(openCard&&openCard!==det){openCard.classList.remove('open');const prev=openCard.closest('.proveedor-card')?.querySelector('.toggle-label');if(prev)prev.textContent=prev.textContent.replace('▴','▾').replace('Ocultar','Ver');}
+  det.classList.toggle('open',!isOpen);
+  if(lbl)lbl.textContent=!isOpen?`Ocultar reseñas ▴`:`Ver reseñas (${det.querySelectorAll('.resena-item').length}) ▾`;
+  openCard=!isOpen?det:null;
 }
-function setFilter(chip){document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));chip.classList.add('active');activeFilter=chip.dataset.filter;openCard=null;renderResults()}
+function setFilter(chip){document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));chip.classList.add('active');activeFilter=chip.dataset.filter;openCard=null;renderResults();}
 
 // ── RECOMENDAR DESDE CARD ──────────────────────────────────────────────────
 function recomendarDesdeCard(pStr){
-  let p;
-  try{p=typeof pStr==='string'?JSON.parse(pStr.replace(/&quot;/g,'"')):pStr}catch(e){console.error('recomendarDesdeCard parse error',e);return}
-  // Activar tab recomendar
+  let p;try{p=JSON.parse(pStr.replace(/&quot;/g,'"'));}catch(e){return;}
   document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));
   document.getElementById('page-recomendar').classList.add('active');
   document.querySelector('.nav-btn:nth-child(2)').classList.add('active');
   setTimeout(()=>{
-    document.getElementById('f-nombre').value  =p.nombre  ||'';
-    document.getElementById('f-empresa').value =p.empresa ||'';
-    document.getElementById('f-dni').value     =p.dni     ||'';
-    document.getElementById('f-telefono').value=p.telefono||'';
-    document.getElementById('f-servicio').value=p.servicio||'';
+    ['nombre','empresa','dni','telefono','servicio'].forEach(k=>document.getElementById('f-'+k).value=p[k]||'');
     document.getElementById('page-recomendar').scrollIntoView({behavior:'smooth'});
   },50);
 }
@@ -591,25 +773,33 @@ async function enviarFormulario(){
   const servicio=document.getElementById('f-servicio').value.trim();
   const recomen=document.querySelector('input[name="recomen"]:checked')?.value;
   const vecino=document.getElementById('f-vecino').value.trim();
-  const msg=document.getElementById('form-msg');
-  msg.style.display='none';
-  if(!nombre||!telefono||!servicio||!recomen||!vecino){msg.textContent='⚠️ Completá todos los campos obligatorios (*)';msg.className='form-msg err';msg.style.display='block';return}
-  const barrio=document.querySelector('input[name="barrio"]:checked')?.value||'No sé';
-  const btn=document.getElementById('btn-submit');btn.disabled=true;btn.textContent='Enviando...';
-  const payload={action:'saveRecomendacion',password:sessionStorage.getItem('ss_pwd'),nombre,empresa:document.getElementById('f-empresa').value.trim(),dni:document.getElementById('f-dni').value.trim(),telefono,servicio,recomendacion:recomen,notas:document.getElementById('f-notas').value.trim(),puntuacion:'',barrio,vecino};
+  const msg=document.getElementById('form-msg');msg.style.display='none';
+  if(!nombre||!telefono||!servicio||!recomen||!vecino){msg.textContent='⚠️ Completá todos los campos obligatorios (*)';msg.className='form-msg err';msg.style.display='block';return;}
+  const btn=document.getElementById('btn-submit');btn.disabled=true;btn.textContent='Verificando...';
+  // Chequear duplicado en frontend
   try{
-    const res=await fetch(APPS_SCRIPT_URL+'?'+new URLSearchParams(payload),{redirect:'follow'});
+    const dup=await apiGet({action:'checkDuplicado',uid:currentUser.uid,email:currentUser.email,nombre,telefono});
+    if(dup.duplicado){msg.textContent='⚠️ Ya enviaste una recomendación para este proveedor.';msg.className='form-msg err';msg.style.display='block';btn.disabled=false;btn.textContent='Enviar recomendación';return;}
+  }catch(e){/* si falla el check, seguir igual */}
+  btn.textContent='Enviando...';
+  const barrio=document.querySelector('input[name="barrio"]:checked')?.value||'No sé';
+  const payload={action:'saveRecomendacion',nombre,empresa:document.getElementById('f-empresa').value.trim(),dni:document.getElementById('f-dni').value.trim(),telefono,servicio,recomendacion:recomen,notas:document.getElementById('f-notas').value.trim(),barrio,vecino,uid:currentUser.uid,email:currentUser.email};
+  try{
+    const res=await fetch(APPS_SCRIPT_URL+'?'+new URLSearchParams({...payload,password:VECINAL_PWD}),{redirect:'follow'});
     const data=await res.json();
     if(data.ok){document.getElementById('form-body').style.display='none';document.getElementById('form-success').style.display='block';}
-    else throw new Error(data.error||'Error desconocido');
+    else if(data.error==='duplicado'){msg.textContent='⚠️ Ya enviaste una recomendación para este proveedor.';msg.className='form-msg err';msg.style.display='block';btn.disabled=false;btn.textContent='Enviar recomendación';}
+    else throw new Error(data.error);
   }catch(e){msg.textContent='❌ Error al enviar. Intentá de nuevo.';msg.className='form-msg err';msg.style.display='block';btn.disabled=false;btn.textContent='Enviar recomendación';}
 }
 function resetForm(){
   document.getElementById('form-body').style.display='block';document.getElementById('form-success').style.display='none';
-  document.getElementById('form-body').querySelectorAll('input:not([type=radio]),textarea').forEach(el=>el.value='');
+  ['f-nombre','f-empresa','f-dni','f-telefono','f-servicio','f-notas','f-vecino'].forEach(id=>document.getElementById(id).value='');
   document.querySelectorAll('input[type=radio]').forEach(r=>r.checked=false);
   document.querySelector('input[name="barrio"][value="No sé"]').checked=true;
-  document.getElementById('btn-submit').disabled=false;document.getElementById('btn-submit').textContent='Enviar recomendación';document.getElementById('form-msg').style.display='none';
+  document.getElementById('f-email').value=currentUser?.email||'';
+  document.getElementById('btn-submit').disabled=false;document.getElementById('btn-submit').textContent='Enviar recomendación';
+  document.getElementById('form-msg').style.display='none';
 }
 
 // ── NAVEGACIÓN ─────────────────────────────────────────────────────────────
@@ -624,113 +814,82 @@ function showPage(page,btn){
 
 // ── ADMIN ──────────────────────────────────────────────────────────────────
 async function cargarPendientes(){
-  const c=document.getElementById('admin-container');c.innerHTML='<div class="loading"><div class="spinner"></div>Cargando pendientes...</div>';
-  try{const r=await fetch(`${APPS_SCRIPT_URL}?action=getPendientes&password=${encodeURIComponent(sessionStorage.getItem('ss_pwd'))}`);const d=await r.json();if(d.error){c.innerHTML=`<div class="admin-empty"><div class="icon">⚠️</div><p>${d.error}</p></div>`;return}renderPendientes(d.pendientes||[]);}
+  const c=document.getElementById('admin-container');c.innerHTML='<div class="loading"><div class="spinner"></div>Cargando...</div>';
+  try{const r=await apiGet({action:'getPendientes'});if(r.error){c.innerHTML=`<div class="admin-empty"><div class="icon">⚠️</div><p>${r.error}</p></div>`;return;}renderPendientes(r.pendientes||[]);}
   catch(e){c.innerHTML='<div class="admin-empty"><div class="icon">❌</div><p>Error al cargar.</p></div>';}
 }
 function renderPendientes(rows){
   const c=document.getElementById('admin-container');
   const pend=rows.filter(r=>r.estado==='Pendiente'),proc=rows.filter(r=>r.estado!=='Pendiente');
-  if(!rows.length){c.innerHTML='<div class="admin-empty"><div class="icon">✅</div><h3>Todo al día</h3><p>No hay recomendaciones pendientes.</p></div>';return}
+  if(!rows.length){c.innerHTML='<div class="admin-empty"><div class="icon">✅</div><h3>Todo al día</h3></div>';return;}
   let html='';
   if(pend.length){html+=`<div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--naranja);margin-bottom:10px">⏳ Pendientes (${pend.length})</div>`;html+=pend.map((r,i)=>adminCardHTML(r,i,true)).join('');}
   if(proc.length){html+=`<div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin:20px 0 10px">✔ Procesados recientemente</div>`;html+=proc.slice(0,5).map((r,i)=>adminCardHTML(r,i+1000,false)).join('');}
   c.innerHTML=html;
 }
-function adminCardHTML(r,idx,acciones){
+function adminCardHTML(r,idx,acc){
   const bc=r.estado==='Aprobado'?'aprobado':r.estado==='Rechazado'?'rechazado':'pendiente';
   return `<div class="admin-card" id="acard-${idx}">
-    <div class="admin-card-header">
-      <div style="font-size:2rem">${servicioEmoji(r.servicio)}</div>
-      <div class="admin-info">
-        <div class="admin-nombre">${r.nombre||'Sin nombre'}</div>
-        <div class="admin-meta">
-          <span>⚙️ ${r.servicio||'—'}</span>
-          ${r.telefono?`<span>📞 ${r.telefono}</span>`:''}
-          ${r.dni?`<span>🪪 ${r.dni}</span>`:''}
-          ${r.empresa?`<span>🏢 ${r.empresa}</span>`:''}
-        </div>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <span class="badge ${badgeCSSClass(r.recomendacion)}" style="font-size:.7rem">${r.recomendacion||''}</span>
-          <span class="admin-badge ${bc}">${r.estado||'Pendiente'}</span>
-        </div>
+    <div class="admin-card-header"><div style="font-size:2rem">${svcEmoji(r.servicio)}</div>
+      <div class="admin-info"><div class="admin-nombre">${r.nombre||'Sin nombre'}</div>
+        <div class="admin-meta"><span>⚙️ ${r.servicio||'—'}</span>${r.telefono?`<span>📞 ${r.telefono}</span>`:''}</div>
+        <div style="display:flex;gap:8px"><span class="badge ${badgeClass(r.recomendacion)}" style="font-size:.7rem">${r.recomendacion||''}</span><span class="admin-badge ${bc}">${r.estado||'Pendiente'}</span></div>
       </div>
     </div>
     <div class="admin-detalle">
-      ${r.notas?`<div class="admin-detalle-row"><strong>Notas:</strong><span>"${r.notas}"</span></div>`:''}
-      ${r.vecino?`<div class="admin-vecino"><strong>🏠 Quien informa (confidencial):</strong> ${r.vecino}</div>`:''}
+      ${r.notas?`<div><strong style="color:var(--muted)">Notas: </strong>"${r.notas}"</div>`:''}
+      ${r.vecino?`<div class="admin-vecino"><strong>🏠 Quien informa:</strong> ${r.vecino}</div>`:''}
     </div>
-    ${acciones?`<div class="admin-actions">
-      <button class="btn-aprobar" id="btn-ap-${idx}" onclick="accionPendiente(${idx},${r.fila},'Aprobado')">✅ Aprobar y mover a Proveedores</button>
+    ${acc?`<div class="admin-actions">
+      <button class="btn-aprobar" id="btn-ap-${idx}" onclick="accionPendiente(${idx},${r.fila},'Aprobado')">✅ Aprobar</button>
       <button class="btn-rechazar" id="btn-re-${idx}" onclick="accionPendiente(${idx},${r.fila},'Rechazado')">❌ Rechazar</button>
     </div>`:''}
   </div>`;
 }
 async function accionPendiente(idx,fila,accion){
   const bA=document.getElementById('btn-ap-'+idx),bR=document.getElementById('btn-re-'+idx);
-  if(bA)bA.disabled=true;if(bR)bR.disabled=true;if(bA)bA.textContent=accion==='Aprobado'?'Procesando...':'...';
+  if(bA)bA.disabled=true;if(bR)bR.disabled=true;if(bA)bA.textContent='...';
   try{
-    const r=await fetch(`${APPS_SCRIPT_URL}?action=procesarPendiente&password=${encodeURIComponent(sessionStorage.getItem('ss_pwd'))}&fila=${fila}&accion=${encodeURIComponent(accion)}`);
-    const d=await r.json();
+    const r=await apiGet({action:'procesarPendiente',fila,accion});
+    const d=r;
     if(d.ok){const card=document.getElementById('acard-'+idx);if(card){card.style.opacity='.5';card.querySelector('.admin-actions').innerHTML=`<span style="font-size:.85rem;color:${accion==='Aprobado'?'var(--verde-ok)':'var(--rojo)'}">${accion==='Aprobado'?'✅ Aprobado':'❌ Rechazado'}</span>`;}}
     else alert('Error: '+(d.error||'desconocido'));
   }catch(e){alert('Error de conexión');}
 }
 
-// ── CONTACTO ADMIN (vecinos) ───────────────────────────────────────────────
-function abrirModalContacto(){document.getElementById('modal-contacto').classList.add('open')}
+// ── MENSAJES ───────────────────────────────────────────────────────────────
+function abrirModalContacto(){document.getElementById('modal-contacto').classList.add('open');}
 function cerrarModalContacto(){document.getElementById('modal-contacto').classList.remove('open');document.getElementById('mc-msg').style.display='none';document.getElementById('mc-btn').disabled=false;document.getElementById('mc-btn').textContent='Enviar mensaje';}
 async function enviarMensajeAdmin(){
-  const nombre=document.getElementById('mc-nombre').value.trim();
-  const email=document.getElementById('mc-email').value.trim();
-  const telefono=document.getElementById('mc-telefono').value.trim();
   const mensaje=document.getElementById('mc-mensaje').value.trim();
   const msg=document.getElementById('mc-msg');
-  if(!nombre||!email||!mensaje){msg.textContent='⚠️ Completá nombre, email y mensaje';msg.style.color='var(--rojo)';msg.style.display='block';return}
+  if(!mensaje){msg.textContent='⚠️ Escribí un mensaje';msg.style.color='var(--rojo)';msg.style.display='block';return;}
   const btn=document.getElementById('mc-btn');btn.disabled=true;btn.textContent='Enviando...';
   try{
-    const params=new URLSearchParams({action:'saveMensaje',password:sessionStorage.getItem('ss_pwd'),nombre,email,telefono,barrio:'San Sebastián - Pilar',mensaje});
-    const r=await fetch(APPS_SCRIPT_URL+'?'+params,{redirect:'follow'});const d=await r.json();
-    if(d.ok){msg.textContent='✅ Mensaje enviado. El admin te responderá a tu email.';msg.style.color='var(--verde-ok)';msg.style.display='block';['mc-nombre','mc-email','mc-telefono','mc-mensaje'].forEach(id=>document.getElementById(id).value='');btn.textContent='Enviado ✓';}
-    else throw new Error(d.error);
+    const r=await apiGet({action:'saveMensaje',nombre:perfilUsuario?.nombre||currentUser?.email||'',email:currentUser?.email||'',telefono:perfilUsuario?.telefono||'',barrio:perfilUsuario?.barrio||'San Sebastián - Pilar',mensaje});
+    if(r.ok){msg.textContent='✅ Mensaje enviado.';msg.style.color='var(--verde-ok)';msg.style.display='block';document.getElementById('mc-mensaje').value='';btn.textContent='Enviado ✓';}
+    else throw new Error(r.error);
   }catch(e){msg.textContent='❌ Error al enviar.';msg.style.color='var(--rojo)';msg.style.display='block';btn.disabled=false;btn.textContent='Enviar mensaje';}
 }
-
-// ── MENSAJES (admin) ───────────────────────────────────────────────────────
 async function cargarMensajes(){
   const c=document.getElementById('mensajes-container');c.innerHTML='<div class="loading"><div class="spinner"></div>Cargando...</div>';
   try{
-    const r=await fetch(`${APPS_SCRIPT_URL}?action=getMensajes&password=${encodeURIComponent(sessionStorage.getItem('ss_pwd'))}`);const d=await r.json();
-    if(d.error){c.innerHTML=`<div class="admin-empty"><div class="icon">⚠️</div><p>${d.error}</p></div>`;return}
+    const d=await apiGet({action:'getMensajes'});
+    if(d.error){c.innerHTML=`<div class="admin-empty"><div class="icon">⚠️</div><p>${d.error}</p></div>`;return;}
     const msgs=d.mensajes||[];
-    if(!msgs.length){c.innerHTML='<div class="admin-empty"><div class="icon">💬</div><h3>Sin mensajes</h3></div>';return}
-    const badge=document.getElementById('badge-mensajes');if(badge){badge.textContent=msgs.length;badge.style.display='inline';}
-    c.innerHTML=msgs.map(m=>`
-      <div class="msg-admin-card">
-        <div class="msg-admin-de">👤 ${m.nombre||'Sin nombre'}</div>
-        <div class="msg-admin-meta">
-          ${m.email?`<span>📧 <a href="mailto:${m.email}" style="color:var(--verde)">${m.email}</a></span>`:''}
-          ${m.telefono?`<span>📞 <a href="tel:${m.telefono.replace(/\s/g,'')}" style="color:var(--verde)">${m.telefono}</a></span>`:''}
-          ${m.barrio?`<span>🏠 ${m.barrio}</span>`:''}
-          ${m.fecha?`<span>📅 ${formatFecha(m.fecha)}</span>`:''}
-        </div>
-        <div class="msg-admin-texto">${m.mensaje||''}</div>
-        ${m.email?`<a class="btn-responder" href="mailto:${m.email}?subject=Re: Consulta San Sebastián Proveedores&body=Hola ${encodeURIComponent(m.nombre||'')},%0A%0A">📧 Responder por email</a>`:''}
-      </div>`).join('');
+    if(!msgs.length){c.innerHTML='<div class="admin-empty"><div class="icon">💬</div><h3>Sin mensajes</h3></div>';return;}
+    c.innerHTML=msgs.map(m=>`<div class="msg-admin-card">
+      <div class="msg-admin-de">👤 ${m.nombre||'Sin nombre'}</div>
+      <div class="msg-admin-meta">
+        ${m.email?`<span>📧 <a href="mailto:${m.email}" style="color:var(--verde)">${m.email}</a></span>`:''}
+        ${m.telefono?`<span>📞 ${m.telefono}</span>`:''}
+        ${m.fecha?`<span>📅 ${fmtFecha(m.fecha)}</span>`:''}
+      </div>
+      <div class="msg-admin-texto">${m.mensaje||''}</div>
+      ${m.email?`<a class="btn-responder" href="mailto:${m.email}?subject=Re: Consulta San Sebastián Proveedores">📧 Responder</a>`:''}
+    </div>`).join('');
   }catch(e){c.innerHTML='<div class="admin-empty"><div class="icon">❌</div><p>Error al cargar.</p></div>';}
 }
-
-// ── AUTO-LOGIN ─────────────────────────────────────────────────────────────
-window.addEventListener('load',()=>{
-  const pwd=sessionStorage.getItem('ss_pwd');
-  if(pwd){
-    document.getElementById('results-container').innerHTML='<div class="loading"><div class="spinner"></div>Cargando...</div>';
-    fetchProveedores(pwd).then(data=>{
-      if(!data.error){procesarDatos(data.proveedores||[]);document.getElementById('login-screen').style.display='none';document.getElementById('app').style.display='block';if(pwd===ADMIN_PASSWORD){document.getElementById('nav-admin').style.display='inline-flex';document.getElementById('nav-mensajes').style.display='inline-flex';}else{document.getElementById('fab-contacto').style.display='flex';}renderResults();}
-      else sessionStorage.removeItem('ss_pwd');
-    }).catch(()=>sessionStorage.removeItem('ss_pwd'));
-  }
-});
 </script>
 </body>
 </html>
