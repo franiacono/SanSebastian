@@ -45,9 +45,37 @@ header{background:var(--verde);color:white;padding:0 20px;position:sticky;top:0;
 .nav-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:white;padding:6px 13px;border-radius:20px;font-size:.8rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s;white-space:nowrap}
 .nav-btn:hover{background:rgba(255,255,255,.22)}
 .nav-btn.active{background:rgba(255,255,255,.9);color:var(--verde);font-weight:600}
-/* Avatar — solo visual, NO hace logout al hacer clic */
-.user-avatar{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:600;overflow:hidden;flex-shrink:0;cursor:default}
+/* Avatar + dropdown */
+.avatar-wrap{position:relative;flex-shrink:0}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:600;overflow:hidden;cursor:pointer;transition:border-color .2s}
+.user-avatar:hover{border-color:rgba(255,255,255,.9)}
 .user-avatar img{width:100%;height:100%;object-fit:cover}
+.avatar-dropdown{display:none;position:absolute;top:calc(100% + 8px);right:0;background:white;border:1.5px solid var(--border);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.15);min-width:200px;z-index:400;overflow:hidden}
+.avatar-dropdown.open{display:block}
+.avatar-dd-header{padding:12px 16px;border-bottom:1px solid var(--crema2);background:var(--crema)}
+.avatar-dd-name{font-weight:600;font-size:.9rem;color:var(--verde)}
+.avatar-dd-email{font-size:.75rem;color:var(--muted);margin-top:1px}
+.avatar-dd-item{display:flex;align-items:center;gap:10px;padding:11px 16px;font-size:.88rem;color:var(--text);cursor:pointer;transition:background .15s;border:none;background:none;width:100%;font-family:'DM Sans',sans-serif;text-align:left}
+.avatar-dd-item:hover{background:var(--crema)}
+.avatar-dd-item.danger{color:var(--rojo)}
+.avatar-dd-item.danger:hover{background:#fff0ee}
+.avatar-dd-sep{height:1px;background:var(--crema2);margin:4px 0}
+
+/* Modal perfil (tabs internas) */
+.perfil-tabs{display:flex;gap:0;border-bottom:1.5px solid var(--crema2);margin-bottom:20px}
+.perfil-tab{padding:10px 16px;font-size:.85rem;font-family:'DM Sans',sans-serif;background:none;border:none;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1.5px;transition:color .2s}
+.perfil-tab.active{color:var(--verde);border-bottom-color:var(--verde);font-weight:600}
+.perfil-panel{display:none}.perfil-panel.active{display:block}
+.mis-rec-card{background:var(--crema);border-radius:10px;padding:12px 14px;margin-bottom:8px;border-left:3px solid var(--border)}
+.mis-rec-card.aprobado{border-color:var(--verde-ok)}
+.mis-rec-card.pendiente{border-color:#e0a800}
+.mis-rec-card.rechazado{border-color:var(--rojo)}
+.mis-rec-nombre{font-weight:600;font-size:.9rem;color:var(--text)}
+.mis-rec-meta{font-size:.78rem;color:var(--muted);margin:3px 0 6px;display:flex;gap:8px;flex-wrap:wrap}
+.estado-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.7rem;font-weight:600}
+.estado-badge.Aprobado{background:#d4edda;color:#155724}
+.estado-badge.Pendiente{background:#fff3cd;color:#856404}
+.estado-badge.Rechazado{background:#fadbd8;color:var(--rojo)}
 
 .page{display:none;max-width:1200px;margin:0 auto;padding:20px 16px 60px}
 .page.active{display:block}
@@ -298,7 +326,19 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
         <button class="nav-btn" id="nav-admin" style="display:none">🛠️ <span class="label">Admin</span></button>
         <button class="nav-btn" id="nav-mensajes" style="display:none">💬 <span class="label">Mensajes</span></button>
         <button class="nav-btn" id="btn-salir">Salir</button>
-        <div class="user-avatar" id="user-avatar">👤</div>
+        <div class="avatar-wrap">
+          <div class="user-avatar" id="user-avatar">👤</div>
+          <div class="avatar-dropdown" id="avatar-dropdown">
+            <div class="avatar-dd-header">
+              <div class="avatar-dd-name" id="dd-nombre">—</div>
+              <div class="avatar-dd-email" id="dd-email">—</div>
+            </div>
+            <button class="avatar-dd-item" id="dd-configuracion">⚙️ Configuración</button>
+            <button class="avatar-dd-item" id="dd-mis-recs">📋 Mis recomendaciones</button>
+            <div class="avatar-dd-sep"></div>
+            <button class="avatar-dd-item danger" id="dd-salir">🚪 Cerrar sesión</button>
+          </div>
+        </div>
       </div>
     </div>
   </header>
@@ -402,11 +442,64 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
   </div>
 </div>
 
+<!-- ── MODAL PERFIL ── -->
+<div class="modal-overlay" id="modal-perfil">
+  <div class="modal-box" style="max-width:520px">
+    <button class="modal-close" id="perfil-close-btn">✕</button>
+    <h3 id="modal-perfil-titulo">⚙️ Configuración</h3>
+    <div style="margin-bottom:16px"></div>
+
+    <div class="perfil-tabs">
+      <button class="perfil-tab active" data-panel="datos">Mis datos</button>
+      <button class="perfil-tab" data-panel="password">Contraseña</button>
+      <button class="perfil-tab" data-panel="misrecs">Mis recomendaciones</button>
+    </div>
+
+    <!-- Panel: datos -->
+    <div class="perfil-panel active" id="panel-datos">
+      <div class="auth-row"><label>Email (no editable)</label><input class="auth-input" id="cfg-email" readonly></div>
+      <div class="auth-row"><label>Nombre y apellido *</label><input class="auth-input" id="cfg-nombre" placeholder="Juan García"></div>
+      <div class="auth-row">
+        <label>Barrio *</label>
+        <select class="auth-select" id="cfg-barrio">
+          <option value="">— Seleccioná tu barrio —</option>
+          <option value="San Sebastián - Pilar">San Sebastián - Pilar</option>
+        </select>
+      </div>
+      <div class="auth-row"><label>Teléfono *</label><input class="auth-input" type="tel" id="cfg-tel" placeholder="11 2345-6789"></div>
+      <button class="btn-primary" id="btn-guardar-cfg" style="margin-top:8px">Guardar cambios</button>
+      <p class="auth-error" id="cfg-error"></p>
+      <p id="cfg-ok" style="color:var(--verde-ok);font-size:.83rem;display:none;margin-top:8px">✅ Datos actualizados correctamente.</p>
+    </div>
+
+    <!-- Panel: contraseña -->
+    <div class="perfil-panel" id="panel-password">
+      <p style="font-size:.83rem;color:var(--muted);margin-bottom:16px">Si creaste tu cuenta con Google, no podés cambiar la contraseña desde acá.</p>
+      <div class="auth-row"><label>Nueva contraseña</label><input class="auth-input" type="password" id="cfg-pass1" placeholder="Mínimo 6 caracteres"></div>
+      <div class="auth-row"><label>Repetir contraseña</label><input class="auth-input" type="password" id="cfg-pass2" placeholder="Repetí la contraseña"></div>
+      <button class="btn-primary" id="btn-cambiar-pass" style="margin-top:8px">Cambiar contraseña</button>
+      <p class="auth-error" id="pass-error"></p>
+      <p id="pass-ok" style="color:var(--verde-ok);font-size:.83rem;display:none;margin-top:8px">✅ Contraseña actualizada.</p>
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--crema2)">
+        <p style="font-size:.83rem;color:var(--muted);margin-bottom:10px">¿Olvidaste tu contraseña?</p>
+        <button class="btn-secondary" id="btn-reset-pass" style="font-size:.83rem">Enviar email de recuperación</button>
+        <p id="reset-ok" style="color:var(--verde-ok);font-size:.83rem;display:none;margin-top:8px">✅ Email enviado. Revisá tu bandeja de entrada.</p>
+      </div>
+    </div>
+
+    <!-- Panel: mis recomendaciones -->
+    <div class="perfil-panel" id="panel-misrecs">
+      <div id="misrecs-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp }       from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup,
          createUserWithEmailAndPassword, signInWithEmailAndPassword,
-         onAuthStateChanged, signOut }
+         onAuthStateChanged, signOut, updatePassword,
+         sendPasswordResetEmail, EmailAuthProvider, reauthenticateWithCredential }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
 // ── CONFIG ─────────────────────────────────────────────────────────────────
@@ -418,7 +511,7 @@ const FB_CONFIG = {
   messagingSenderId: "502507789799",
   appId:             "1:502507789799:web:18c23d38e2d6f657f6f142",
 };
-const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbyRSb3Fv2jZofGImGJxd7G12Sy2VC3w-ITfEWzJ3YPrOzBZzVLgkhzhsVRARmKVYaUMCg/exec';
+const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbxFnHtKE3BVH9qOWkgwatLLUH9T7f88Tu1GqcRvVTetSQDxhULwWIQCC042KAhjpb7ehA/exec';
 const SCRIPT_PWD   = 'sansebastian2025';
 const ADMIN_EMAILS = ['francisco.iacono@gmail.com']; // ← tu email
 
@@ -528,10 +621,12 @@ function entrarALaApp() {
   hideScreens();
   document.getElementById('app').style.display = 'block';
   const isAdmin = ADMIN_EMAILS.includes((currentUser?.email||'').toLowerCase());
-  // Avatar
+  // Avatar + dropdown header
   const av = document.getElementById('user-avatar');
   if (currentUser?.photoURL) av.innerHTML=`<img src="${currentUser.photoURL}" alt="">`;
   else av.textContent = (perfilUsuario?.nombre||currentUser?.email||'?')[0].toUpperCase();
+  document.getElementById('dd-nombre').textContent = perfilUsuario?.nombre || currentUser?.email || '—';
+  document.getElementById('dd-email').textContent  = currentUser?.email || '';
   // Tabs
   if (isAdmin) {
     document.getElementById('nav-admin').style.display='inline-flex';
@@ -562,10 +657,156 @@ document.getElementById('nav-buscar').addEventListener('click',    () => showPag
 document.getElementById('nav-recomendar').addEventListener('click', () => showPage('recomendar'));
 document.getElementById('nav-admin').addEventListener('click',      () => showPage('admin'));
 document.getElementById('nav-mensajes').addEventListener('click',   () => showPage('mensajes'));
-document.getElementById('btn-salir').addEventListener('click', async () => {
-  await signOut(auth);
-  location.reload();
+document.getElementById('btn-salir').addEventListener('click', async () => { await signOut(auth); location.reload(); });
+document.getElementById('dd-salir').addEventListener('click',   async () => { await signOut(auth); location.reload(); });
+
+// ── AVATAR DROPDOWN ────────────────────────────────────────────────────────
+const avatarBtn  = document.getElementById('user-avatar');
+const avatarDrop = document.getElementById('avatar-dropdown');
+avatarBtn.addEventListener('click', e => { e.stopPropagation(); avatarDrop.classList.toggle('open'); });
+document.addEventListener('click', () => avatarDrop.classList.remove('open'));
+avatarDrop.addEventListener('click', e => e.stopPropagation());
+
+document.getElementById('dd-configuracion').addEventListener('click', () => {
+  avatarDrop.classList.remove('open');
+  abrirModalPerfil('datos');
 });
+document.getElementById('dd-mis-recs').addEventListener('click', () => {
+  avatarDrop.classList.remove('open');
+  abrirModalPerfil('misrecs');
+});
+
+// ── MODAL PERFIL ───────────────────────────────────────────────────────────
+function abrirModalPerfil(panelId) {
+  // Llenar datos actuales
+  document.getElementById('cfg-email').value  = currentUser?.email || '';
+  document.getElementById('cfg-nombre').value = perfilUsuario?.nombre   || '';
+  document.getElementById('cfg-barrio').value = perfilUsuario?.barrio   || '';
+  document.getElementById('cfg-tel').value    = perfilUsuario?.telefono || '';
+  // Ocultar mensajes previos
+  ['cfg-error','cfg-ok','pass-error','pass-ok','reset-ok'].forEach(id => {
+    const el = document.getElementById(id); el.style.display='none'; el.textContent='';
+  });
+  // Activar tab
+  activarPanelPerfil(panelId);
+  document.getElementById('modal-perfil').classList.add('open');
+  if (panelId === 'misrecs') cargarMisRecomendaciones();
+}
+
+function activarPanelPerfil(panelId) {
+  document.querySelectorAll('.perfil-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.panel === panelId);
+  });
+  document.querySelectorAll('.perfil-panel').forEach(p => {
+    p.classList.toggle('active', p.id === 'panel-' + panelId);
+  });
+}
+document.querySelectorAll('.perfil-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    activarPanelPerfil(tab.dataset.panel);
+    if (tab.dataset.panel === 'misrecs') cargarMisRecomendaciones();
+  });
+});
+document.getElementById('perfil-close-btn').addEventListener('click', () => {
+  document.getElementById('modal-perfil').classList.remove('open');
+});
+document.getElementById('modal-perfil').addEventListener('click', e => {
+  if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
+});
+
+// Guardar datos personales
+document.getElementById('btn-guardar-cfg').addEventListener('click', async () => {
+  const nombre = document.getElementById('cfg-nombre').value.trim();
+  const barrio = document.getElementById('cfg-barrio').value;
+  const tel    = document.getElementById('cfg-tel').value.trim();
+  const errEl  = document.getElementById('cfg-error');
+  const okEl   = document.getElementById('cfg-ok');
+  errEl.style.display='none'; okEl.style.display='none';
+  if (!nombre||!barrio||!tel) { errEl.textContent='Completá todos los campos'; errEl.style.display='block'; return; }
+  const btn = document.getElementById('btn-guardar-cfg'); btn.disabled=true; btn.textContent='Guardando...';
+  try {
+    await apiGet({ action:'saveUsuario', uid:currentUser.uid, email:currentUser.email, nombre, barrio, telefono:tel });
+    perfilUsuario = { ...perfilUsuario, nombre, barrio, telefono:tel };
+    // Actualizar avatar y dropdown
+    document.getElementById('dd-nombre').textContent  = nombre;
+    document.getElementById('user-avatar').textContent = nombre[0].toUpperCase();
+    document.getElementById('f-vecino') // hint en formulario si estaba vacío
+    okEl.style.display='block';
+  } catch(e) { errEl.textContent='Error al guardar.'; errEl.style.display='block'; }
+  btn.disabled=false; btn.textContent='Guardar cambios';
+});
+
+// Cambiar contraseña
+document.getElementById('btn-cambiar-pass').addEventListener('click', async () => {
+  const p1     = document.getElementById('cfg-pass1').value;
+  const p2     = document.getElementById('cfg-pass2').value;
+  const errEl  = document.getElementById('pass-error');
+  const okEl   = document.getElementById('pass-ok');
+  errEl.style.display='none'; okEl.style.display='none';
+  if (!p1||!p2)       { errEl.textContent='Completá ambos campos'; errEl.style.display='block'; return; }
+  if (p1 !== p2)      { errEl.textContent='Las contraseñas no coinciden'; errEl.style.display='block'; return; }
+  if (p1.length < 6)  { errEl.textContent='Mínimo 6 caracteres'; errEl.style.display='block'; return; }
+  // Verificar que no sea cuenta de Google
+  const isGoogle = currentUser?.providerData?.some(p => p.providerId === 'google.com');
+  if (isGoogle) { errEl.textContent='Tu cuenta usa Google. No podés cambiar contraseña acá.'; errEl.style.display='block'; return; }
+  const btn = document.getElementById('btn-cambiar-pass'); btn.disabled=true; btn.textContent='Cambiando...';
+  try {
+    await updatePassword(currentUser, p1);
+    document.getElementById('cfg-pass1').value = '';
+    document.getElementById('cfg-pass2').value = '';
+    okEl.style.display='block';
+  } catch(e) {
+    // Si el token es viejo Firebase pide re-autenticación
+    if (e.code === 'auth/requires-recent-login') {
+      errEl.textContent='Por seguridad, cerrá sesión, volvé a ingresar y cambiá la contraseña.';
+    } else {
+      errEl.textContent = errMsg(e.code);
+    }
+    errEl.style.display='block';
+  }
+  btn.disabled=false; btn.textContent='Cambiar contraseña';
+});
+
+// Recuperar contraseña por email
+document.getElementById('btn-reset-pass').addEventListener('click', async () => {
+  const okEl  = document.getElementById('reset-ok');
+  const errEl = document.getElementById('pass-error');
+  okEl.style.display='none'; errEl.style.display='none';
+  const btn = document.getElementById('btn-reset-pass'); btn.disabled=true; btn.textContent='Enviando...';
+  try {
+    await sendPasswordResetEmail(auth, currentUser.email);
+    okEl.style.display='block';
+  } catch(e) {
+    errEl.textContent = errMsg(e.code); errEl.style.display='block';
+  }
+  btn.disabled=false; btn.textContent='Enviar email de recuperación';
+});
+
+// Mis recomendaciones
+async function cargarMisRecomendaciones() {
+  const c = document.getElementById('misrecs-container');
+  c.innerHTML='<div class="loading"><div class="spinner"></div>Cargando...</div>';
+  try {
+    const d = await apiGet({ action:'getMisRecomendaciones', uid:currentUser.uid, email:currentUser.email });
+    if (d.error) { c.innerHTML=`<p style="color:var(--rojo);font-size:.85rem">${d.error}</p>`; return; }
+    const recs = d.recomendaciones || [];
+    if (!recs.length) { c.innerHTML='<div class="empty-state" style="padding:30px 0"><div class="icon">📋</div><h3>Sin recomendaciones</h3><p>Todavía no enviaste ninguna recomendación.</p></div>'; return; }
+    c.innerHTML = recs.map(r => `
+      <div class="mis-rec-card ${r.estado.toLowerCase()}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+          <div class="mis-rec-nombre">${r.nombre||'—'}</div>
+          <span class="estado-badge ${r.estado}">${r.estado}</span>
+        </div>
+        <div class="mis-rec-meta">
+          ${r.servicio?`<span>⚙️ ${r.servicio}</span>`:''}
+          <span class="badge ${badgeCls(r.recomendacion)}" style="font-size:.68rem">${r.recomendacion||''}</span>
+        </div>
+        ${r.notas&&r.notas.toLowerCase()!=='n/a'?`<div style="font-size:.8rem;color:var(--muted)">"${r.notas}"</div>`:''}
+      </div>`).join('');
+  } catch(e) {
+    c.innerHTML='<p style="color:var(--rojo);font-size:.85rem">Error al cargar.</p>';
+  }
+}
 
 // ── FILTROS Y BÚSQUEDA ─────────────────────────────────────────────────────
 document.getElementById('search-input').addEventListener('input',   () => renderResults());
