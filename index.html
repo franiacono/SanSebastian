@@ -231,6 +231,10 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
   .auth-card{padding:30px 20px}
   .form-body,.form-header,.form-disclaimer{padding-left:18px;padding-right:18px}
   .header-nav .nav-btn span.label{display:none}
+  .header-inner{gap:6px}
+  .header-nav{gap:4px;flex-shrink:0}
+  .header-title{min-width:0;flex:1}
+  .avatar-dropdown{right:0;left:auto}
 }
 </style>
 </head>
@@ -252,6 +256,26 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
     <button class="btn-primary" id="btn-email-login">Ingresar</button>
     <p class="auth-error" id="li-error"></p>
     <div class="auth-switch">¿No tenés cuenta? <a id="ir-registro">Registrate</a></div>
+  <div style="text-align:center;margin-top:12px">
+    <a id="ir-reset" style="font-size:.82rem;color:var(--muted);cursor:pointer">¿Olvidaste tu contraseña?</a>
+  </div>
+  </div>
+</div>
+
+<!-- ── RESET CONTRASEÑA ── -->
+<div id="screen-reset" class="auth-screen" style="display:none">
+  <div class="auth-card">
+    <div class="auth-logo">🔑</div>
+    <h1>Recuperar contraseña</h1>
+    <p class="auth-subtitle">Te enviaremos un email para restablecer tu contraseña</p>
+    <div class="auth-row">
+      <label>Email</label>
+      <input class="auth-input" type="email" id="reset-email" placeholder="tu@email.com">
+    </div>
+    <button class="btn-primary" id="btn-enviar-reset">Enviar email de recuperación</button>
+    <p class="auth-error" id="reset-error"></p>
+    <p id="reset-ok-msg" style="color:var(--verde-ok);font-size:.83rem;display:none;text-align:center;margin-top:8px">✅ Email enviado. Revisá tu bandeja de entrada.</p>
+    <div class="auth-switch"><a id="volver-login">← Volver al inicio de sesión</a></div>
   </div>
 </div>
 
@@ -325,7 +349,6 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
         <button class="nav-btn" id="nav-recomendar">✍️ <span class="label">Recomendar</span></button>
         <button class="nav-btn" id="nav-admin" style="display:none">🛠️ <span class="label">Admin</span></button>
         <button class="nav-btn" id="nav-mensajes" style="display:none">💬 <span class="label">Mensajes</span></button>
-        <button class="nav-btn" id="btn-salir">Salir</button>
         <div class="avatar-wrap">
           <div class="user-avatar" id="user-avatar">👤</div>
           <div class="avatar-dropdown" id="avatar-dropdown">
@@ -451,7 +474,7 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 
     <div class="perfil-tabs">
       <button class="perfil-tab active" data-panel="datos">Mis datos</button>
-      <button class="perfil-tab" data-panel="password">Contraseña</button>
+      <button class="perfil-tab" data-panel="password">Cambiar contraseña</button>
       <button class="perfil-tab" data-panel="misrecs">Mis recomendaciones</button>
     </div>
 
@@ -480,11 +503,6 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
       <button class="btn-primary" id="btn-cambiar-pass" style="margin-top:8px">Cambiar contraseña</button>
       <p class="auth-error" id="pass-error"></p>
       <p id="pass-ok" style="color:var(--verde-ok);font-size:.83rem;display:none;margin-top:8px">✅ Contraseña actualizada.</p>
-      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--crema2)">
-        <p style="font-size:.83rem;color:var(--muted);margin-bottom:10px">¿Olvidaste tu contraseña?</p>
-        <button class="btn-secondary" id="btn-reset-pass" style="font-size:.83rem">Enviar email de recuperación</button>
-        <p id="reset-ok" style="color:var(--verde-ok);font-size:.83rem;display:none;margin-top:8px">✅ Email enviado. Revisá tu bandeja de entrada.</p>
-      </div>
     </div>
 
     <!-- Panel: mis recomendaciones -->
@@ -511,8 +529,9 @@ const FB_CONFIG = {
   messagingSenderId: "502507789799",
   appId:             "1:502507789799:web:18c23d38e2d6f657f6f142",
 };
-const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbxFnHtKE3BVH9qOWkgwatLLUH9T7f88Tu1GqcRvVTetSQDxhULwWIQCC042KAhjpb7ehA/exec';
+const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycby-hMCNa3ab2dR5gFJ9w6l7-K2eWOjopjT7DtkfbE26O8QwIjBJwiMKL_nzG4CZZsElaQ/exec';
 const SCRIPT_PWD   = 'sansebastian2025';
+const ADMIN_PWD    = 'admin2025';
 const ADMIN_EMAILS = ['francisco.iacono@gmail.com']; // ← tu email
 
 // ── FIREBASE ───────────────────────────────────────────────────────────────
@@ -537,7 +556,7 @@ const fmtFecha = f => { try { const d=new Date(f); return isNaN(d)?'':d.toLocale
 const apiGet = p => fetch(SCRIPT_URL+'?'+new URLSearchParams({...p, password:SCRIPT_PWD})).then(r=>r.json());
 const errMsg = code => ({'auth/email-already-in-use':'Este email ya está registrado.','auth/invalid-email':'Email inválido.','auth/wrong-password':'Contraseña incorrecta.','auth/user-not-found':'No existe cuenta con ese email.','auth/weak-password':'Contraseña de al menos 6 caracteres.','auth/popup-closed-by-user':'Cerraste el popup.','auth/network-request-failed':'Error de red.','auth/invalid-credential':'Email o contraseña incorrectos.'})[code]||'Error al autenticar. Intentá de nuevo.';
 const showErr = (id, msg) => { const e=document.getElementById(id); e.textContent=msg; e.style.display='block'; };
-const hideScreens = () => ['screen-login','screen-register','screen-perfil'].forEach(id=>{document.getElementById(id).style.display='none';});
+const hideScreens = () => ['screen-login','screen-register','screen-perfil','screen-reset'].forEach(id=>{document.getElementById(id).style.display='none';});
 
 // ── AUTH STATE ─────────────────────────────────────────────────────────────
 onAuthStateChanged(auth, async user => {
@@ -595,7 +614,22 @@ document.getElementById('btn-email-reg').addEventListener('click', async () => {
   catch(e) { showErr('reg-error', errMsg(e.code)); }
 });
 document.getElementById('ir-registro').addEventListener('click', () => { document.getElementById('screen-login').style.display='none'; document.getElementById('screen-register').style.display='flex'; });
-document.getElementById('ir-login').addEventListener('click', () => { document.getElementById('screen-register').style.display='none'; document.getElementById('screen-login').style.display='flex'; });
+document.getElementById('ir-login').addEventListener('click',    () => { document.getElementById('screen-register').style.display='none'; document.getElementById('screen-login').style.display='flex'; });
+document.getElementById('ir-reset').addEventListener('click',    () => { hideScreens(); document.getElementById('screen-reset').style.display='flex'; });
+document.getElementById('volver-login').addEventListener('click',() => { hideScreens(); document.getElementById('screen-login').style.display='flex'; });
+document.getElementById('btn-enviar-reset').addEventListener('click', async () => {
+  const email = document.getElementById('reset-email').value.trim();
+  const errEl = document.getElementById('reset-error');
+  const okEl  = document.getElementById('reset-ok-msg');
+  errEl.style.display='none'; okEl.style.display='none';
+  if (!email) { errEl.textContent='Ingresá tu email'; errEl.style.display='block'; return; }
+  const btn = document.getElementById('btn-enviar-reset'); btn.disabled=true; btn.textContent='Enviando...';
+  try {
+    await sendPasswordResetEmail(auth, email);
+    okEl.style.display='block';
+  } catch(e) { errEl.textContent=errMsg(e.code); errEl.style.display='block'; }
+  btn.disabled=false; btn.textContent='Enviar email de recuperación';
+});
 
 // ── GUARDAR PERFIL ─────────────────────────────────────────────────────────
 document.getElementById('btn-guardar-perfil').addEventListener('click', async () => {
@@ -657,8 +691,12 @@ document.getElementById('nav-buscar').addEventListener('click',    () => showPag
 document.getElementById('nav-recomendar').addEventListener('click', () => showPage('recomendar'));
 document.getElementById('nav-admin').addEventListener('click',      () => showPage('admin'));
 document.getElementById('nav-mensajes').addEventListener('click',   () => showPage('mensajes'));
-document.getElementById('btn-salir').addEventListener('click', async () => { await signOut(auth); location.reload(); });
-document.getElementById('dd-salir').addEventListener('click',   async () => { await signOut(auth); location.reload(); });
+// Logout correcto — espera a que Firebase cierre sesión antes de recargar
+async function doSignOut() {
+  try { await signOut(auth); } catch(e) {}
+  location.reload();
+}
+document.getElementById('dd-salir').addEventListener('click', doSignOut);
 
 // ── AVATAR DROPDOWN ────────────────────────────────────────────────────────
 const avatarBtn  = document.getElementById('user-avatar');
@@ -684,7 +722,7 @@ function abrirModalPerfil(panelId) {
   document.getElementById('cfg-barrio').value = perfilUsuario?.barrio   || '';
   document.getElementById('cfg-tel').value    = perfilUsuario?.telefono || '';
   // Ocultar mensajes previos
-  ['cfg-error','cfg-ok','pass-error','pass-ok','reset-ok'].forEach(id => {
+  ['cfg-error','cfg-ok','pass-error','pass-ok'].forEach(id => {
     const el = document.getElementById(id); el.style.display='none'; el.textContent='';
   });
   // Activar tab
@@ -767,20 +805,7 @@ document.getElementById('btn-cambiar-pass').addEventListener('click', async () =
   btn.disabled=false; btn.textContent='Cambiar contraseña';
 });
 
-// Recuperar contraseña por email
-document.getElementById('btn-reset-pass').addEventListener('click', async () => {
-  const okEl  = document.getElementById('reset-ok');
-  const errEl = document.getElementById('pass-error');
-  okEl.style.display='none'; errEl.style.display='none';
-  const btn = document.getElementById('btn-reset-pass'); btn.disabled=true; btn.textContent='Enviando...';
-  try {
-    await sendPasswordResetEmail(auth, currentUser.email);
-    okEl.style.display='block';
-  } catch(e) {
-    errEl.textContent = errMsg(e.code); errEl.style.display='block';
-  }
-  btn.disabled=false; btn.textContent='Enviar email de recuperación';
-});
+
 
 // Mis recomendaciones
 async function cargarMisRecomendaciones() {
