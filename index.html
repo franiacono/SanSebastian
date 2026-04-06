@@ -9,11 +9,28 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="SS Proveedores">
 <meta name="theme-color" content="#2d5016">
+<link rel="manifest" href="/manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{--verde:#2d5016;--verde2:#4a7c2f;--crema:#f5f0e8;--crema2:#ede6d6;--text:#1a1a1a;--muted:#6b6b5a;--border:#d4c9b0;--white:#ffffff;--rojo:#c0392b;--naranja:#d35400;--verde-ok:#27ae60;--verde-ex:#1e8449}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:var(--crema);color:var(--text);min-height:100vh}
+
+/* ── TELÉFONOS ÚTILES ── */
+.tel-util-list{display:flex;flex-direction:column;gap:2px}
+.tel-util-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:10px;background:var(--crema);transition:background .15s}
+.tel-util-item:hover{background:var(--crema2)}
+.tel-util-emoji{font-size:1.3rem;width:32px;text-align:center;flex-shrink:0}
+.tel-util-info{flex:1;min-width:0}
+.tel-util-nombre{font-size:.9rem;font-weight:500;color:var(--text)}
+.tel-util-notas{font-size:.75rem;color:var(--muted);margin-top:1px}
+.tel-util-btn{display:flex;align-items:center;gap:5px;background:var(--verde);color:white;border:none;border-radius:8px;padding:7px 13px;font-size:.82rem;font-family:'DM Sans',sans-serif;cursor:pointer;text-decoration:none;white-space:nowrap;transition:background .2s;flex-shrink:0}
+.tel-util-btn:hover{background:var(--verde2)}
+.tel-util-separator{height:1px;background:var(--border);margin:4px 0;opacity:.5}
+
+/* ── LEGAL ── */
+.legal-footer{text-align:center;padding:16px;font-size:.72rem;color:var(--muted);max-width:600px;margin:0 auto;line-height:1.6;cursor:pointer}
+.legal-footer a{color:var(--muted);text-decoration:underline;text-decoration-style:dotted}
 
 /* ── AUTH ── */
 .auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--verde);background-image:radial-gradient(ellipse at 20% 50%,rgba(74,124,47,.4) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(45,80,22,.6) 0%,transparent 50%)}
@@ -319,6 +336,8 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
       </select>
     </div>
     <div class="auth-row"><label>Teléfono *</label><input class="auth-input" type="tel" id="prf-tel" placeholder="11 2345-6789"></div>
+    <div class="auth-row"><label>Área *</label><input class="auth-input" type="text" id="prf-area" placeholder="Ej: Sector A, Los Robles, etc."></div>
+    <div class="auth-row"><label>Lote *</label><input class="auth-input" type="text" id="prf-lote" placeholder="Ej: 42"></div>
     <button class="btn-primary" id="btn-guardar-perfil">Guardar y continuar</button>
     <p class="auth-error" id="prf-error"></p>
   </div>
@@ -326,6 +345,33 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 
 <!-- ── FAB ── -->
 <button class="fab-contacto" id="fab-contacto" style="display:none" id="fab-contacto">💬 Contactar admin</button>
+
+<!-- ── MODAL TELÉFONOS ÚTILES ── -->
+<div class="modal-overlay" id="modal-telefonos">
+  <div class="modal-box" style="max-width:480px">
+    <button class="modal-close" id="tel-close-btn">✕</button>
+    <h3>📞 Teléfonos Útiles</h3>
+    <p style="color:var(--muted);font-size:.83rem;margin-bottom:16px">Contactos de emergencia y servicios del barrio</p>
+    <div id="tel-util-container">
+      <div class="loading"><div class="spinner"></div>Cargando...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL LEGAL ── -->
+<div class="modal-overlay" id="modal-legal">
+  <div class="modal-box" style="max-width:520px">
+    <button class="modal-close" id="legal-close-btn">✕</button>
+    <h3>⚖️ Aviso Legal</h3>
+    <div style="font-size:.85rem;color:var(--text);line-height:1.7;margin-top:12px">
+      <p style="margin-bottom:12px">Todo lo publicado en este directorio es de carácter personal y refleja exclusivamente la experiencia propia de cada vecino que realiza una recomendación. Cada usuario es responsable del contenido que publica.</p>
+      <p style="margin-bottom:12px">Los administradores de esta plataforma <strong>no verifican</strong> los datos publicados, no avalan ni rechazan ninguna recomendación, y <strong>no son responsables</strong> por las opiniones vertidas por los vecinos.</p>
+      <p style="margin-bottom:12px">Las decisiones de contratación de cualquier proveedor son de <strong>exclusiva responsabilidad</strong> de cada vecino. Esta plataforma no tiene fines legales ni acusatorios — su único propósito es facilitar el intercambio de experiencias entre vecinos del barrio San Sebastián.</p>
+      <p style="color:var(--muted);font-size:.8rem;border-top:1px solid var(--crema2);padding-top:12px;margin-top:4px">Al utilizar esta plataforma, cada usuario acepta estas condiciones y asume responsabilidad por el contenido que publica.</p>
+    </div>
+    <button class="btn-primary" id="legal-ok-btn" style="margin-top:20px">Entendido</button>
+  </div>
+</div>
 
 <!-- ── MODAL CONTACTO ── -->
 <div class="modal-overlay" id="modal-contacto">
@@ -397,6 +443,9 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
     </div>
     <div class="stats-bar" id="stats-bar"></div>
     <div id="results-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
+    <div class="legal-footer" onclick="document.getElementById('modal-legal').classList.add('open')">
+      ⚖️ Las recomendaciones son opiniones personales de vecinos. <a>Ver aviso legal completo</a>
+    </div>
   </div>
 
   <div class="page" id="page-recomendar">
@@ -495,6 +544,8 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
         </select>
       </div>
       <div class="auth-row"><label>Teléfono *</label><input class="auth-input" type="tel" id="cfg-tel" placeholder="11 2345-6789"></div>
+      <div class="auth-row"><label>Área *</label><input class="auth-input" type="text" id="cfg-area" placeholder="Ej: Sector A, Los Robles, etc."></div>
+      <div class="auth-row"><label>Lote *</label><input class="auth-input" type="text" id="cfg-lote" placeholder="Ej: 42"></div>
       <button class="btn-primary" id="btn-guardar-cfg" style="margin-top:8px">Guardar cambios</button>
       <p class="auth-error" id="cfg-error"></p>
       <p id="cfg-ok" style="color:var(--verde-ok);font-size:.83rem;display:none;margin-top:8px">✅ Datos actualizados correctamente.</p>
@@ -534,7 +585,7 @@ const FB_CONFIG = {
   messagingSenderId: "502507789799",
   appId:             "1:502507789799:web:18c23d38e2d6f657f6f142",
 };
-const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbwIEHxmc61oYAeOpFb8YrN2NCkR9nBBSo8ISRQhj1goV8FQpy9bh4991a19AuUr9bnvHg/exec';
+const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbxxgleu8HW4-2fKFmk9rO4m77kAqKth713irDqo6nRHhNv_EBbV5wK8MeSCepu0B15UkQ/exec';
 const SCRIPT_PWD   = 'sansebastian2025';
 const ADMIN_PWD    = 'admin2025';
 const ADMIN_EMAILS = ['francisco.iacono@gmail.com']; // ← tu email
@@ -641,12 +692,14 @@ document.getElementById('btn-guardar-perfil').addEventListener('click', async ()
   const nombre = document.getElementById('prf-nombre').value.trim();
   const barrio = document.getElementById('prf-barrio').value;
   const tel    = document.getElementById('prf-tel').value.trim();
-  if (!nombre||!barrio||!tel) { showErr('prf-error','Completá todos los campos'); return; }
+  const area   = document.getElementById('prf-area').value.trim();
+  const lote   = document.getElementById('prf-lote').value.trim();
+  if (!nombre||!barrio||!tel||!area||!lote) { showErr('prf-error','Completá todos los campos'); return; }
   const btn = document.getElementById('btn-guardar-perfil');
   btn.disabled = true; btn.textContent = 'Guardando...';
   try {
-    await apiGet({ action:'saveUsuario', uid:currentUser.uid, email:currentUser.email, nombre, barrio, telefono:tel });
-    perfilUsuario = { nombre, barrio, telefono:tel, email:currentUser.email };
+    await apiGet({ action:'saveUsuario', uid:currentUser.uid, email:currentUser.email, nombre, barrio, telefono:tel, area, lote });
+    perfilUsuario = { nombre, barrio, telefono:tel, area, lote, email:currentUser.email };
     document.getElementById('screen-perfil').style.display = 'none';
     entrarALaApp();
   } catch(e) {
@@ -703,7 +756,57 @@ async function doSignOut() {
 }
 document.getElementById('dd-salir').addEventListener('click', doSignOut);
 
-// ── AVATAR DROPDOWN ────────────────────────────────────────────────────────
+// ── TELÉFONOS ÚTILES ──────────────────────────────────────────────────────
+document.getElementById('nav-telefonos').addEventListener('click', abrirTelefonosUtiles);
+document.getElementById('tel-close-btn').addEventListener('click', () => document.getElementById('modal-telefonos').classList.remove('open'));
+document.getElementById('modal-telefonos').addEventListener('click', e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); });
+
+async function abrirTelefonosUtiles() {
+  document.getElementById('modal-telefonos').classList.add('open');
+  const c = document.getElementById('tel-util-container');
+  c.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando...</div>';
+  try {
+    const data = await apiGet({ action:'getProveedores' });
+    const utiles = (data.proveedores||[]).filter(p => p.recomendacion && p.recomendacion.trim().toLowerCase() === 'utiles');
+    if (!utiles.length) {
+      c.innerHTML = '<div class="empty-state" style="padding:30px 0"><div class="icon">📞</div><h3>Sin teléfonos cargados</h3><p>Agregá entradas con Recomendación = "Utiles" en el sheet.</p></div>';
+      return;
+    }
+    c.innerHTML = `<div class="tel-util-list">${utiles.map((p,i) => `
+      <div class="tel-util-item">
+        <div class="tel-util-emoji">${telEmoji(p.servicio)}</div>
+        <div class="tel-util-info">
+          <div class="tel-util-nombre">${p.nombre}${p.empresa&&p.empresa!==p.nombre?` <span style="color:var(--muted);font-weight:400">· ${p.empresa}</span>`:''}</div>
+          ${p.notas&&p.notas.toLowerCase()!=='n/a'?`<div class="tel-util-notas">${p.notas}</div>`:''}
+        </div>
+        ${p.telefono&&p.telefono.toLowerCase()!=='n/a'
+          ? `<a class="tel-util-btn" href="tel:${p.telefono.replace(/\s/g,'')}">📞 ${p.telefono}</a>`
+          : `<span style="font-size:.78rem;color:var(--muted)">Sin tel.</span>`}
+      </div>
+      ${i < utiles.length-1 ? '<div class="tel-util-separator"></div>' : ''}`).join('')}
+    </div>`;
+  } catch(e) {
+    c.innerHTML = '<p style="color:var(--rojo);font-size:.85rem;padding:10px">Error al cargar.</p>';
+  }
+}
+
+function telEmoji(s) {
+  if(!s) return '📞'; const v = norm(s);
+  if(v.includes('bombero'))   return '🚒';
+  if(v.includes('ambulancia')||v.includes('emergencia')) return '🚑';
+  if(v.includes('policia')||v.includes('seguridad'))     return '🚔';
+  if(v.includes('guardia'))   return '👮';
+  if(v.includes('gas'))       return '🔥';
+  if(v.includes('luz')||v.includes('electr')) return '⚡';
+  if(v.includes('agua'))      return '💧';
+  if(v.includes('admin'))     return '🏢';
+  return '📞';
+}
+
+// ── LEGAL ──────────────────────────────────────────────────────────────────
+document.getElementById('legal-close-btn').addEventListener('click', () => document.getElementById('modal-legal').classList.remove('open'));
+document.getElementById('legal-ok-btn').addEventListener('click',    () => document.getElementById('modal-legal').classList.remove('open'));
+document.getElementById('modal-legal').addEventListener('click', e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); });
 const avatarBtn  = document.getElementById('user-avatar');
 const avatarDrop = document.getElementById('avatar-dropdown');
 avatarBtn.addEventListener('click', e => { e.stopPropagation(); avatarDrop.classList.toggle('open'); });
@@ -726,6 +829,8 @@ function abrirModalPerfil(panelId) {
   document.getElementById('cfg-nombre').value = perfilUsuario?.nombre   || '';
   document.getElementById('cfg-barrio').value = perfilUsuario?.barrio   || '';
   document.getElementById('cfg-tel').value    = perfilUsuario?.telefono || '';
+  document.getElementById('cfg-area').value   = perfilUsuario?.area     || '';
+  document.getElementById('cfg-lote').value   = perfilUsuario?.lote     || '';
   // Ocultar mensajes previos
   ['cfg-error','cfg-ok','pass-error','pass-ok'].forEach(id => {
     const el = document.getElementById(id); el.style.display='none'; el.textContent='';
@@ -1070,7 +1175,16 @@ function adminCardHTML(r,idx,acc){
     </div>
     <div class="admin-detalle">
       ${r.notas?`<div><strong style="color:var(--muted)">Notas: </strong>"${r.notas}"</div>`:''}
-      ${r.vecino?`<div class="admin-vecino"><strong>🏠 Quien informa:</strong> ${r.vecino}</div>`:''}
+      ${r.vecinoNombre||r.vecino?`<div class="admin-vecino">
+        <strong>🏠 Quien recomienda (confidencial):</strong>
+        ${r.vecinoNombre?`<div style="margin-top:4px">
+          <span style="color:var(--text)">${r.vecinoNombre}</span>
+          ${r.vecinoArea?`· <span style="color:var(--muted)">Área: ${r.vecinoArea}</span>`:''}
+          ${r.vecinoLote?`· <span style="color:var(--muted)">Lote: ${r.vecinoLote}</span>`:''}
+          ${r.vecinoTel?`· <a href="tel:${r.vecinoTel.replace(/\s/g,'')}" style="color:var(--verde)">📞 ${r.vecinoTel}</a>`:''}
+        </div>`:''}
+        ${r.vecino?`<div style="font-size:.75rem;color:var(--muted);margin-top:4px">${r.vecino}</div>`:''}
+      </div>`:''}
     </div>
     ${acc?`<div class="admin-actions">
       <button class="btn-aprobar" data-idx="${idx}" data-fila="${r.fila}">✅ Aprobar</button>
