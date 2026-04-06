@@ -5,11 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Proveedores · San Sebastián</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 220'%3E%3Cpath fill='%232d5016' d='M100 5 L195 5 L195 120 Q195 175 100 210 Q5 175 5 120 L5 5 Z'/%3E%3Cpath fill='%233a6b1e' d='M100 18 L182 18 L182 118 Q182 166 100 197 Q18 166 18 118 L18 18 Z'/%3E%3Ctext x='100' y='138' font-family='Georgia,serif' font-size='88' font-weight='700' fill='%23f5f0e8' text-anchor='middle'%3ESS%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="/manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="SS Proveedores">
 <meta name="theme-color" content="#2d5016">
-<link rel="manifest" href="/manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{--verde:#2d5016;--verde2:#4a7c2f;--crema:#f5f0e8;--crema2:#ede6d6;--text:#1a1a1a;--muted:#6b6b5a;--border:#d4c9b0;--white:#ffffff;--rojo:#c0392b;--naranja:#d35400;--verde-ok:#27ae60;--verde-ex:#1e8449}
@@ -59,15 +60,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--crema);color:var(--text);
 
 /* ── APP ── */
 #app{display:none}
-header{background:var(--verde);color:white;padding:0 20px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.2)}
-.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:12px;height:60px}
-.header-title{font-family:'Playfair Display',serif;font-size:1.15rem;flex:1}
-.header-title span{font-size:.75rem;font-weight:300;opacity:.8;display:block}
-.header-nav{display:flex;gap:6px;align-items:center}
-.nav-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:white;padding:6px 13px;border-radius:20px;font-size:.8rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s;white-space:nowrap}
+header{background:var(--verde);color:white;padding:0 16px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:8px;height:60px}
+.header-title{font-family:'Playfair Display',serif;font-size:1.1rem;flex:1;min-width:0}
+.header-title span{font-size:.72rem;font-weight:300;opacity:.8;display:block}
+.header-nav{display:flex;gap:5px;align-items:center;flex-shrink:0}
+.nav-btn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:white;padding:6px 11px;border-radius:20px;font-size:.78rem;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s;white-space:nowrap}
 .nav-btn:hover{background:rgba(255,255,255,.22)}
 .nav-btn.active{background:rgba(255,255,255,.9);color:var(--verde);font-weight:600}
-/* Avatar + dropdown */
 .avatar-wrap{position:relative;flex-shrink:0}
 .user-avatar{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:600;overflow:hidden;cursor:pointer;transition:border-color .2s}
 .user-avatar:hover{border-color:rgba(255,255,255,.9)}
@@ -83,22 +83,7 @@ header{background:var(--verde);color:white;padding:0 20px;position:sticky;top:0;
 .avatar-dd-item.danger:hover{background:#fff0ee}
 .avatar-dd-sep{height:1px;background:var(--crema2);margin:4px 0}
 
-/* Modal perfil (tabs internas) */
-.perfil-tabs{display:flex;gap:0;border-bottom:1.5px solid var(--crema2);margin-bottom:20px}
-.perfil-tab{padding:10px 16px;font-size:.85rem;font-family:'DM Sans',sans-serif;background:none;border:none;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1.5px;transition:color .2s}
-.perfil-tab.active{color:var(--verde);border-bottom-color:var(--verde);font-weight:600}
-.perfil-panel{display:none}.perfil-panel.active{display:block}
-.mis-rec-card{background:var(--crema);border-radius:10px;padding:12px 14px;margin-bottom:8px;border-left:3px solid var(--border)}
-.mis-rec-card.aprobado{border-color:var(--verde-ok)}
-.mis-rec-card.pendiente{border-color:#e0a800}
-.mis-rec-card.rechazado{border-color:var(--rojo)}
-.mis-rec-nombre{font-weight:600;font-size:.9rem;color:var(--text)}
-.mis-rec-meta{font-size:.78rem;color:var(--muted);margin:3px 0 6px;display:flex;gap:8px;flex-wrap:wrap}
-.estado-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.7rem;font-weight:600}
-.estado-badge.Aprobado{background:#d4edda;color:#155724}
-.estado-badge.Pendiente{background:#fff3cd;color:#856404}
-.estado-badge.Rechazado{background:#fadbd8;color:var(--rojo)}
-
+/* ── PAGES ── */
 .page{display:none;max-width:1200px;margin:0 auto;padding:20px 16px 60px}
 .page.active{display:block}
 
@@ -109,7 +94,7 @@ header{background:var(--verde);color:white;padding:0 20px;position:sticky;top:0;
 .search-wrap input:focus{outline:none;border-color:var(--verde2);box-shadow:0 0 0 3px rgba(74,124,47,.1)}
 .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1rem;pointer-events:none}
 .rubros-select-wrap{position:relative}
-.rubros-select{padding:11px 36px 11px 14px;border:2px solid var(--border);border-radius:12px;font-size:.88rem;font-family:'DM Sans',sans-serif;background:white;color:var(--text);cursor:pointer;appearance:none;-webkit-appearance:none;min-width:170px}
+.rubros-select{padding:11px 36px 11px 14px;border:2px solid var(--border);border-radius:12px;font-size:.88rem;font-family:'DM Sans',sans-serif;background:white;color:var(--text);cursor:pointer;appearance:none;-webkit-appearance:none;min-width:160px}
 .rubros-select:focus{outline:none;border-color:var(--verde2)}
 .rubros-arrow{position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--muted);font-size:.8rem}
 .sort-select{padding:11px 14px;border:2px solid var(--border);border-radius:12px;font-size:.88rem;font-family:'DM Sans',sans-serif;background:white;color:var(--text);cursor:pointer}
@@ -166,6 +151,7 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 .btn-recomendar-card{background:transparent;border:1.5px solid var(--verde2);color:var(--verde);border-radius:8px;padding:6px 14px;font-size:.78rem;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s}
 .btn-recomendar-card:hover{background:var(--verde);color:white}
 
+/* ── LOADING/EMPTY ── */
 .empty-state{text-align:center;padding:50px 20px;color:var(--muted)}
 .empty-state .icon{font-size:2.5rem;margin-bottom:10px}
 .empty-state h3{font-family:'Playfair Display',serif;color:var(--text);margin-bottom:5px}
@@ -238,14 +224,29 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 .btn-responder{padding:7px 16px;background:var(--verde);color:white;border:none;border-radius:8px;font-size:.8rem;font-family:'DM Sans',sans-serif;cursor:pointer;text-decoration:none;display:inline-block}
 .btn-responder:hover{background:var(--verde2)}
 
+/* ── PERFIL MODAL ── */
+.perfil-tabs{display:flex;gap:0;border-bottom:1.5px solid var(--crema2);margin-bottom:20px}
+.perfil-tab{padding:10px 16px;font-size:.85rem;font-family:'DM Sans',sans-serif;background:none;border:none;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1.5px;transition:color .2s}
+.perfil-tab.active{color:var(--verde);border-bottom-color:var(--verde);font-weight:600}
+.perfil-panel{display:none}.perfil-panel.active{display:block}
+.mis-rec-card{background:var(--crema);border-radius:10px;padding:12px 14px;margin-bottom:8px;border-left:3px solid var(--border)}
+.mis-rec-card.aprobado{border-color:var(--verde-ok)}
+.mis-rec-card.pendiente{border-color:#e0a800}
+.mis-rec-card.rechazado{border-color:var(--rojo)}
+.mis-rec-nombre{font-weight:600;font-size:.9rem;color:var(--text)}
+.mis-rec-meta{font-size:.78rem;color:var(--muted);margin:3px 0 6px;display:flex;gap:8px;flex-wrap:wrap}
+.estado-badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.7rem;font-weight:600}
+.estado-badge.Aprobado{background:#d4edda;color:#155724}
+.estado-badge.Pendiente{background:#fff3cd;color:#856404}
+.estado-badge.Rechazado{background:#fadbd8;color:var(--rojo)}
+
 /* ── FAB + MODAL ── */
 .fab-contacto{position:fixed;bottom:24px;right:20px;background:var(--verde);color:white;border:none;border-radius:50px;padding:12px 18px;font-size:.85rem;font-family:'DM Sans',sans-serif;cursor:pointer;box-shadow:0 4px 16px rgba(45,80,22,.35);z-index:150;display:flex;align-items:center;gap:6px;transition:background .2s,transform .15s}
 .fab-contacto:hover{background:var(--verde2);transform:translateY(-2px)}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:300;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.open{display:flex}
-.modal-box{background:var(--crema);border-radius:16px;padding:28px;width:100%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.modal-box{background:var(--crema);border-radius:16px;padding:28px;width:100%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:90vh;overflow-y:auto}
 .modal-box h3{font-family:'Playfair Display',serif;color:var(--verde);margin-bottom:6px;font-size:1.2rem}
-.modal-box>p{color:var(--muted);font-size:.83rem;margin-bottom:18px}
 .modal-close{float:right;background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--muted)}
 
 @media(max-width:650px){
@@ -254,13 +255,98 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
   .form-body,.form-header,.form-disclaimer{padding-left:18px;padding-right:18px}
   .header-nav .nav-btn span.label{display:none}
   .header-inner{gap:6px}
-  .header-nav{gap:4px;flex-shrink:0}
-  .header-title{min-width:0;flex:1}
+  .header-nav{gap:4px}
   .avatar-dropdown{right:0;left:auto}
 }
 </style>
 </head>
 <body>
+
+<!-- ── MODAL TELÉFONOS ÚTILES ── -->
+<div class="modal-overlay" id="modal-telefonos">
+  <div class="modal-box" style="max-width:480px">
+    <button class="modal-close" id="tel-close-btn">✕</button>
+    <h3>📞 Teléfonos Útiles</h3>
+    <p style="color:var(--muted);font-size:.83rem;margin-bottom:16px">Contactos de emergencia y servicios del barrio</p>
+    <div id="tel-util-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
+  </div>
+</div>
+
+<!-- ── MODAL LEGAL ── -->
+<div class="modal-overlay" id="modal-legal">
+  <div class="modal-box" style="max-width:520px">
+    <button class="modal-close" id="legal-close-btn">✕</button>
+    <h3>⚖️ Aviso Legal</h3>
+    <div style="font-size:.85rem;color:var(--text);line-height:1.7;margin-top:12px">
+      <p style="margin-bottom:12px">Todo lo publicado en este directorio es de carácter personal y refleja exclusivamente la experiencia propia de cada vecino que realiza una recomendación. Cada usuario es responsable del contenido que publica.</p>
+      <p style="margin-bottom:12px">Los administradores de esta plataforma <strong>no verifican</strong> los datos publicados, no avalan ni rechazan ninguna recomendación, y <strong>no son responsables</strong> por las opiniones vertidas por los vecinos.</p>
+      <p style="margin-bottom:12px">Las decisiones de contratación de cualquier proveedor son de <strong>exclusiva responsabilidad</strong> de cada vecino. Esta plataforma no tiene fines legales ni acusatorios — su único propósito es facilitar el intercambio de experiencias entre vecinos del barrio San Sebastián.</p>
+      <p style="color:var(--muted);font-size:.8rem;border-top:1px solid var(--crema2);padding-top:12px;margin-top:4px">Al utilizar esta plataforma, cada usuario acepta estas condiciones y asume responsabilidad por el contenido que publica.</p>
+    </div>
+    <button class="btn-primary" id="legal-ok-btn" style="margin-top:20px">Entendido</button>
+  </div>
+</div>
+
+<!-- ── FAB ── -->
+<button class="fab-contacto" id="fab-contacto" style="display:none">💬 Contactar admin</button>
+
+<!-- ── MODAL CONTACTO ── -->
+<div class="modal-overlay" id="modal-contacto">
+  <div class="modal-box">
+    <button class="modal-close" id="modal-close-btn">✕</button>
+    <h3>💬 Contactar al administrador</h3>
+    <p style="color:var(--muted);font-size:.83rem;margin-bottom:18px">El admin te responderá a tu email registrado.</p>
+    <div style="margin-bottom:16px">
+      <label style="font-size:.83rem;font-weight:500;margin-bottom:5px;display:block">Mensaje *</label>
+      <textarea id="mc-mensaje" placeholder="Escribí tu consulta..." style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:.92rem;font-family:'DM Sans',sans-serif;background:white;resize:vertical;min-height:100px"></textarea>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <button class="btn-submit" id="mc-btn" style="width:auto;padding:11px 22px">Enviar mensaje</button>
+      <span id="mc-msg" style="font-size:.83rem;display:none"></span>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODAL PERFIL ── -->
+<div class="modal-overlay" id="modal-perfil">
+  <div class="modal-box" style="max-width:520px">
+    <button class="modal-close" id="perfil-close-btn">✕</button>
+    <h3>⚙️ Mi cuenta</h3>
+    <div style="margin-bottom:16px"></div>
+    <div class="perfil-tabs">
+      <button class="perfil-tab active" data-panel="datos">Mis datos</button>
+      <button class="perfil-tab" data-panel="password">Contraseña</button>
+      <button class="perfil-tab" data-panel="misrecs">Mis recomendaciones</button>
+    </div>
+    <div class="perfil-panel active" id="panel-datos">
+      <div class="auth-row"><label>Email (no editable)</label><input class="auth-input" id="cfg-email" readonly></div>
+      <div class="auth-row"><label>Nombre y apellido *</label><input class="auth-input" id="cfg-nombre" placeholder="Juan García"></div>
+      <div class="auth-row"><label>Barrio *</label>
+        <select class="auth-select" id="cfg-barrio">
+          <option value="">— Seleccioná tu barrio —</option>
+          <option value="San Sebastián - Pilar">San Sebastián - Pilar</option>
+        </select>
+      </div>
+      <div class="auth-row"><label>Teléfono *</label><input class="auth-input" type="tel" id="cfg-tel" placeholder="11 2345-6789"></div>
+      <div class="auth-row"><label>Área *</label><input class="auth-input" type="text" id="cfg-area" placeholder="Ej: Sector A, Los Robles..."></div>
+      <div class="auth-row"><label>Lote *</label><input class="auth-input" type="text" id="cfg-lote" placeholder="Ej: 42"></div>
+      <button class="btn-primary" id="btn-guardar-cfg" style="margin-top:8px">Guardar cambios</button>
+      <p class="auth-error" id="cfg-error"></p>
+      <p id="cfg-ok" style="color:var(--verde-ok);font-size:.83rem;display:none;margin-top:8px">✅ Datos actualizados.</p>
+    </div>
+    <div class="perfil-panel" id="panel-password">
+      <p style="font-size:.83rem;color:var(--muted);margin-bottom:16px">Si creaste tu cuenta con Google, no podés cambiar la contraseña desde acá.</p>
+      <div class="auth-row"><label>Nueva contraseña</label><input class="auth-input" type="password" id="cfg-pass1" placeholder="Mínimo 6 caracteres"></div>
+      <div class="auth-row"><label>Repetir contraseña</label><input class="auth-input" type="password" id="cfg-pass2" placeholder="Repetí la contraseña"></div>
+      <button class="btn-primary" id="btn-cambiar-pass" style="margin-top:8px">Cambiar contraseña</button>
+      <p class="auth-error" id="pass-error"></p>
+      <p id="pass-ok" style="color:var(--verde-ok);font-size:.83rem;display:none;margin-top:8px">✅ Contraseña actualizada.</p>
+    </div>
+    <div class="perfil-panel" id="panel-misrecs">
+      <div id="misrecs-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
+    </div>
+  </div>
+</div>
 
 <!-- ── LOGIN ── -->
 <div id="screen-login" class="auth-screen">
@@ -278,26 +364,7 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
     <button class="btn-primary" id="btn-email-login">Ingresar</button>
     <p class="auth-error" id="li-error"></p>
     <div class="auth-switch">¿No tenés cuenta? <a id="ir-registro">Registrate</a></div>
-  <div style="text-align:center;margin-top:12px">
-    <a id="ir-reset" style="font-size:.82rem;color:var(--muted);cursor:pointer">¿Olvidaste tu contraseña?</a>
-  </div>
-  </div>
-</div>
-
-<!-- ── RESET CONTRASEÑA ── -->
-<div id="screen-reset" class="auth-screen" style="display:none">
-  <div class="auth-card">
-    <div class="auth-logo">🔑</div>
-    <h1>Recuperar contraseña</h1>
-    <p class="auth-subtitle">Te enviaremos un email para restablecer tu contraseña</p>
-    <div class="auth-row">
-      <label>Email</label>
-      <input class="auth-input" type="email" id="reset-email" placeholder="tu@email.com">
-    </div>
-    <button class="btn-primary" id="btn-enviar-reset">Enviar email de recuperación</button>
-    <p class="auth-error" id="reset-error"></p>
-    <p id="reset-ok-msg" style="color:var(--verde-ok);font-size:.83rem;display:none;text-align:center;margin-top:8px">✅ Email enviado. Revisá tu bandeja de entrada.</p>
-    <div class="auth-switch"><a id="volver-login">← Volver al inicio de sesión</a></div>
+    <div style="text-align:center;margin-top:12px"><a id="ir-reset" style="font-size:.82rem;color:var(--muted);cursor:pointer">¿Olvidaste tu contraseña?</a></div>
   </div>
 </div>
 
@@ -328,65 +395,31 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
     <p class="auth-subtitle">Solo la primera vez</p>
     <div class="auth-row"><label>Email</label><input class="auth-input" type="email" id="prf-email" readonly></div>
     <div class="auth-row"><label>Nombre y apellido *</label><input class="auth-input" type="text" id="prf-nombre" placeholder="Juan García"></div>
-    <div class="auth-row">
-      <label>Barrio *</label>
+    <div class="auth-row"><label>Barrio *</label>
       <select class="auth-select" id="prf-barrio">
         <option value="">— Seleccioná tu barrio —</option>
         <option value="San Sebastián - Pilar">San Sebastián - Pilar</option>
       </select>
     </div>
     <div class="auth-row"><label>Teléfono *</label><input class="auth-input" type="tel" id="prf-tel" placeholder="11 2345-6789"></div>
-    <div class="auth-row"><label>Área *</label><input class="auth-input" type="text" id="prf-area" placeholder="Ej: Sector A, Los Robles, etc."></div>
+    <div class="auth-row"><label>Área *</label><input class="auth-input" type="text" id="prf-area" placeholder="Ej: Sector A, Los Robles..."></div>
     <div class="auth-row"><label>Lote *</label><input class="auth-input" type="text" id="prf-lote" placeholder="Ej: 42"></div>
     <button class="btn-primary" id="btn-guardar-perfil">Guardar y continuar</button>
     <p class="auth-error" id="prf-error"></p>
   </div>
 </div>
 
-<!-- ── FAB ── -->
-<button class="fab-contacto" id="fab-contacto" style="display:none" id="fab-contacto">💬 Contactar admin</button>
-
-<!-- ── MODAL TELÉFONOS ÚTILES ── -->
-<div class="modal-overlay" id="modal-telefonos">
-  <div class="modal-box" style="max-width:480px">
-    <button class="modal-close" id="tel-close-btn">✕</button>
-    <h3>📞 Teléfonos Útiles</h3>
-    <p style="color:var(--muted);font-size:.83rem;margin-bottom:16px">Contactos de emergencia y servicios del barrio</p>
-    <div id="tel-util-container">
-      <div class="loading"><div class="spinner"></div>Cargando...</div>
-    </div>
-  </div>
-</div>
-
-<!-- ── MODAL LEGAL ── -->
-<div class="modal-overlay" id="modal-legal">
-  <div class="modal-box" style="max-width:520px">
-    <button class="modal-close" id="legal-close-btn">✕</button>
-    <h3>⚖️ Aviso Legal</h3>
-    <div style="font-size:.85rem;color:var(--text);line-height:1.7;margin-top:12px">
-      <p style="margin-bottom:12px">Todo lo publicado en este directorio es de carácter personal y refleja exclusivamente la experiencia propia de cada vecino que realiza una recomendación. Cada usuario es responsable del contenido que publica.</p>
-      <p style="margin-bottom:12px">Los administradores de esta plataforma <strong>no verifican</strong> los datos publicados, no avalan ni rechazan ninguna recomendación, y <strong>no son responsables</strong> por las opiniones vertidas por los vecinos.</p>
-      <p style="margin-bottom:12px">Las decisiones de contratación de cualquier proveedor son de <strong>exclusiva responsabilidad</strong> de cada vecino. Esta plataforma no tiene fines legales ni acusatorios — su único propósito es facilitar el intercambio de experiencias entre vecinos del barrio San Sebastián.</p>
-      <p style="color:var(--muted);font-size:.8rem;border-top:1px solid var(--crema2);padding-top:12px;margin-top:4px">Al utilizar esta plataforma, cada usuario acepta estas condiciones y asume responsabilidad por el contenido que publica.</p>
-    </div>
-    <button class="btn-primary" id="legal-ok-btn" style="margin-top:20px">Entendido</button>
-  </div>
-</div>
-
-<!-- ── MODAL CONTACTO ── -->
-<div class="modal-overlay" id="modal-contacto">
-  <div class="modal-box">
-    <button class="modal-close" id="modal-close-btn">✕</button>
-    <h3>💬 Contactar al administrador</h3>
-    <p>El admin te responderá a tu email registrado.</p>
-    <div style="margin-bottom:16px">
-      <label style="font-size:.83rem;font-weight:500;margin-bottom:5px;display:block">Mensaje *</label>
-      <textarea id="mc-mensaje" placeholder="Escribí tu consulta..." style="width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:.92rem;font-family:'DM Sans',sans-serif;background:white;resize:vertical;min-height:100px"></textarea>
-    </div>
-    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-      <button class="btn-submit" id="mc-btn" style="width:auto;padding:11px 22px">Enviar mensaje</button>
-      <span id="mc-msg" style="font-size:.83rem;display:none"></span>
-    </div>
+<!-- ── RESET CONTRASEÑA ── -->
+<div id="screen-reset" class="auth-screen" style="display:none">
+  <div class="auth-card">
+    <div class="auth-logo">🔑</div>
+    <h1>Recuperar contraseña</h1>
+    <p class="auth-subtitle">Te enviaremos un email para restablecer tu contraseña</p>
+    <div class="auth-row"><label>Email</label><input class="auth-input" type="email" id="reset-email" placeholder="tu@email.com"></div>
+    <button class="btn-primary" id="btn-enviar-reset">Enviar email de recuperación</button>
+    <p class="auth-error" id="reset-error"></p>
+    <p id="reset-ok-msg" style="color:var(--verde-ok);font-size:.83rem;display:none;text-align:center;margin-top:8px">✅ Email enviado. Revisá tu bandeja.</p>
+    <div class="auth-switch"><a id="volver-login">← Volver al inicio de sesión</a></div>
   </div>
 </div>
 
@@ -397,6 +430,7 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
       <div class="header-title">Proveedores <span>San Sebastián · Pilar</span></div>
       <div class="header-nav">
         <button class="nav-btn active" id="nav-buscar">🔍 <span class="label">Buscar</span></button>
+        <button class="nav-btn" id="nav-telefonos">📞 <span class="label">Útiles</span></button>
         <button class="nav-btn" id="nav-recomendar">✍️ <span class="label">Recomendar</span></button>
         <button class="nav-btn" id="nav-admin" style="display:none">🛠️ <span class="label">Admin</span></button>
         <button class="nav-btn" id="nav-mensajes" style="display:none">💬 <span class="label">Mensajes</span></button>
@@ -443,9 +477,7 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
     </div>
     <div class="stats-bar" id="stats-bar"></div>
     <div id="results-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
-    <div class="legal-footer" onclick="document.getElementById('modal-legal').classList.add('open')">
-      ⚖️ Las recomendaciones son opiniones personales de vecinos. <a>Ver aviso legal completo</a>
-    </div>
+    <div class="legal-footer" id="abrir-legal">⚖️ Las recomendaciones son opiniones personales de vecinos. <a>Ver aviso legal completo</a></div>
   </div>
 
   <div class="page" id="page-recomendar">
@@ -519,61 +551,11 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
   </div>
 </div>
 
-<!-- ── MODAL PERFIL ── -->
-<div class="modal-overlay" id="modal-perfil">
-  <div class="modal-box" style="max-width:520px">
-    <button class="modal-close" id="perfil-close-btn">✕</button>
-    <h3 id="modal-perfil-titulo">⚙️ Configuración</h3>
-    <div style="margin-bottom:16px"></div>
-
-    <div class="perfil-tabs">
-      <button class="perfil-tab active" data-panel="datos">Mis datos</button>
-      <button class="perfil-tab" data-panel="password">Cambiar contraseña</button>
-      <button class="perfil-tab" data-panel="misrecs">Mis recomendaciones</button>
-    </div>
-
-    <!-- Panel: datos -->
-    <div class="perfil-panel active" id="panel-datos">
-      <div class="auth-row"><label>Email (no editable)</label><input class="auth-input" id="cfg-email" readonly></div>
-      <div class="auth-row"><label>Nombre y apellido *</label><input class="auth-input" id="cfg-nombre" placeholder="Juan García"></div>
-      <div class="auth-row">
-        <label>Barrio *</label>
-        <select class="auth-select" id="cfg-barrio">
-          <option value="">— Seleccioná tu barrio —</option>
-          <option value="San Sebastián - Pilar">San Sebastián - Pilar</option>
-        </select>
-      </div>
-      <div class="auth-row"><label>Teléfono *</label><input class="auth-input" type="tel" id="cfg-tel" placeholder="11 2345-6789"></div>
-      <div class="auth-row"><label>Área *</label><input class="auth-input" type="text" id="cfg-area" placeholder="Ej: Sector A, Los Robles, etc."></div>
-      <div class="auth-row"><label>Lote *</label><input class="auth-input" type="text" id="cfg-lote" placeholder="Ej: 42"></div>
-      <button class="btn-primary" id="btn-guardar-cfg" style="margin-top:8px">Guardar cambios</button>
-      <p class="auth-error" id="cfg-error"></p>
-      <p id="cfg-ok" style="color:var(--verde-ok);font-size:.83rem;display:none;margin-top:8px">✅ Datos actualizados correctamente.</p>
-    </div>
-
-    <!-- Panel: contraseña -->
-    <div class="perfil-panel" id="panel-password">
-      <p style="font-size:.83rem;color:var(--muted);margin-bottom:16px">Si creaste tu cuenta con Google, no podés cambiar la contraseña desde acá.</p>
-      <div class="auth-row"><label>Nueva contraseña</label><input class="auth-input" type="password" id="cfg-pass1" placeholder="Mínimo 6 caracteres"></div>
-      <div class="auth-row"><label>Repetir contraseña</label><input class="auth-input" type="password" id="cfg-pass2" placeholder="Repetí la contraseña"></div>
-      <button class="btn-primary" id="btn-cambiar-pass" style="margin-top:8px">Cambiar contraseña</button>
-      <p class="auth-error" id="pass-error"></p>
-      <p id="pass-ok" style="color:var(--verde-ok);font-size:.83rem;display:none;margin-top:8px">✅ Contraseña actualizada.</p>
-    </div>
-
-    <!-- Panel: mis recomendaciones -->
-    <div class="perfil-panel" id="panel-misrecs">
-      <div id="misrecs-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
-    </div>
-  </div>
-</div>
-
 <script type="module">
 import { initializeApp }       from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup,
          createUserWithEmailAndPassword, signInWithEmailAndPassword,
-         onAuthStateChanged, signOut, updatePassword,
-         sendPasswordResetEmail, EmailAuthProvider, reauthenticateWithCredential }
+         onAuthStateChanged, signOut, updatePassword, sendPasswordResetEmail }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
 // ── CONFIG ─────────────────────────────────────────────────────────────────
@@ -585,10 +567,10 @@ const FB_CONFIG = {
   messagingSenderId: "502507789799",
   appId:             "1:502507789799:web:18c23d38e2d6f657f6f142",
 };
-const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbxxgleu8HW4-2fKFmk9rO4m77kAqKth713irDqo6nRHhNv_EBbV5wK8MeSCepu0B15UkQ/exec';
+const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycby-hMCNa3ab2dR5gFJ9w6l7-K2eWOjopjT7DtkfbE26O8QwIjBJwiMKL_nzG4CZZsElaQ/exec';
 const SCRIPT_PWD   = 'sansebastian2025';
 const ADMIN_PWD    = 'admin2025';
-const ADMIN_EMAILS = ['francisco.iacono@gmail.com']; // ← tu email
+const ADMIN_EMAILS = ['francisco.iacono@gmail.com'];
 
 // ── FIREBASE ───────────────────────────────────────────────────────────────
 const fbApp = initializeApp(FB_CONFIG);
@@ -598,376 +580,10 @@ const gprov = new GoogleAuthProvider();
 // ── ESTADO ─────────────────────────────────────────────────────────────────
 let currentUser   = null;
 let perfilUsuario = null;
-let proveedores   = [];
 let activeFilter  = 'todos';
 let openCard      = null;
 
-// ── HELPERS ────────────────────────────────────────────────────────────────
-const norm = t => { if(!t)return ''; return String(t).toLowerCase().trim().replace(/á/g,'a').replace(/é/g,'e').replace(/í/g,'i').replace(/ó/g,'o').replace(/ú/g,'u').replace(/ü/g,'u'); };
-const slugify = t => norm(t||'').replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
-const starsHtml = n => { if(!n)return ''; const l=Math.round(n); return '★'.repeat(l)+'☆'.repeat(5-l); };
-const badgeCls = e => ({'Destacado':'badge-destacado','Muy Recomendable':'badge-muy-recomendable','Recomendable':'badge-recomendable','Malas Experiencias':'badge-malas-experiencias','No Recomendable':'badge-no-recomendable','No Contratar':'badge-no-recomendable'})[e]||'badge-sin-datos';
-const emoji = s => { if(!s)return '⚙️'; const v=norm(s); if(v.includes('plom'))return '🔧'; if(v.includes('electr'))return '⚡'; if(v.includes('limp'))return '🧹'; if(v.includes('pint'))return '🖌️'; if(v.includes('jardin')||v.includes('pasto'))return '🌿'; if(v.includes('comid')||v.includes('delivery')||v.includes('empanada')||v.includes('pizza'))return '🍕'; if(v.includes('gas')||v.includes('calef'))return '🔥'; if(v.includes('piscina')||v.includes('pileta'))return '🏊'; if(v.includes('carpint'))return '🪵'; if(v.includes('alban')||v.includes('construc'))return '🏗️'; if(v.includes('segur')||v.includes('alarm'))return '🔒'; if(v.includes('mudanz'))return '📦'; if(v.includes('panad')||v.includes('torta'))return '🍰'; if(v.includes('sushi'))return '🍱'; if(v.includes('helad'))return '🍦'; return '⚙️'; };
-const fmtFecha = f => { try { const d=new Date(f); return isNaN(d)?'':d.toLocaleDateString('es-AR'); } catch(e){return '';} };
-const apiGet = p => fetch(SCRIPT_URL+'?'+new URLSearchParams({...p, password:SCRIPT_PWD})).then(r=>r.json());
-const errMsg = code => ({'auth/email-already-in-use':'Este email ya está registrado.','auth/invalid-email':'Email inválido.','auth/wrong-password':'Contraseña incorrecta.','auth/user-not-found':'No existe cuenta con ese email.','auth/weak-password':'Contraseña de al menos 6 caracteres.','auth/popup-closed-by-user':'Cerraste el popup.','auth/network-request-failed':'Error de red.','auth/invalid-credential':'Email o contraseña incorrectos.'})[code]||'Error al autenticar. Intentá de nuevo.';
-const showErr = (id, msg) => { const e=document.getElementById(id); e.textContent=msg; e.style.display='block'; };
-const hideScreens = () => ['screen-login','screen-register','screen-perfil','screen-reset'].forEach(id=>{document.getElementById(id).style.display='none';});
-
-// ── AUTH STATE ─────────────────────────────────────────────────────────────
-onAuthStateChanged(auth, async user => {
-  if (!user) {
-    // No logueado — mostrar login, ocultar app
-    document.getElementById('app').style.display = 'none';
-    hideScreens();
-    document.getElementById('screen-login').style.display = 'flex';
-    return;
-  }
-  currentUser = user;
-  hideScreens(); // ocultar todas las pantallas auth
-  // Buscar perfil
-  try {
-    const data = await apiGet({ action:'getUsuario', uid:user.uid });
-    if (data.usuario && data.usuario.nombre) {
-      perfilUsuario = data.usuario;
-      entrarALaApp();
-    } else {
-      // Primera vez: pedir perfil — ocultar app hasta completar
-      document.getElementById('app').style.display = 'none';
-      document.getElementById('prf-email').value = user.email || '';
-      if (user.displayName) document.getElementById('prf-nombre').value = user.displayName;
-      document.getElementById('screen-perfil').style.display = 'flex';
-    }
-  } catch(e) {
-    // Error de red — entrar igual
-    entrarALaApp();
-  }
-});
-
-// ── BOTONES AUTH ───────────────────────────────────────────────────────────
-document.getElementById('btn-google-login').addEventListener('click', async () => {
-  try { await signInWithPopup(auth, gprov); }
-  catch(e) { showErr('li-error', errMsg(e.code)); }
-});
-document.getElementById('btn-google-reg').addEventListener('click', async () => {
-  try { await signInWithPopup(auth, gprov); }
-  catch(e) { showErr('reg-error', errMsg(e.code)); }
-});
-document.getElementById('btn-email-login').addEventListener('click', async () => {
-  const email=document.getElementById('li-email').value.trim();
-  const pass=document.getElementById('li-pass').value;
-  if(!email||!pass){showErr('li-error','Completá email y contraseña');return;}
-  try { await signInWithEmailAndPassword(auth, email, pass); }
-  catch(e) { showErr('li-error', errMsg(e.code)); }
-});
-document.getElementById('li-pass').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('btn-email-login').click(); });
-document.getElementById('btn-email-reg').addEventListener('click', async () => {
-  const email=document.getElementById('reg-email').value.trim();
-  const pass=document.getElementById('reg-pass').value;
-  if(!email||!pass){showErr('reg-error','Completá email y contraseña');return;}
-  if(pass.length<6){showErr('reg-error','Mínimo 6 caracteres');return;}
-  try { await createUserWithEmailAndPassword(auth, email, pass); }
-  catch(e) { showErr('reg-error', errMsg(e.code)); }
-});
-document.getElementById('ir-registro').addEventListener('click', () => { document.getElementById('screen-login').style.display='none'; document.getElementById('screen-register').style.display='flex'; });
-document.getElementById('ir-login').addEventListener('click',    () => { document.getElementById('screen-register').style.display='none'; document.getElementById('screen-login').style.display='flex'; });
-document.getElementById('ir-reset').addEventListener('click',    () => { hideScreens(); document.getElementById('screen-reset').style.display='flex'; });
-document.getElementById('volver-login').addEventListener('click',() => { hideScreens(); document.getElementById('screen-login').style.display='flex'; });
-document.getElementById('btn-enviar-reset').addEventListener('click', async () => {
-  const email = document.getElementById('reset-email').value.trim();
-  const errEl = document.getElementById('reset-error');
-  const okEl  = document.getElementById('reset-ok-msg');
-  errEl.style.display='none'; okEl.style.display='none';
-  if (!email) { errEl.textContent='Ingresá tu email'; errEl.style.display='block'; return; }
-  const btn = document.getElementById('btn-enviar-reset'); btn.disabled=true; btn.textContent='Enviando...';
-  try {
-    await sendPasswordResetEmail(auth, email);
-    okEl.style.display='block';
-  } catch(e) { errEl.textContent=errMsg(e.code); errEl.style.display='block'; }
-  btn.disabled=false; btn.textContent='Enviar email de recuperación';
-});
-
-// ── GUARDAR PERFIL ─────────────────────────────────────────────────────────
-document.getElementById('btn-guardar-perfil').addEventListener('click', async () => {
-  const nombre = document.getElementById('prf-nombre').value.trim();
-  const barrio = document.getElementById('prf-barrio').value;
-  const tel    = document.getElementById('prf-tel').value.trim();
-  const area   = document.getElementById('prf-area').value.trim();
-  const lote   = document.getElementById('prf-lote').value.trim();
-  if (!nombre||!barrio||!tel||!area||!lote) { showErr('prf-error','Completá todos los campos'); return; }
-  const btn = document.getElementById('btn-guardar-perfil');
-  btn.disabled = true; btn.textContent = 'Guardando...';
-  try {
-    await apiGet({ action:'saveUsuario', uid:currentUser.uid, email:currentUser.email, nombre, barrio, telefono:tel, area, lote });
-    perfilUsuario = { nombre, barrio, telefono:tel, area, lote, email:currentUser.email };
-    document.getElementById('screen-perfil').style.display = 'none';
-    entrarALaApp();
-  } catch(e) {
-    showErr('prf-error','Error al guardar. Intentá de nuevo.');
-    btn.disabled=false; btn.textContent='Guardar y continuar';
-  }
-});
-
-// ── ENTRAR A LA APP ────────────────────────────────────────────────────────
-function entrarALaApp() {
-  hideScreens();
-  document.getElementById('app').style.display = 'block';
-  const isAdmin = ADMIN_EMAILS.includes((currentUser?.email||'').toLowerCase());
-  // Avatar + dropdown header
-  const av = document.getElementById('user-avatar');
-  if (currentUser?.photoURL) av.innerHTML=`<img src="${currentUser.photoURL}" alt="">`;
-  else av.textContent = (perfilUsuario?.nombre||currentUser?.email||'?')[0].toUpperCase();
-  document.getElementById('dd-nombre').textContent = perfilUsuario?.nombre || currentUser?.email || '—';
-  document.getElementById('dd-email').textContent  = currentUser?.email || '';
-  // Tabs
-  if (isAdmin) {
-    document.getElementById('nav-admin').style.display='inline-flex';
-    document.getElementById('nav-mensajes').style.display='inline-flex';
-  } else {
-    document.getElementById('fab-contacto').style.display='flex';
-  }
-  // Pre-llenar email en formulario
-  document.getElementById('f-email').value = currentUser?.email || '';
-  // Cargar datos
-  cargarProveedores();
-  // Refresh al volver a la pestaña
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') cargarProveedores();
-  }, { once: false });
-}
-
-// ── NAVEGACIÓN ─────────────────────────────────────────────────────────────
-function showPage(pageId) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + pageId).classList.add('active');
-  document.getElementById('nav-' + pageId)?.classList.add('active');
-  if (pageId==='admin')    cargarPendientes();
-  if (pageId==='mensajes') cargarMensajes();
-}
-document.getElementById('nav-buscar').addEventListener('click',    () => showPage('buscar'));
-document.getElementById('nav-recomendar').addEventListener('click', () => showPage('recomendar'));
-document.getElementById('nav-admin').addEventListener('click',      () => showPage('admin'));
-document.getElementById('nav-mensajes').addEventListener('click',   () => showPage('mensajes'));
-// Logout correcto — espera a que Firebase cierre sesión antes de recargar
-async function doSignOut() {
-  try { await signOut(auth); } catch(e) {}
-  location.reload();
-}
-document.getElementById('dd-salir').addEventListener('click', doSignOut);
-
-// ── TELÉFONOS ÚTILES ──────────────────────────────────────────────────────
-document.getElementById('nav-telefonos').addEventListener('click', abrirTelefonosUtiles);
-document.getElementById('tel-close-btn').addEventListener('click', () => document.getElementById('modal-telefonos').classList.remove('open'));
-document.getElementById('modal-telefonos').addEventListener('click', e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); });
-
-async function abrirTelefonosUtiles() {
-  document.getElementById('modal-telefonos').classList.add('open');
-  const c = document.getElementById('tel-util-container');
-  c.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando...</div>';
-  try {
-    const data = await apiGet({ action:'getProveedores' });
-    const utiles = (data.proveedores||[]).filter(p => p.recomendacion && p.recomendacion.trim().toLowerCase() === 'utiles');
-    if (!utiles.length) {
-      c.innerHTML = '<div class="empty-state" style="padding:30px 0"><div class="icon">📞</div><h3>Sin teléfonos cargados</h3><p>Agregá entradas con Recomendación = "Utiles" en el sheet.</p></div>';
-      return;
-    }
-    c.innerHTML = `<div class="tel-util-list">${utiles.map((p,i) => `
-      <div class="tel-util-item">
-        <div class="tel-util-emoji">${telEmoji(p.servicio)}</div>
-        <div class="tel-util-info">
-          <div class="tel-util-nombre">${p.nombre}${p.empresa&&p.empresa!==p.nombre?` <span style="color:var(--muted);font-weight:400">· ${p.empresa}</span>`:''}</div>
-          ${p.notas&&p.notas.toLowerCase()!=='n/a'?`<div class="tel-util-notas">${p.notas}</div>`:''}
-        </div>
-        ${p.telefono&&p.telefono.toLowerCase()!=='n/a'
-          ? `<a class="tel-util-btn" href="tel:${p.telefono.replace(/\s/g,'')}">📞 ${p.telefono}</a>`
-          : `<span style="font-size:.78rem;color:var(--muted)">Sin tel.</span>`}
-      </div>
-      ${i < utiles.length-1 ? '<div class="tel-util-separator"></div>' : ''}`).join('')}
-    </div>`;
-  } catch(e) {
-    c.innerHTML = '<p style="color:var(--rojo);font-size:.85rem;padding:10px">Error al cargar.</p>';
-  }
-}
-
-function telEmoji(s) {
-  if(!s) return '📞'; const v = norm(s);
-  if(v.includes('bombero'))   return '🚒';
-  if(v.includes('ambulancia')||v.includes('emergencia')) return '🚑';
-  if(v.includes('policia')||v.includes('seguridad'))     return '🚔';
-  if(v.includes('guardia'))   return '👮';
-  if(v.includes('gas'))       return '🔥';
-  if(v.includes('luz')||v.includes('electr')) return '⚡';
-  if(v.includes('agua'))      return '💧';
-  if(v.includes('admin'))     return '🏢';
-  return '📞';
-}
-
-// ── LEGAL ──────────────────────────────────────────────────────────────────
-document.getElementById('legal-close-btn').addEventListener('click', () => document.getElementById('modal-legal').classList.remove('open'));
-document.getElementById('legal-ok-btn').addEventListener('click',    () => document.getElementById('modal-legal').classList.remove('open'));
-document.getElementById('modal-legal').addEventListener('click', e => { if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); });
-const avatarBtn  = document.getElementById('user-avatar');
-const avatarDrop = document.getElementById('avatar-dropdown');
-avatarBtn.addEventListener('click', e => { e.stopPropagation(); avatarDrop.classList.toggle('open'); });
-document.addEventListener('click', () => avatarDrop.classList.remove('open'));
-avatarDrop.addEventListener('click', e => e.stopPropagation());
-
-document.getElementById('dd-configuracion').addEventListener('click', () => {
-  avatarDrop.classList.remove('open');
-  abrirModalPerfil('datos');
-});
-document.getElementById('dd-mis-recs').addEventListener('click', () => {
-  avatarDrop.classList.remove('open');
-  abrirModalPerfil('misrecs');
-});
-
-// ── MODAL PERFIL ───────────────────────────────────────────────────────────
-function abrirModalPerfil(panelId) {
-  // Llenar datos actuales
-  document.getElementById('cfg-email').value  = currentUser?.email || '';
-  document.getElementById('cfg-nombre').value = perfilUsuario?.nombre   || '';
-  document.getElementById('cfg-barrio').value = perfilUsuario?.barrio   || '';
-  document.getElementById('cfg-tel').value    = perfilUsuario?.telefono || '';
-  document.getElementById('cfg-area').value   = perfilUsuario?.area     || '';
-  document.getElementById('cfg-lote').value   = perfilUsuario?.lote     || '';
-  // Ocultar mensajes previos
-  ['cfg-error','cfg-ok','pass-error','pass-ok'].forEach(id => {
-    const el = document.getElementById(id); el.style.display='none'; el.textContent='';
-  });
-  // Activar tab
-  activarPanelPerfil(panelId);
-  document.getElementById('modal-perfil').classList.add('open');
-  if (panelId === 'misrecs') cargarMisRecomendaciones();
-}
-
-function activarPanelPerfil(panelId) {
-  document.querySelectorAll('.perfil-tab').forEach(t => {
-    t.classList.toggle('active', t.dataset.panel === panelId);
-  });
-  document.querySelectorAll('.perfil-panel').forEach(p => {
-    p.classList.toggle('active', p.id === 'panel-' + panelId);
-  });
-}
-document.querySelectorAll('.perfil-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    activarPanelPerfil(tab.dataset.panel);
-    if (tab.dataset.panel === 'misrecs') cargarMisRecomendaciones();
-  });
-});
-document.getElementById('perfil-close-btn').addEventListener('click', () => {
-  document.getElementById('modal-perfil').classList.remove('open');
-});
-document.getElementById('modal-perfil').addEventListener('click', e => {
-  if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
-});
-
-// Guardar datos personales
-document.getElementById('btn-guardar-cfg').addEventListener('click', async () => {
-  const nombre = document.getElementById('cfg-nombre').value.trim();
-  const barrio = document.getElementById('cfg-barrio').value;
-  const tel    = document.getElementById('cfg-tel').value.trim();
-  const errEl  = document.getElementById('cfg-error');
-  const okEl   = document.getElementById('cfg-ok');
-  errEl.style.display='none'; okEl.style.display='none';
-  if (!nombre||!barrio||!tel) { errEl.textContent='Completá todos los campos'; errEl.style.display='block'; return; }
-  const btn = document.getElementById('btn-guardar-cfg'); btn.disabled=true; btn.textContent='Guardando...';
-  try {
-    await apiGet({ action:'saveUsuario', uid:currentUser.uid, email:currentUser.email, nombre, barrio, telefono:tel });
-    perfilUsuario = { ...perfilUsuario, nombre, barrio, telefono:tel };
-    // Actualizar avatar y dropdown
-    document.getElementById('dd-nombre').textContent  = nombre;
-    document.getElementById('user-avatar').textContent = nombre[0].toUpperCase();
-    document.getElementById('f-vecino') // hint en formulario si estaba vacío
-    okEl.style.display='block';
-  } catch(e) { errEl.textContent='Error al guardar.'; errEl.style.display='block'; }
-  btn.disabled=false; btn.textContent='Guardar cambios';
-});
-
-// Cambiar contraseña
-document.getElementById('btn-cambiar-pass').addEventListener('click', async () => {
-  const p1     = document.getElementById('cfg-pass1').value;
-  const p2     = document.getElementById('cfg-pass2').value;
-  const errEl  = document.getElementById('pass-error');
-  const okEl   = document.getElementById('pass-ok');
-  errEl.style.display='none'; okEl.style.display='none';
-  if (!p1||!p2)       { errEl.textContent='Completá ambos campos'; errEl.style.display='block'; return; }
-  if (p1 !== p2)      { errEl.textContent='Las contraseñas no coinciden'; errEl.style.display='block'; return; }
-  if (p1.length < 6)  { errEl.textContent='Mínimo 6 caracteres'; errEl.style.display='block'; return; }
-  // Verificar que no sea cuenta de Google
-  const isGoogle = currentUser?.providerData?.some(p => p.providerId === 'google.com');
-  if (isGoogle) { errEl.textContent='Tu cuenta usa Google. No podés cambiar contraseña acá.'; errEl.style.display='block'; return; }
-  const btn = document.getElementById('btn-cambiar-pass'); btn.disabled=true; btn.textContent='Cambiando...';
-  try {
-    await updatePassword(currentUser, p1);
-    document.getElementById('cfg-pass1').value = '';
-    document.getElementById('cfg-pass2').value = '';
-    okEl.style.display='block';
-  } catch(e) {
-    // Si el token es viejo Firebase pide re-autenticación
-    if (e.code === 'auth/requires-recent-login') {
-      errEl.textContent='Por seguridad, cerrá sesión, volvé a ingresar y cambiá la contraseña.';
-    } else {
-      errEl.textContent = errMsg(e.code);
-    }
-    errEl.style.display='block';
-  }
-  btn.disabled=false; btn.textContent='Cambiar contraseña';
-});
-
-
-
-// Mis recomendaciones
-async function cargarMisRecomendaciones() {
-  const c = document.getElementById('misrecs-container');
-  c.innerHTML='<div class="loading"><div class="spinner"></div>Cargando...</div>';
-  try {
-    const d = await apiGet({ action:'getMisRecomendaciones', uid:currentUser.uid, email:currentUser.email });
-    if (d.error) { c.innerHTML=`<p style="color:var(--rojo);font-size:.85rem">${d.error}</p>`; return; }
-    const recs = d.recomendaciones || [];
-    if (!recs.length) { c.innerHTML='<div class="empty-state" style="padding:30px 0"><div class="icon">📋</div><h3>Sin recomendaciones</h3><p>Todavía no enviaste ninguna recomendación.</p></div>'; return; }
-    c.innerHTML = recs.map(r => `
-      <div class="mis-rec-card ${r.estado.toLowerCase()}">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
-          <div class="mis-rec-nombre">${r.nombre||'—'}</div>
-          <span class="estado-badge ${r.estado}">${r.estado}</span>
-        </div>
-        <div class="mis-rec-meta">
-          ${r.servicio?`<span>⚙️ ${r.servicio}</span>`:''}
-          <span class="badge ${badgeCls(r.recomendacion)}" style="font-size:.68rem">${r.recomendacion||''}</span>
-        </div>
-        ${r.notas&&r.notas.toLowerCase()!=='n/a'?`<div style="font-size:.8rem;color:var(--muted)">"${r.notas}"</div>`:''}
-      </div>`).join('');
-  } catch(e) {
-    c.innerHTML='<p style="color:var(--rojo);font-size:.85rem">Error al cargar.</p>';
-  }
-}
-
-// ── FILTROS Y BÚSQUEDA ─────────────────────────────────────────────────────
-document.getElementById('search-input').addEventListener('input',   () => renderResults());
-document.getElementById('rubros-select').addEventListener('change', () => renderResults());
-document.getElementById('sort-select').addEventListener('change',   () => renderResults());
-document.querySelectorAll('.chip').forEach(chip => {
-  chip.addEventListener('click', () => {
-    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-    chip.classList.add('active');
-    activeFilter = chip.dataset.filter;
-    openCard = null;
-    renderResults();
-  });
-});
-
-// ── CATEGORÍAS (debe ir antes de procesarDatos) ───────────────────────────
-
-
-// ── DATOS ──────────────────────────────────────────────────────────────────
-async function cargarProveedores() {
-  try {
-    const data = await apiGet({ action:'getProveedores' });
-    if (!data.error) { procesarDatos(data.proveedores||[]); renderResults(); }
-  } catch(e) { console.error('Error cargando proveedores', e); }
-}
-
+// ── CATEGORÍAS — declaradas antes de cualquier uso ─────────────────────────
 const CATS = [
   {label:'🍕 Comida & Delivery',kw:['comid','delivery','empanada','pizza','panad','sushi','helad','restau','catering','alfajor','torta','dulce','miel']},
   {label:'🧹 Limpieza',kw:['limp','cleaning']},
@@ -980,101 +596,290 @@ const CATS = [
   {label:'📦 Mudanza & Fletes',kw:['mudanz','flete','transporte']},
   {label:'🏠 Hogar & Varios',kw:[]},
 ];
-const catDe = s => { const v=norm(s||''); for(const c of CATS){if(c.kw.length&&c.kw.some(k=>v.includes(k)))return c.label;} return '🏠 Hogar & Varios'; };
 
-function procesarDatos(filas) {
-  const mapa = {};
-  filas.forEach(f => {
-    const key = genKey(f);
-    if (!mapa[key]) mapa[key] = {nombre:f.nombre,empresa:f.empresa,dni:f.dni,telefono:f.telefono,servicio:f.servicio,destacado:false,resenas:[]};
-    if (norm(f.recomendacion)==='publicidad') mapa[key].destacado = true;
-    else if (f.recomendacion) mapa[key].resenas.push({recomendacion:f.recomendacion,notas:f.notas});
+// ── HELPERS ────────────────────────────────────────────────────────────────
+const norm = t => { if(!t)return ''; return String(t).toLowerCase().trim().replace(/á/g,'a').replace(/é/g,'e').replace(/í/g,'i').replace(/ó/g,'o').replace(/ú/g,'u').replace(/ü/g,'u'); };
+const slugify = t => norm(t||'').replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+const starsHtml = n => { if(!n)return ''; const l=Math.round(n); return '★'.repeat(l)+'☆'.repeat(5-l); };
+const badgeCls = e => ({'Destacado':'badge-destacado','Muy Recomendable':'badge-muy-recomendable','Recomendable':'badge-recomendable','Malas Experiencias':'badge-malas-experiencias','No Recomendable':'badge-no-recomendable','No Contratar':'badge-no-recomendable'})[e]||'badge-sin-datos';
+const svcEmoji = s => { if(!s)return '⚙️'; const v=norm(s); if(v.includes('plom'))return '🔧'; if(v.includes('electr'))return '⚡'; if(v.includes('limp'))return '🧹'; if(v.includes('pint'))return '🖌️'; if(v.includes('jardin')||v.includes('pasto'))return '🌿'; if(v.includes('comid')||v.includes('delivery')||v.includes('empanada')||v.includes('pizza'))return '🍕'; if(v.includes('gas')||v.includes('calef'))return '🔥'; if(v.includes('piscina')||v.includes('pileta'))return '🏊'; if(v.includes('carpint'))return '🪵'; if(v.includes('alban')||v.includes('construc'))return '🏗️'; if(v.includes('segur')||v.includes('alarm'))return '🔒'; if(v.includes('mudanz'))return '📦'; if(v.includes('panad')||v.includes('torta'))return '🍰'; if(v.includes('sushi'))return '🍱'; if(v.includes('helad'))return '🍦'; return '⚙️'; };
+const catDe = s => { const v=norm(s||''); for(const c of CATS){if(c.kw.length&&c.kw.some(k=>v.includes(k)))return c.label;} return '🏠 Hogar & Varios'; };
+const fmtFecha = f => { try{const d=new Date(f);return isNaN(d)?'':d.toLocaleDateString('es-AR');}catch(e){return '';} };
+const isAdmin = () => ADMIN_EMAILS.includes((currentUser?.email||'').toLowerCase());
+const apiGet = p => { const pwd=isAdmin()?ADMIN_PWD:SCRIPT_PWD; return fetch(SCRIPT_URL+'?'+new URLSearchParams({...p,password:pwd})).then(r=>r.json()); };
+const errMsg = code => ({'auth/email-already-in-use':'Este email ya está registrado.','auth/invalid-email':'Email inválido.','auth/wrong-password':'Contraseña incorrecta.','auth/user-not-found':'No existe cuenta con ese email.','auth/weak-password':'Mínimo 6 caracteres.','auth/popup-closed-by-user':'Cerraste el popup.','auth/network-request-failed':'Error de red.','auth/invalid-credential':'Email o contraseña incorrectos.'})[code]||'Error al autenticar.';
+const showErr = (id,msg) => { const e=document.getElementById(id); e.textContent=msg; e.style.display='block'; };
+const hideScreens = () => ['screen-login','screen-register','screen-perfil','screen-reset'].forEach(id=>{ document.getElementById(id).style.display='none'; });
+
+// ── AUTH STATE ─────────────────────────────────────────────────────────────
+onAuthStateChanged(auth, async user => {
+  if (!user) {
+    document.getElementById('app').style.display='none';
+    hideScreens();
+    document.getElementById('screen-login').style.display='flex';
+    return;
+  }
+  currentUser = user;
+  hideScreens();
+  try {
+    const data = await apiGet({ action:'getUsuario', uid:user.uid });
+    if (data.usuario && data.usuario.nombre) {
+      perfilUsuario = data.usuario;
+      entrarALaApp();
+    } else {
+      document.getElementById('app').style.display='none';
+      document.getElementById('prf-email').value = user.email||'';
+      if (user.displayName) document.getElementById('prf-nombre').value = user.displayName;
+      document.getElementById('screen-perfil').style.display='flex';
+    }
+  } catch(e) { entrarALaApp(); }
+});
+
+// ── BOTONES AUTH ───────────────────────────────────────────────────────────
+document.getElementById('btn-google-login').addEventListener('click', async () => { try{await signInWithPopup(auth,gprov);}catch(e){showErr('li-error',errMsg(e.code));} });
+document.getElementById('btn-google-reg').addEventListener('click',   async () => { try{await signInWithPopup(auth,gprov);}catch(e){showErr('reg-error',errMsg(e.code));} });
+document.getElementById('btn-email-login').addEventListener('click',  async () => {
+  const email=document.getElementById('li-email').value.trim(), pass=document.getElementById('li-pass').value;
+  if(!email||!pass){showErr('li-error','Completá email y contraseña');return;}
+  try{await signInWithEmailAndPassword(auth,email,pass);}catch(e){showErr('li-error',errMsg(e.code));}
+});
+document.getElementById('li-pass').addEventListener('keydown', e=>{if(e.key==='Enter')document.getElementById('btn-email-login').click();});
+document.getElementById('btn-email-reg').addEventListener('click', async () => {
+  const email=document.getElementById('reg-email').value.trim(), pass=document.getElementById('reg-pass').value;
+  if(!email||!pass){showErr('reg-error','Completá email y contraseña');return;}
+  if(pass.length<6){showErr('reg-error','Mínimo 6 caracteres');return;}
+  try{await createUserWithEmailAndPassword(auth,email,pass);}catch(e){showErr('reg-error',errMsg(e.code));}
+});
+document.getElementById('ir-registro').addEventListener('click', ()=>{hideScreens();document.getElementById('screen-register').style.display='flex';});
+document.getElementById('ir-login').addEventListener('click',    ()=>{hideScreens();document.getElementById('screen-login').style.display='flex';});
+document.getElementById('ir-reset').addEventListener('click',    ()=>{hideScreens();document.getElementById('screen-reset').style.display='flex';});
+document.getElementById('volver-login').addEventListener('click',()=>{hideScreens();document.getElementById('screen-login').style.display='flex';});
+document.getElementById('btn-enviar-reset').addEventListener('click', async () => {
+  const email=document.getElementById('reset-email').value.trim();
+  const errEl=document.getElementById('reset-error'), okEl=document.getElementById('reset-ok-msg');
+  errEl.style.display='none'; okEl.style.display='none';
+  if(!email){showErr('reset-error','Ingresá tu email');return;}
+  const btn=document.getElementById('btn-enviar-reset'); btn.disabled=true; btn.textContent='Enviando...';
+  try{await sendPasswordResetEmail(auth,email); okEl.style.display='block';}
+  catch(e){showErr('reset-error',errMsg(e.code));}
+  btn.disabled=false; btn.textContent='Enviar email de recuperación';
+});
+
+// ── GUARDAR PERFIL ─────────────────────────────────────────────────────────
+document.getElementById('btn-guardar-perfil').addEventListener('click', async () => {
+  const nombre=document.getElementById('prf-nombre').value.trim();
+  const barrio=document.getElementById('prf-barrio').value;
+  const tel=document.getElementById('prf-tel').value.trim();
+  const area=document.getElementById('prf-area').value.trim();
+  const lote=document.getElementById('prf-lote').value.trim();
+  if(!nombre||!barrio||!tel||!area||!lote){showErr('prf-error','Completá todos los campos');return;}
+  const btn=document.getElementById('btn-guardar-perfil'); btn.disabled=true; btn.textContent='Guardando...';
+  try {
+    await apiGet({action:'saveUsuario',uid:currentUser.uid,email:currentUser.email,nombre,barrio,telefono:tel,area,lote});
+    perfilUsuario={nombre,barrio,telefono:tel,area,lote,email:currentUser.email};
+    document.getElementById('screen-perfil').style.display='none';
+    entrarALaApp();
+  } catch(e){ showErr('prf-error','Error al guardar.'); btn.disabled=false; btn.textContent='Guardar y continuar'; }
+});
+
+// ── ENTRAR A LA APP ────────────────────────────────────────────────────────
+function entrarALaApp() {
+  hideScreens();
+  document.getElementById('app').style.display='block';
+  const av=document.getElementById('user-avatar');
+  if(currentUser?.photoURL) av.innerHTML=`<img src="${currentUser.photoURL}" alt="">`;
+  else av.textContent=(perfilUsuario?.nombre||currentUser?.email||'?')[0].toUpperCase();
+  document.getElementById('dd-nombre').textContent=perfilUsuario?.nombre||currentUser?.email||'—';
+  document.getElementById('dd-email').textContent=currentUser?.email||'';
+  if(isAdmin()){
+    document.getElementById('nav-admin').style.display='inline-flex';
+    document.getElementById('nav-mensajes').style.display='inline-flex';
+  } else {
+    document.getElementById('fab-contacto').style.display='flex';
+  }
+  document.getElementById('f-email').value=currentUser?.email||'';
+  // Pre-llenar vecino si ya tiene perfil completo
+  if(perfilUsuario?.nombre){
+    const vecino=`${perfilUsuario.nombre}, Área: ${perfilUsuario.area||'—'}, Lote: ${perfilUsuario.lote||'—'}`;
+    document.getElementById('f-vecino').value=vecino;
+  }
+  cargarProveedores();
+  document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') cargarProveedores(); });
+}
+
+// ── LOGOUT ─────────────────────────────────────────────────────────────────
+async function doSignOut(){ try{await signOut(auth);}catch(e){} location.reload(); }
+document.getElementById('dd-salir').addEventListener('click', doSignOut);
+
+// ── AVATAR DROPDOWN ────────────────────────────────────────────────────────
+const avatarBtn=document.getElementById('user-avatar');
+const avatarDrop=document.getElementById('avatar-dropdown');
+avatarBtn.addEventListener('click', e=>{e.stopPropagation(); avatarDrop.classList.toggle('open');});
+document.addEventListener('click', ()=>avatarDrop.classList.remove('open'));
+avatarDrop.addEventListener('click', e=>e.stopPropagation());
+document.getElementById('dd-configuracion').addEventListener('click',()=>{avatarDrop.classList.remove('open'); abrirModalPerfil('datos');});
+document.getElementById('dd-mis-recs').addEventListener('click',()=>{avatarDrop.classList.remove('open'); abrirModalPerfil('misrecs');});
+
+// ── TELEFONOS ÚTILES ───────────────────────────────────────────────────────
+document.getElementById('nav-telefonos').addEventListener('click', abrirTelefonosUtiles);
+document.getElementById('tel-close-btn').addEventListener('click', ()=>document.getElementById('modal-telefonos').classList.remove('open'));
+document.getElementById('modal-telefonos').addEventListener('click', e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});
+
+async function abrirTelefonosUtiles() {
+  document.getElementById('modal-telefonos').classList.add('open');
+  const c=document.getElementById('tel-util-container');
+  c.innerHTML='<div class="loading"><div class="spinner"></div>Cargando...</div>';
+  try {
+    const data=await apiGet({action:'getProveedores'});
+    const utiles=(data.proveedores||[]).filter(p=>norm(p.recomendacion)==='utiles');
+    if(!utiles.length){c.innerHTML='<div class="empty-state" style="padding:30px 0"><div class="icon">📞</div><h3>Sin teléfonos cargados</h3><p>Agregá filas con Recomendación = "Utiles" en el sheet.</p></div>';return;}
+    const telEmoji = s => { if(!s)return '📞'; const v=norm(s); if(v.includes('bombero'))return '🚒'; if(v.includes('ambulancia')||v.includes('emergencia'))return '🚑'; if(v.includes('policia'))return '🚔'; if(v.includes('guardia'))return '👮'; if(v.includes('gas'))return '🔥'; if(v.includes('luz')||v.includes('electr'))return '⚡'; if(v.includes('agua'))return '💧'; if(v.includes('admin'))return '🏢'; return '📞'; };
+    c.innerHTML=`<div class="tel-util-list">${utiles.map((p,i)=>`
+      <div class="tel-util-item">
+        <div class="tel-util-emoji">${telEmoji(p.servicio)}</div>
+        <div class="tel-util-info">
+          <div class="tel-util-nombre">${p.nombre}${p.empresa&&p.empresa!==p.nombre?` <span style="color:var(--muted);font-weight:400">· ${p.empresa}</span>`:''}</div>
+          ${p.notas&&norm(p.notas)!=='n/a'?`<div class="tel-util-notas">${p.notas}</div>`:''}
+        </div>
+        ${p.telefono&&norm(p.telefono)!=='n/a'?`<a class="tel-util-btn" href="tel:${p.telefono.replace(/\s/g,'')}">📞 ${p.telefono}</a>`:`<span style="font-size:.78rem;color:var(--muted)">Sin tel.</span>`}
+      </div>
+      ${i<utiles.length-1?'<div class="tel-util-separator"></div>':''}`).join('')}</div>`;
+  } catch(e){c.innerHTML='<p style="color:var(--rojo);font-size:.85rem;padding:10px">Error al cargar.</p>';}
+}
+
+// ── LEGAL ──────────────────────────────────────────────────────────────────
+document.getElementById('legal-close-btn').addEventListener('click', ()=>document.getElementById('modal-legal').classList.remove('open'));
+document.getElementById('legal-ok-btn').addEventListener('click',    ()=>document.getElementById('modal-legal').classList.remove('open'));
+document.getElementById('modal-legal').addEventListener('click', e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});
+document.getElementById('abrir-legal').addEventListener('click', ()=>document.getElementById('modal-legal').classList.add('open'));
+
+// ── NAVEGACIÓN ─────────────────────────────────────────────────────────────
+function showPage(pageId){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+pageId).classList.add('active');
+  document.getElementById('nav-'+pageId)?.classList.add('active');
+  if(pageId==='admin')    cargarPendientes();
+  if(pageId==='mensajes') cargarMensajes();
+}
+document.getElementById('nav-buscar').addEventListener('click',    ()=>showPage('buscar'));
+document.getElementById('nav-recomendar').addEventListener('click',()=>showPage('recomendar'));
+document.getElementById('nav-admin').addEventListener('click',     ()=>showPage('admin'));
+document.getElementById('nav-mensajes').addEventListener('click',  ()=>showPage('mensajes'));
+
+// ── FILTROS ────────────────────────────────────────────────────────────────
+document.getElementById('search-input').addEventListener('input',   ()=>renderResults());
+document.getElementById('rubros-select').addEventListener('change', ()=>renderResults());
+document.getElementById('sort-select').addEventListener('change',   ()=>renderResults());
+document.querySelectorAll('.chip').forEach(chip=>{
+  chip.addEventListener('click', ()=>{
+    document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    activeFilter=chip.dataset.filter;
+    openCard=null;
+    renderResults();
   });
-  proveedores = Object.values(mapa).map(p => ({
+});
+
+// ── DATOS ──────────────────────────────────────────────────────────────────
+let proveedores = [];
+
+async function cargarProveedores(){
+  try{
+    const data=await apiGet({action:'getProveedores'});
+    if(!data.error){procesarDatos(data.proveedores||[]);renderResults();}
+  }catch(e){console.error('Error cargando proveedores',e);}
+}
+
+function procesarDatos(filas){
+  const mapa={};
+  filas.forEach(f=>{
+    if(norm(f.recomendacion)==='utiles') return; // excluir teléfonos útiles de la lista principal
+    const key=genKey(f);
+    if(!mapa[key]) mapa[key]={nombre:f.nombre,empresa:f.empresa,dni:f.dni,telefono:f.telefono,servicio:f.servicio,destacado:false,resenas:[]};
+    if(norm(f.recomendacion)==='publicidad') mapa[key].destacado=true;
+    else if(f.recomendacion) mapa[key].resenas.push({recomendacion:f.recomendacion,notas:f.notas});
+  });
+  proveedores=Object.values(mapa).map(p=>({
     ...p,
-    score: p.destacado ? {promedio:5,total:0,etiqueta:'Destacado',estrellas:5} : calcScore(p.resenas),
-    categoria: catDe(p.servicio),
+    score:p.destacado?{promedio:5,total:0,etiqueta:'Destacado',estrellas:5}:calcScore(p.resenas),
+    categoria:catDe(p.servicio),
   }));
   poblarRubros();
 }
 
-function genKey(f) { const n=norm(f.nombre),d=norm(f.dni),t=norm(f.telefono); if(d&&d!=='n/a')return n+'_d_'+d; if(t&&t!=='n/a')return n+'_t_'+t.replace(/\D/g,'').slice(-8); return n+'_e_'+norm(f.empresa); }
+function genKey(f){const n=norm(f.nombre),d=norm(f.dni),t=norm(f.telefono);if(d&&d!=='n/a')return n+'_d_'+d;if(t&&t!=='n/a')return n+'_t_'+t.replace(/\D/g,'').slice(-8);return n+'_e_'+norm(f.empresa);}
 
-function calcScore(r) {
-  if (!r||!r.length) return {promedio:0,total:0,etiqueta:'Sin datos',estrellas:0};
-  const total=r.length, pos=r.filter(x=>norm(x.recomendacion)==='recomendable').length, neg=total-pos, pct=pos/total;
-  const est = Math.max(1,Math.round(pct*4+1));
+function calcScore(r){
+  if(!r||!r.length)return{promedio:0,total:0,etiqueta:'Sin datos',estrellas:0};
+  const total=r.length,pos=r.filter(x=>norm(x.recomendacion)==='recomendable').length,neg=total-pos,pct=pos/total;
+  const est=Math.max(1,Math.round(pct*4+1));
   let et;
-  if(neg>=3) et='No Recomendable';
-  else if(neg>0&&neg<pos) et='Malas Experiencias';
-  else if(neg>=pos&&neg>0) et='No Recomendable';
-  else if(pos>=5&&pct>=0.9) et='Muy Recomendable';
-  else if(pos>=5&&neg===0) et='Muy Recomendable';
+  if(neg>=3)et='No Recomendable';
+  else if(neg>0&&neg<pos)et='Malas Experiencias';
+  else if(neg>=pos&&neg>0)et='No Recomendable';
+  else if(pos>=5&&pct>=0.9)et='Muy Recomendable';
+  else if(pos>=5&&neg===0)et='Muy Recomendable';
   else et='Recomendable';
-  return {promedio:Math.round(pct*4+1),total,etiqueta:et,estrellas:est};
+  return{promedio:Math.round(pct*4+1),total,etiqueta:et,estrellas:est};
 }
 
-function poblarRubros() {
+function poblarRubros(){
   const sel=document.getElementById('rubros-select');
-  const cnt={}; proveedores.forEach(p=>{cnt[p.categoria]=(cnt[p.categoria]||0)+1;});
+  const cnt={};proveedores.forEach(p=>{cnt[p.categoria]=(cnt[p.categoria]||0)+1;});
   const cats=CATS.filter(c=>cnt[c.label]).sort((a,b)=>(cnt[b.label]||0)-(cnt[a.label]||0));
   sel.innerHTML=`<option value="todos">📂 Todos los rubros (${proveedores.length})</option>`+cats.map(c=>`<option value="${c.label}">${c.label} (${cnt[c.label]})</option>`).join('');
 }
 
 // ── RENDER ─────────────────────────────────────────────────────────────────
-function renderResults() {
-  const q   = norm(document.getElementById('search-input').value);
-  const srt = document.getElementById('sort-select').value;
-  const rub = document.getElementById('rubros-select').value;
-  const cont= document.getElementById('results-container');
-
-  let fil = [...proveedores];
-  if (rub !== 'todos')      fil = fil.filter(p => p.categoria === rub);
-  if (activeFilter !== 'todos') fil = fil.filter(p => p.score.etiqueta === activeFilter);
-  if (q) {
-    const ws = q.trim().split(/\s+/).filter(Boolean);
-    fil = fil.filter(p => {
-      const nt  = p.resenas.map(r=>norm(r.notas)+' '+norm(r.recomendacion)).join(' ');
-      const tel = (p.telefono||'').replace(/\D/g,'');
-      const tx  = [p.nombre,p.empresa,p.servicio,p.telefono,tel,p.dni,nt].map(norm).join(' ');
-      return ws.every(w => tx.includes(w));
+function renderResults(){
+  const q=norm(document.getElementById('search-input').value);
+  const srt=document.getElementById('sort-select').value;
+  const rub=document.getElementById('rubros-select').value;
+  const cont=document.getElementById('results-container');
+  let fil=[...proveedores];
+  if(rub!=='todos')fil=fil.filter(p=>p.categoria===rub);
+  if(activeFilter!=='todos')fil=fil.filter(p=>p.score.etiqueta===activeFilter);
+  if(q){
+    const ws=q.trim().split(/\s+/).filter(Boolean);
+    fil=fil.filter(p=>{
+      const nt=p.resenas.map(r=>norm(r.notas)+' '+norm(r.recomendacion)).join(' ');
+      const tel=(p.telefono||'').replace(/\D/g,'');
+      const tx=[p.nombre,p.empresa,p.servicio,p.telefono,tel,p.dni,nt].map(norm).join(' ');
+      return ws.every(w=>tx.includes(w));
     });
   }
-  const ord = {Destacado:5,'Muy Recomendable':4,Recomendable:3,'Malas Experiencias':2,'No Recomendable':1,'Sin datos':0};
-  if (srt==='alfabetico') fil.sort((a,b)=>a.destacado!==b.destacado?(a.destacado?-1:1):a.nombre.localeCompare(b.nombre,'es'));
-  else if (srt==='puntuacion') fil.sort((a,b)=>a.destacado!==b.destacado?(a.destacado?-1:1):b.score.estrellas-a.score.estrellas||a.nombre.localeCompare(b.nombre,'es'));
+  const ord={Destacado:5,'Muy Recomendable':4,Recomendable:3,'Malas Experiencias':2,'No Recomendable':1,'Sin datos':0};
+  if(srt==='alfabetico')fil.sort((a,b)=>a.destacado!==b.destacado?(a.destacado?-1:1):a.nombre.localeCompare(b.nombre,'es'));
+  else if(srt==='puntuacion')fil.sort((a,b)=>a.destacado!==b.destacado?(a.destacado?-1:1):b.score.estrellas-a.score.estrellas||a.nombre.localeCompare(b.nombre,'es'));
   else fil.sort((a,b)=>a.destacado!==b.destacado?(a.destacado?-1:1):(ord[b.score.etiqueta]||0)-(ord[a.score.etiqueta]||0)||b.score.estrellas-a.score.estrellas);
-
-  document.getElementById('stats-bar').textContent = `${fil.length} proveedor${fil.length!==1?'es':''} encontrado${fil.length!==1?'s':''}`;
-
-  if (!fil.length) { cont.innerHTML=`<div class="empty-state"><div class="icon">🔍</div><h3>Sin resultados</h3><p>Probá con otras palabras</p></div>`; return; }
-  const dest=fil.filter(p=>p.destacado), reg=fil.filter(p=>!p.destacado);
+  document.getElementById('stats-bar').textContent=`${fil.length} proveedor${fil.length!==1?'es':''} encontrado${fil.length!==1?'s':''}`;
+  if(!fil.length){cont.innerHTML=`<div class="empty-state"><div class="icon">🔍</div><h3>Sin resultados</h3><p>Probá con otras palabras</p></div>`;return;}
+  const dest=fil.filter(p=>p.destacado),reg=fil.filter(p=>!p.destacado);
   let html='';
-  if (dest.length) html+=`<div class="destacados-section"><div class="section-label">⭐ Destacados</div><div class="destacados-grid">${dest.map(p=>cardHTML(p,true)).join('')}</div></div>`;
-  if (reg.length)  html+=`<div class="regular-section" style="display:flex;flex-direction:column;gap:10px">${dest.length?'<div class="section-label">Todos los proveedores</div>':''}${reg.map(p=>cardHTML(p,false)).join('')}</div>`;
-  cont.innerHTML = html;
-
-  // Eventos de cards — usando delegación para no usar onclick inline
-  cont.querySelectorAll('.card-main, .card-resenas-toggle').forEach(el => {
-    el.addEventListener('click', e => { e.stopPropagation(); toggleCard(el.closest('.proveedor-card')); });
+  if(dest.length)html+=`<div class="destacados-section"><div class="section-label">⭐ Destacados</div><div class="destacados-grid">${dest.map(p=>cardHTML(p,true)).join('')}</div></div>`;
+  if(reg.length)html+=`<div class="regular-section" style="display:flex;flex-direction:column;gap:10px">${dest.length?'<div class="section-label">Todos los proveedores</div>':''}${reg.map(p=>cardHTML(p,false)).join('')}</div>`;
+  cont.innerHTML=html;
+  cont.querySelectorAll('.card-main,.card-resenas-toggle').forEach(el=>{
+    el.addEventListener('click', e=>{e.stopPropagation();toggleCard(el.closest('.proveedor-card'));});
   });
-  cont.querySelectorAll('.btn-recomendar-card').forEach(btn => {
-    btn.addEventListener('click', e => { e.stopPropagation(); recomendarDesdeCard(btn.dataset.p); });
+  cont.querySelectorAll('.btn-recomendar-card').forEach(btn=>{
+    btn.addEventListener('click', e=>{e.stopPropagation();recomendarDesdeCard(btn.dataset.p);});
   });
 }
 
-function cardHTML(p, isDest) {
-  const sc = p.score;
-  const bc = isDest ? 'badge-destacado' : badgeCls(sc.etiqueta);
-  const el = isDest ? '⭐ Destacado' : sc.etiqueta;
-  const st = sc.total>0 ? starsHtml(sc.estrellas) : (isDest?'★★★★★':'');
-  const em = emoji(p.servicio);
-  const telOk = p.telefono&&!['n/a',''].includes(norm(p.telefono));
-  const dniOk = p.dni&&!['n/a',''].includes(norm(p.dni));
-  const empOk = p.empresa&&!['n/a',''].includes(norm(p.empresa))&&p.empresa!==p.nombre;
-  const pData = JSON.stringify({nombre:p.nombre,empresa:p.empresa,dni:p.dni,telefono:p.telefono,servicio:p.servicio});
-  const resHtml = p.resenas.map(r=>`<div class="resena-item ${slugify(r.recomendacion)}"><div class="resena-top"><span class="badge ${badgeCls(r.recomendacion)}" style="font-size:.72rem">${r.recomendacion||''}</span></div>${r.notas&&!['n/a',''].includes(norm(r.notas))?`<div class="resena-notas">"${r.notas}"</div>`:''}</div>`).join('');
-  const toggle = p.resenas.length ? `<div class="card-resenas-toggle"><span class="toggle-label">Ver reseñas (${p.resenas.length}) ▾</span></div><div class="card-detail"><div class="resenas-title">Reseñas</div>${resHtml}</div>` : '';
+function cardHTML(p,isDest){
+  const sc=p.score;
+  const bc=isDest?'badge-destacado':badgeCls(sc.etiqueta);
+  const el=isDest?'⭐ Destacado':sc.etiqueta;
+  const st=sc.total>0?starsHtml(sc.estrellas):(isDest?'★★★★★':'');
+  const em=svcEmoji(p.servicio);
+  const telOk=p.telefono&&!['n/a',''].includes(norm(p.telefono));
+  const dniOk=p.dni&&!['n/a',''].includes(norm(p.dni));
+  const empOk=p.empresa&&!['n/a',''].includes(norm(p.empresa))&&p.empresa!==p.nombre;
+  const pData=JSON.stringify({nombre:p.nombre,empresa:p.empresa,dni:p.dni,telefono:p.telefono,servicio:p.servicio});
+  const resHtml=p.resenas.map(r=>`<div class="resena-item ${slugify(r.recomendacion)}"><div class="resena-top"><span class="badge ${badgeCls(r.recomendacion)}" style="font-size:.72rem">${r.recomendacion||''}</span></div>${r.notas&&!['n/a',''].includes(norm(r.notas))?`<div class="resena-notas">"${r.notas}"</div>`:''}</div>`).join('');
+  const toggle=p.resenas.length?`<div class="card-resenas-toggle"><span class="toggle-label">Ver reseñas (${p.resenas.length}) ▾</span></div><div class="card-detail"><div class="resenas-title">Reseñas</div>${resHtml}</div>`:'';
   return `<div class="proveedor-card${isDest?' destacado':''}">
     <div class="card-main">
       <div class="card-avatar">${em}</div>
@@ -1091,8 +896,8 @@ function cardHTML(p, isDest) {
   </div>`;
 }
 
-function toggleCard(el) {
-  const det=el.querySelector('.card-detail'); if(!det)return;
+function toggleCard(el){
+  const det=el.querySelector('.card-detail');if(!det)return;
   const lbl=el.querySelector('.toggle-label');
   const isOpen=det.classList.contains('open');
   if(openCard&&openCard!==det){openCard.classList.remove('open');const prev=openCard.closest('.proveedor-card')?.querySelector('.toggle-label');if(prev)prev.textContent=prev.textContent.replace('▴','▾').replace('Ocultar','Ver');}
@@ -1101,9 +906,8 @@ function toggleCard(el) {
   openCard=!isOpen?det:null;
 }
 
-// ── RECOMENDAR DESDE CARD ──────────────────────────────────────────────────
-function recomendarDesdeCard(pStr) {
-  let p; try{p=JSON.parse(pStr);}catch(e){return;}
+function recomendarDesdeCard(pStr){
+  let p;try{p=JSON.parse(pStr);}catch(e){return;}
   showPage('recomendar');
   setTimeout(()=>{
     ['nombre','empresa','dni','telefono','servicio'].forEach(k=>document.getElementById('f-'+k).value=p[k]||'');
@@ -1112,20 +916,19 @@ function recomendarDesdeCard(pStr) {
 }
 
 // ── FORMULARIO ─────────────────────────────────────────────────────────────
-document.getElementById('btn-submit').addEventListener('click', async () => {
-  const nombre   = document.getElementById('f-nombre').value.trim();
-  const telefono = document.getElementById('f-telefono').value.trim();
-  const servicio = document.getElementById('f-servicio').value.trim();
-  const recomen  = document.querySelector('input[name="recomen"]:checked')?.value;
-  const vecino   = document.getElementById('f-vecino').value.trim();
-  const msg      = document.getElementById('form-msg');
-  msg.style.display='none';
+document.getElementById('btn-submit').addEventListener('click', async ()=>{
+  const nombre=document.getElementById('f-nombre').value.trim();
+  const telefono=document.getElementById('f-telefono').value.trim();
+  const servicio=document.getElementById('f-servicio').value.trim();
+  const recomen=document.querySelector('input[name="recomen"]:checked')?.value;
+  const vecino=document.getElementById('f-vecino').value.trim();
+  const msg=document.getElementById('form-msg'); msg.style.display='none';
   if(!nombre||!telefono||!servicio||!recomen||!vecino){msg.textContent='⚠️ Completá todos los campos obligatorios (*)';msg.className='form-msg err';msg.style.display='block';return;}
-  const btn=document.getElementById('btn-submit'); btn.disabled=true; btn.textContent='Verificando...';
-  try {
+  const btn=document.getElementById('btn-submit');btn.disabled=true;btn.textContent='Verificando...';
+  try{
     const dup=await apiGet({action:'checkDuplicado',uid:currentUser.uid,email:currentUser.email,nombre,telefono});
     if(dup.duplicado){msg.textContent='⚠️ Ya enviaste una recomendación para este proveedor.';msg.className='form-msg err';msg.style.display='block';btn.disabled=false;btn.textContent='Enviar recomendación';return;}
-  } catch(e) { /* si falla el check, seguir */ }
+  }catch(e){}
   btn.textContent='Enviando...';
   const barrio=document.querySelector('input[name="barrio"]:checked')?.value||'No sé';
   const payload={action:'saveRecomendacion',nombre,empresa:document.getElementById('f-empresa').value.trim(),dni:document.getElementById('f-dni').value.trim(),telefono,servicio,recomendacion:recomen,notas:document.getElementById('f-notas').value.trim(),barrio,vecino,uid:currentUser.uid,email:currentUser.email};
@@ -1135,15 +938,16 @@ document.getElementById('btn-submit').addEventListener('click', async () => {
     if(data.ok){document.getElementById('form-body').style.display='none';document.getElementById('form-success').style.display='block';}
     else if(data.error==='duplicado'){msg.textContent='⚠️ Ya enviaste una recomendación para este proveedor.';msg.className='form-msg err';msg.style.display='block';btn.disabled=false;btn.textContent='Enviar recomendación';}
     else throw new Error(data.error);
-  }catch(e){msg.textContent='❌ Error al enviar. Intentá de nuevo.';msg.className='form-msg err';msg.style.display='block';btn.disabled=false;btn.textContent='Enviar recomendación';}
+  }catch(e){msg.textContent='❌ Error al enviar.';msg.className='form-msg err';msg.style.display='block';btn.disabled=false;btn.textContent='Enviar recomendación';}
 });
-document.getElementById('btn-otra-rec').addEventListener('click', () => {
+document.getElementById('btn-otra-rec').addEventListener('click', ()=>{
   document.getElementById('form-body').style.display='block';
   document.getElementById('form-success').style.display='none';
-  ['f-nombre','f-empresa','f-dni','f-telefono','f-servicio','f-notas','f-vecino'].forEach(id=>document.getElementById(id).value='');
+  ['f-nombre','f-empresa','f-dni','f-telefono','f-servicio','f-notas'].forEach(id=>document.getElementById(id).value='');
   document.querySelectorAll('input[type=radio]').forEach(r=>r.checked=false);
   document.querySelector('input[name="barrio"][value="No sé"]').checked=true;
   document.getElementById('f-email').value=currentUser?.email||'';
+  if(perfilUsuario?.nombre) document.getElementById('f-vecino').value=`${perfilUsuario.nombre}, Área: ${perfilUsuario.area||'—'}, Lote: ${perfilUsuario.lote||'—'}`;
   document.getElementById('btn-submit').disabled=false;
   document.getElementById('btn-submit').textContent='Enviar recomendación';
   document.getElementById('form-msg').style.display='none';
@@ -1170,23 +974,27 @@ function renderPendientes(rows){
 function adminCardHTML(r,idx,acc){
   const bc=r.estado==='Aprobado'?'aprobado':r.estado==='Rechazado'?'rechazado':'pendiente';
   return `<div class="admin-card" id="acard-${idx}">
-    <div class="admin-card-header"><div style="font-size:2rem">${emoji(r.servicio)}</div>
-      <div class="admin-info"><div class="admin-nombre">${r.nombre||'Sin nombre'}</div>
+    <div class="admin-card-header"><div style="font-size:2rem">${svcEmoji(r.servicio)}</div>
+      <div class="admin-info">
+        <div class="admin-nombre">${r.nombre||'Sin nombre'}</div>
         <div class="admin-meta"><span>⚙️ ${r.servicio||'—'}</span>${r.telefono?`<span>📞 ${r.telefono}</span>`:''}</div>
-        <div style="display:flex;gap:8px"><span class="badge ${badgeCls(r.recomendacion)}" style="font-size:.7rem">${r.recomendacion||''}</span><span class="admin-badge ${bc}">${r.estado||'Pendiente'}</span></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span class="badge ${badgeCls(r.recomendacion)}" style="font-size:.7rem">${r.recomendacion||''}</span>
+          <span class="admin-badge ${bc}">${r.estado||'Pendiente'}</span>
+        </div>
       </div>
     </div>
     <div class="admin-detalle">
-      ${r.notas?`<div><strong style="color:var(--muted)">Notas: </strong>"${r.notas}"</div>`:''}
+      ${r.notas?`<div style="margin-bottom:6px"><strong style="color:var(--muted)">Notas: </strong>"${r.notas}"</div>`:''}
       ${r.vecinoNombre||r.vecino?`<div class="admin-vecino">
         <strong>🏠 Quien recomienda (confidencial):</strong>
         ${r.vecinoNombre?`<div style="margin-top:4px">
-          <span style="color:var(--text)">${r.vecinoNombre}</span>
-          ${r.vecinoArea?`· <span style="color:var(--muted)">Área: ${r.vecinoArea}</span>`:''}
-          ${r.vecinoLote?`· <span style="color:var(--muted)">Lote: ${r.vecinoLote}</span>`:''}
-          ${r.vecinoTel?`· <a href="tel:${r.vecinoTel.replace(/\s/g,'')}" style="color:var(--verde)">📞 ${r.vecinoTel}</a>`:''}
+          <span style="color:var(--text);font-weight:500">${r.vecinoNombre}</span>
+          ${r.vecinoArea?` · <span style="color:var(--muted)">Área: ${r.vecinoArea}</span>`:''}
+          ${r.vecinoLote?` · <span style="color:var(--muted)">Lote: ${r.vecinoLote}</span>`:''}
+          ${r.vecinoTel?` · <a href="tel:${r.vecinoTel.replace(/\s/g,'')}" style="color:var(--verde)">📞 ${r.vecinoTel}</a>`:''}
         </div>`:''}
-        ${r.vecino?`<div style="font-size:.75rem;color:var(--muted);margin-top:4px">${r.vecino}</div>`:''}
+        ${r.vecino?`<div style="font-size:.74rem;color:var(--muted);margin-top:4px">${r.vecino}</div>`:''}
       </div>`:''}
     </div>
     ${acc?`<div class="admin-actions">
@@ -1207,10 +1015,10 @@ async function accionPendiente(idx,fila,accion){
 
 // ── MENSAJES ───────────────────────────────────────────────────────────────
 document.getElementById('btn-actualizar-mensajes').addEventListener('click', cargarMensajes);
-document.getElementById('fab-contacto').addEventListener('click', () => { document.getElementById('modal-contacto').classList.add('open'); });
-document.getElementById('modal-close-btn').addEventListener('click', () => { document.getElementById('modal-contacto').classList.remove('open'); });
-document.getElementById('modal-contacto').addEventListener('click', e => { if(e.target===e.currentTarget)e.currentTarget.classList.remove('open'); });
-document.getElementById('mc-btn').addEventListener('click', async () => {
+document.getElementById('fab-contacto').addEventListener('click', ()=>document.getElementById('modal-contacto').classList.add('open'));
+document.getElementById('modal-close-btn').addEventListener('click', ()=>document.getElementById('modal-contacto').classList.remove('open'));
+document.getElementById('modal-contacto').addEventListener('click', e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});
+document.getElementById('mc-btn').addEventListener('click', async ()=>{
   const mensaje=document.getElementById('mc-mensaje').value.trim();
   const msgEl=document.getElementById('mc-msg');
   if(!mensaje){msgEl.textContent='⚠️ Escribí un mensaje';msgEl.style.color='var(--rojo)';msgEl.style.display='block';return;}
@@ -1239,6 +1047,91 @@ async function cargarMensajes(){
       ${m.email?`<a class="btn-responder" href="mailto:${m.email}?subject=Re: Consulta Proveedores San Sebastián">📧 Responder</a>`:''}
     </div>`).join('');
   }catch(e){c.innerHTML='<div class="admin-empty"><div class="icon">❌</div><p>Error al cargar.</p></div>';}
+}
+
+// ── MODAL PERFIL ───────────────────────────────────────────────────────────
+function abrirModalPerfil(panelId){
+  document.getElementById('cfg-email').value  =currentUser?.email||'';
+  document.getElementById('cfg-nombre').value =perfilUsuario?.nombre  ||'';
+  document.getElementById('cfg-barrio').value =perfilUsuario?.barrio  ||'';
+  document.getElementById('cfg-tel').value    =perfilUsuario?.telefono||'';
+  document.getElementById('cfg-area').value   =perfilUsuario?.area    ||'';
+  document.getElementById('cfg-lote').value   =perfilUsuario?.lote    ||'';
+  ['cfg-error','cfg-ok','pass-error','pass-ok'].forEach(id=>{const e=document.getElementById(id);e.style.display='none';e.textContent='';});
+  activarPanelPerfil(panelId);
+  document.getElementById('modal-perfil').classList.add('open');
+  if(panelId==='misrecs') cargarMisRecomendaciones();
+}
+function activarPanelPerfil(panelId){
+  document.querySelectorAll('.perfil-tab').forEach(t=>t.classList.toggle('active',t.dataset.panel===panelId));
+  document.querySelectorAll('.perfil-panel').forEach(p=>p.classList.toggle('active',p.id==='panel-'+panelId));
+}
+document.querySelectorAll('.perfil-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{activarPanelPerfil(tab.dataset.panel);if(tab.dataset.panel==='misrecs')cargarMisRecomendaciones();});
+});
+document.getElementById('perfil-close-btn').addEventListener('click', ()=>document.getElementById('modal-perfil').classList.remove('open'));
+document.getElementById('modal-perfil').addEventListener('click', e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});
+
+document.getElementById('btn-guardar-cfg').addEventListener('click', async ()=>{
+  const nombre=document.getElementById('cfg-nombre').value.trim();
+  const barrio=document.getElementById('cfg-barrio').value;
+  const tel=document.getElementById('cfg-tel').value.trim();
+  const area=document.getElementById('cfg-area').value.trim();
+  const lote=document.getElementById('cfg-lote').value.trim();
+  const errEl=document.getElementById('cfg-error'),okEl=document.getElementById('cfg-ok');
+  errEl.style.display='none';okEl.style.display='none';
+  if(!nombre||!barrio||!tel||!area||!lote){errEl.textContent='Completá todos los campos';errEl.style.display='block';return;}
+  const btn=document.getElementById('btn-guardar-cfg');btn.disabled=true;btn.textContent='Guardando...';
+  try{
+    await apiGet({action:'saveUsuario',uid:currentUser.uid,email:currentUser.email,nombre,barrio,telefono:tel,area,lote});
+    perfilUsuario={...perfilUsuario,nombre,barrio,telefono:tel,area,lote};
+    document.getElementById('dd-nombre').textContent=nombre;
+    const av=document.getElementById('user-avatar');
+    if(!currentUser?.photoURL) av.textContent=nombre[0].toUpperCase();
+    okEl.style.display='block';
+  }catch(e){errEl.textContent='Error al guardar.';errEl.style.display='block';}
+  btn.disabled=false;btn.textContent='Guardar cambios';
+});
+
+document.getElementById('btn-cambiar-pass').addEventListener('click', async ()=>{
+  const p1=document.getElementById('cfg-pass1').value, p2=document.getElementById('cfg-pass2').value;
+  const errEl=document.getElementById('pass-error'),okEl=document.getElementById('pass-ok');
+  errEl.style.display='none';okEl.style.display='none';
+  if(!p1||!p2){errEl.textContent='Completá ambos campos';errEl.style.display='block';return;}
+  if(p1!==p2){errEl.textContent='Las contraseñas no coinciden';errEl.style.display='block';return;}
+  if(p1.length<6){errEl.textContent='Mínimo 6 caracteres';errEl.style.display='block';return;}
+  if(currentUser?.providerData?.some(p=>p.providerId==='google.com')){errEl.textContent='Tu cuenta usa Google. No podés cambiar contraseña acá.';errEl.style.display='block';return;}
+  const btn=document.getElementById('btn-cambiar-pass');btn.disabled=true;btn.textContent='Cambiando...';
+  try{
+    await updatePassword(currentUser,p1);
+    document.getElementById('cfg-pass1').value='';document.getElementById('cfg-pass2').value='';
+    okEl.style.display='block';
+  }catch(e){
+    errEl.textContent=e.code==='auth/requires-recent-login'?'Por seguridad, cerrá sesión, volvé a ingresar y cambiá la contraseña.':errMsg(e.code);
+    errEl.style.display='block';
+  }
+  btn.disabled=false;btn.textContent='Cambiar contraseña';
+});
+
+async function cargarMisRecomendaciones(){
+  const c=document.getElementById('misrecs-container');
+  c.innerHTML='<div class="loading"><div class="spinner"></div>Cargando...</div>';
+  try{
+    const d=await apiGet({action:'getMisRecomendaciones',uid:currentUser.uid,email:currentUser.email});
+    if(d.error){c.innerHTML=`<p style="color:var(--rojo);font-size:.85rem">${d.error}</p>`;return;}
+    const recs=d.recomendaciones||[];
+    if(!recs.length){c.innerHTML='<div class="empty-state" style="padding:30px 0"><div class="icon">📋</div><h3>Sin recomendaciones</h3><p>Todavía no enviaste ninguna.</p></div>';return;}
+    c.innerHTML=recs.map(r=>`<div class="mis-rec-card ${r.estado.toLowerCase()}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <div class="mis-rec-nombre">${r.nombre||'—'}</div>
+        <span class="estado-badge ${r.estado}">${r.estado}</span>
+      </div>
+      <div class="mis-rec-meta">
+        ${r.servicio?`<span>⚙️ ${r.servicio}</span>`:''}
+        <span class="badge ${badgeCls(r.recomendacion)}" style="font-size:.68rem">${r.recomendacion||''}</span>
+      </div>
+      ${r.notas&&norm(r.notas)!=='n/a'?`<div style="font-size:.8rem;color:var(--muted)">"${r.notas}"</div>`:''}`+`</div>`).join('');
+  }catch(e){c.innerHTML='<p style="color:var(--rojo);font-size:.85rem;padding:10px">Error al cargar.</p>';}
 }
 </script>
 </body>
