@@ -584,7 +584,7 @@ const FB_CONFIG = {
   messagingSenderId: "502507789799",
   appId:             "1:502507789799:web:18c23d38e2d6f657f6f142",
 };
-const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbyuj73IKZFS-5w-NRfLpV4aj-KF3OEozR6gwIBrwetcjlTZk2uIOAbMIoRyAK23ITe6_g/exec';
+const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbyuj73IKZFS-5w-NRfLpV4aj-KF3OEozR6gwIBrwetcjlTZk2uIOAbMIoRyAK23ITe6_g/exec'; // ← reemplazá con tu URL de Apps Script
 const SCRIPT_PWD   = 'sansebastian2025';
 const ADMIN_PWD    = 'admin2025';
 const ADMIN_EMAILS = ['francisco.iacono@gmail.com'];
@@ -616,6 +616,7 @@ const CATS = [
 
 // ── HELPERS ────────────────────────────────────────────────────────────────
 const norm = t => { if(!t)return ''; return String(t).toLowerCase().trim().replace(/á/g,'a').replace(/é/g,'e').replace(/í/g,'i').replace(/ó/g,'o').replace(/ú/g,'u').replace(/ü/g,'u'); };
+const normBarrio = b => { const v=norm(b||''); if(v==='si'||v==='sí') return 'Si'; if(v==='no') return 'No'; return ''; };
 const slugify = t => norm(t||'').replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
 const starsHtml = n => { if(!n)return ''; const l=Math.round(n); return '★'.repeat(l)+'☆'.repeat(5-l); };
 const badgeCls = e => ({'Destacado':'badge-destacado','Muy Recomendable':'badge-muy-recomendable','Recomendable':'badge-recomendable','Malas Experiencias':'badge-malas-experiencias','No Recomendable':'badge-no-recomendable','No Contratar':'badge-no-recomendable'})[e]||'badge-sin-datos';
@@ -859,10 +860,10 @@ function renderResults(){
   let fil=[...proveedores];
   if(rub!=='todos')fil=fil.filter(p=>p.categoria===rub);
   if(barrioFil!=='todos')fil=fil.filter(p=>{
-    const b=norm(p.barrio||'');
-    if(barrioFil==='Sí')  return b==='si' || b==='sí';
-    if(barrioFil==='No')  return b==='no';
-    if(barrioFil==='No sé') return b!=='si' && b!=='sí' && b!=='no' && b!=='';
+    const b=p.barrio||'';
+    if(barrioFil==='Sí') return b==='Si';
+    if(barrioFil==='No') return b==='No';
+    if(barrioFil==='No sé') return b!=='Si' && b!=='No';
     return true;
   });
   if(activeFilter!=='todos')fil=fil.filter(p=>p.score.etiqueta===activeFilter);
@@ -916,7 +917,7 @@ function cardHTML(p,isDest){
       ${telOk?`<a class="contacto-item tel" href="tel:${p.telefono.replace(/\s/g,'')}">📞 ${p.telefono}</a>`:''}
       ${dniOk?`<span class="contacto-item">🪪 ${p.dni}</span>`:''}
       ${empOk?`<span class="contacto-item">🏢 ${p.empresa}</span>`:''}
-      ${(()=>{const b=norm(p.barrio||'');if(b==='si'||b==='sí')return `<span class="contacto-item" style="color:var(--verde);border-color:rgba(74,124,47,.4);background:rgba(74,124,47,.06)">🏘️ Del barrio</span>`;if(b==='no')return `<span class="contacto-item">🔄 Externo</span>`;return '';})()}
+      ${p.barrio==='Si'?`<span class="contacto-item" style="color:var(--verde);border-color:rgba(74,124,47,.4);background:rgba(74,124,47,.06)">🏘️ Del barrio</span>`:p.barrio==='No'?`<span class="contacto-item">🔄 Externo</span>`:''}
     </div>
     ${toggle}
     <div class="card-footer-actions"><button class="btn-recomendar-card" data-p='${pData.replace(/'/g,"&apos;")}'>✍️ Recomendar este proveedor</button></div>
