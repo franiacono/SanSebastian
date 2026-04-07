@@ -813,9 +813,10 @@ async function cargarProveedores(){
 function procesarDatos(filas){
   const mapa={};
   filas.forEach(f=>{
-    if(norm(f.recomendacion)==='utiles') return; // excluir teléfonos útiles de la lista principal
+    if(norm(f.recomendacion)==='utiles') return;
     const key=genKey(f);
-    if(!mapa[key]) mapa[key]={nombre:f.nombre,empresa:f.empresa,dni:f.dni,telefono:f.telefono,servicio:f.servicio,destacado:false,resenas:[]};
+    if(!mapa[key]) mapa[key]={nombre:f.nombre,empresa:f.empresa,dni:f.dni,telefono:f.telefono,servicio:f.servicio,barrio:'',destacado:false,resenas:[]};
+    if(!mapa[key].barrio && f.barrio && f.barrio.trim()!=='') mapa[key].barrio=normBarrio(f.barrio);
     if(norm(f.recomendacion)==='publicidad') mapa[key].destacado=true;
     else if(f.recomendacion) mapa[key].resenas.push({recomendacion:f.recomendacion,notas:f.notas});
   });
