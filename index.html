@@ -858,7 +858,7 @@ function renderResults(){
   const cont=document.getElementById('results-container');
   let fil=[...proveedores];
   if(rub!=='todos')fil=fil.filter(p=>p.categoria===rub);
-  if(barrioFil!=='todos')fil=fil.filter(p=>p.barrio===barrioFil);
+  if(barrioFil!=='todos')fil=fil.filter(p=>(p.barrio||'')=== barrioFil);
   if(activeFilter!=='todos')fil=fil.filter(p=>p.score.etiqueta===activeFilter);
   if(q){
     const ws=q.trim().split(/\s+/).filter(Boolean);
@@ -897,7 +897,7 @@ function cardHTML(p,isDest){
   const telOk=p.telefono&&!['n/a',''].includes(norm(p.telefono));
   const dniOk=p.dni&&!['n/a',''].includes(norm(p.dni));
   const empOk=p.empresa&&!['n/a',''].includes(norm(p.empresa))&&p.empresa!==p.nombre;
-  const pData=JSON.stringify({nombre:p.nombre,empresa:p.empresa,dni:p.dni,telefono:p.telefono,servicio:p.servicio});
+  const pData=JSON.stringify({nombre:p.nombre,empresa:p.empresa,dni:p.dni,telefono:p.telefono,servicio:p.servicio,barrio:p.barrio||''});
   const resHtml=p.resenas.map(r=>`<div class="resena-item ${slugify(r.recomendacion)}"><div class="resena-top"><span class="badge ${badgeCls(r.recomendacion)}" style="font-size:.72rem">${r.recomendacion||''}</span></div>${r.notas&&!['n/a',''].includes(norm(r.notas))?`<div class="resena-notas">"${r.notas}"</div>`:''}</div>`).join('');
   const toggle=p.resenas.length?`<div class="card-resenas-toggle"><span class="toggle-label">Ver reseñas (${p.resenas.length}) ▾</span></div><div class="card-detail"><div class="resenas-title">Reseñas</div>${resHtml}</div>`:'';
   return `<div class="proveedor-card${isDest?' destacado':''}">
@@ -910,7 +910,7 @@ function cardHTML(p,isDest){
       ${telOk?`<a class="contacto-item tel" href="tel:${p.telefono.replace(/\s/g,'')}">📞 ${p.telefono}</a>`:''}
       ${dniOk?`<span class="contacto-item">🪪 ${p.dni}</span>`:''}
       ${empOk?`<span class="contacto-item">🏢 ${p.empresa}</span>`:''}
-      ${p.barrio==='Sí'?`<span class="contacto-item" style="color:var(--verde);border-color:rgba(74,124,47,.4);background:rgba(74,124,47,.06)">🏘️ Del barrio</span>`:p.barrio==='No'?`<span class="contacto-item">🔄 Externo</span>`:''}
+      ${p.barrio==='Sí'?`<span class="contacto-item" style="color:var(--verde);border-color:rgba(74,124,47,.4);background:rgba(74,124,47,.06)">🏘️ Del barrio</span>`:p.barrio==='No'?`<span class="contacto-item">🔄 Externo</span>`:p.barrio?`<span class="contacto-item">❓ No se sabe</span>`:''}
     </div>
     ${toggle}
     <div class="card-footer-actions"><button class="btn-recomendar-card" data-p='${pData.replace(/'/g,"&apos;")}'>✍️ Recomendar este proveedor</button></div>
