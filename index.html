@@ -452,6 +452,10 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
   </header>
 
   <div class="page active" id="page-buscar">
+    <div style="background:#f0f7ec;border:1px solid rgba(74,124,47,.25);border-radius:10px;padding:10px 16px;margin-bottom:14px;font-size:.85rem;color:var(--verde);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <span>🏪 ¿Querés publicar tu comercio o servicio en el barrio?</span>
+      <a id="link-publicar" style="font-weight:600;color:var(--verde);text-decoration:underline;cursor:pointer;white-space:nowrap">Registralo acá →</a>
+    </div>
     <div class="top-controls">
       <div class="search-wrap">
         <span class="search-icon">🔍</span>
@@ -459,6 +463,15 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
       </div>
       <div class="rubros-select-wrap">
         <select class="rubros-select" id="rubros-select"><option value="todos">📂 Todos los rubros</option></select>
+        <span class="rubros-arrow">▾</span>
+      </div>
+      <div class="rubros-select-wrap">
+        <select class="rubros-select" id="barrio-select">
+          <option value="todos">🏘️ Todos</option>
+          <option value="Sí">✅ Del barrio</option>
+          <option value="No">🔄 Externos</option>
+          <option value="No sé">❓ No se sabe</option>
+        </select>
         <span class="rubros-arrow">▾</span>
       </div>
       <select class="sort-select" id="sort-select">
@@ -484,8 +497,8 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
     <div class="form-page">
       <div class="form-card">
         <div class="form-header">
-          <h2>✍️ Recomendá un Proveedor</h2>
-          <p style="opacity:.85;font-size:.88rem">Tu opinión ayuda a toda la comunidad</p>
+          <h2>✍️ Registrá un Proveedor o Comercio</h2>
+          <p style="opacity:.85;font-size:.88rem">Recomendá a alguien de confianza o registrá tu propio servicio para que la comunidad te conozca</p>
         </div>
         <div class="form-disclaimer"><strong>🔒 Privacidad</strong>Tu email se registra de forma confidencial para validar que la recomendación proviene de un vecino y evitar duplicados.</div>
         <div class="form-body" id="form-body">
@@ -514,7 +527,11 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
           <div class="form-row"><label>Notas <span class="opt">(links, Instagram, etc.)</span></label><textarea class="form-textarea" id="f-notas" placeholder="Contanos tu experiencia..."></textarea></div>
           <div class="form-section-title">Tu identidad (confidencial)</div>
           <div class="form-row"><label>Email (no editable)</label><input class="form-input" id="f-email" readonly></div>
-          <div class="form-row"><label>Nombre, área y lote <span class="req">*</span></label><textarea class="form-textarea" id="f-vecino" placeholder="Ej: Juan García, Sector A, Lote 42" style="min-height:60px"></textarea></div>
+          <div class="form-row">
+            <label>Tu nombre, área y lote</label>
+            <input class="form-input" id="f-vecino" readonly style="background:var(--crema);color:var(--muted)">
+            <p style="font-size:.75rem;color:var(--muted);margin-top:4px">Estos datos vienen de tu perfil. Si son incorrectos, actualizalos en ⚙️ Configuración.</p>
+          </div>
           <div class="form-submit-row">
             <button class="btn-submit" id="btn-submit">Enviar recomendación</button>
             <span class="form-msg" id="form-msg"></span>
@@ -567,7 +584,7 @@ const FB_CONFIG = {
   messagingSenderId: "502507789799",
   appId:             "1:502507789799:web:18c23d38e2d6f657f6f142",
 };
-const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbxxgleu8HW4-2fKFmk9rO4m77kAqKth713irDqo6nRHhNv_EBbV5wK8MeSCepu0B15UkQ/exec';
+const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbzxjt7LwFaMmtC73-CKqjNpY9s69pKEA6X5YraV5vrx7AvCbqhL7_3VbWtEqF6IaXTd/exec';
 const SCRIPT_PWD   = 'sansebastian2025';
 const ADMIN_PWD    = 'admin2025';
 const ADMIN_EMAILS = ['francisco.iacono@gmail.com'];
@@ -698,10 +715,9 @@ function entrarALaApp() {
     document.getElementById('fab-contacto').style.display='flex';
   }
   document.getElementById('f-email').value=currentUser?.email||'';
-  // Pre-llenar vecino si ya tiene perfil completo
+  // Pre-llenar vecino readonly desde el perfil
   if(perfilUsuario?.nombre){
-    const vecino=`${perfilUsuario.nombre}, Área: ${perfilUsuario.area||'—'}, Lote: ${perfilUsuario.lote||'—'}`;
-    document.getElementById('f-vecino').value=vecino;
+    document.getElementById('f-vecino').value=`${perfilUsuario.nombre} · Área: ${perfilUsuario.area||'—'} · Lote: ${perfilUsuario.lote||'—'}`;
   }
   cargarProveedores();
   document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') cargarProveedores(); });
@@ -770,7 +786,9 @@ document.getElementById('nav-mensajes').addEventListener('click',  ()=>showPage(
 // ── FILTROS ────────────────────────────────────────────────────────────────
 document.getElementById('search-input').addEventListener('input',   ()=>renderResults());
 document.getElementById('rubros-select').addEventListener('change', ()=>renderResults());
+document.getElementById('barrio-select').addEventListener('change', ()=>renderResults());
 document.getElementById('sort-select').addEventListener('change',   ()=>renderResults());
+document.getElementById('link-publicar').addEventListener('click',  ()=>showPage('recomendar'));
 document.querySelectorAll('.chip').forEach(chip=>{
   chip.addEventListener('click', ()=>{
     document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
@@ -836,9 +854,11 @@ function renderResults(){
   const q=norm(document.getElementById('search-input').value);
   const srt=document.getElementById('sort-select').value;
   const rub=document.getElementById('rubros-select').value;
+  const barrioFil=document.getElementById('barrio-select').value;
   const cont=document.getElementById('results-container');
   let fil=[...proveedores];
   if(rub!=='todos')fil=fil.filter(p=>p.categoria===rub);
+  if(barrioFil!=='todos')fil=fil.filter(p=>p.barrio===barrioFil);
   if(activeFilter!=='todos')fil=fil.filter(p=>p.score.etiqueta===activeFilter);
   if(q){
     const ws=q.trim().split(/\s+/).filter(Boolean);
@@ -890,6 +910,7 @@ function cardHTML(p,isDest){
       ${telOk?`<a class="contacto-item tel" href="tel:${p.telefono.replace(/\s/g,'')}">📞 ${p.telefono}</a>`:''}
       ${dniOk?`<span class="contacto-item">🪪 ${p.dni}</span>`:''}
       ${empOk?`<span class="contacto-item">🏢 ${p.empresa}</span>`:''}
+      ${p.barrio==='Sí'?`<span class="contacto-item" style="color:var(--verde);border-color:rgba(74,124,47,.4);background:rgba(74,124,47,.06)">🏘️ Del barrio</span>`:p.barrio==='No'?`<span class="contacto-item">🔄 Externo</span>`:''}
     </div>
     ${toggle}
     <div class="card-footer-actions"><button class="btn-recomendar-card" data-p='${pData.replace(/'/g,"&apos;")}'>✍️ Recomendar este proveedor</button></div>
@@ -947,7 +968,7 @@ document.getElementById('btn-otra-rec').addEventListener('click', ()=>{
   document.querySelectorAll('input[type=radio]').forEach(r=>r.checked=false);
   document.querySelector('input[name="barrio"][value="No sé"]').checked=true;
   document.getElementById('f-email').value=currentUser?.email||'';
-  if(perfilUsuario?.nombre) document.getElementById('f-vecino').value=`${perfilUsuario.nombre}, Área: ${perfilUsuario.area||'—'}, Lote: ${perfilUsuario.lote||'—'}`;
+  if(perfilUsuario?.nombre) document.getElementById('f-vecino').value=`${perfilUsuario.nombre} · Área: ${perfilUsuario.area||'—'} · Lote: ${perfilUsuario.lote||'—'}`;
   document.getElementById('btn-submit').disabled=false;
   document.getElementById('btn-submit').textContent='Enviar recomendación';
   document.getElementById('form-msg').style.display='none';
