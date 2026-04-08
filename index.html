@@ -716,7 +716,6 @@ function entrarALaApp() {
     document.getElementById('fab-contacto').style.display='flex';
   }
   document.getElementById('f-email').value=currentUser?.email||'';
-  // Pre-llenar vecino readonly desde el perfil
   if(perfilUsuario?.nombre){
     document.getElementById('f-vecino').value=`${perfilUsuario.nombre} · Área: ${perfilUsuario.area||'—'} · Lote: ${perfilUsuario.lote||'—'}`;
   }
@@ -737,7 +736,7 @@ avatarDrop.addEventListener('click', e=>e.stopPropagation());
 document.getElementById('dd-configuracion').addEventListener('click',()=>{avatarDrop.classList.remove('open'); abrirModalPerfil('datos');});
 document.getElementById('dd-mis-recs').addEventListener('click',()=>{avatarDrop.classList.remove('open'); abrirModalPerfil('misrecs');});
 
-// ── TELEFONOS ÚTILES ───────────────────────────────────────────────────────
+// ── TELÉFONOS ÚTILES ───────────────────────────────────────────────────────
 document.getElementById('nav-telefonos').addEventListener('click', abrirTelefonosUtiles);
 document.getElementById('tel-close-btn').addEventListener('click', ()=>document.getElementById('modal-telefonos').classList.remove('open'));
 document.getElementById('modal-telefonos').addEventListener('click', e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});
@@ -1162,6 +1161,14 @@ async function cargarMisRecomendaciones(){
       ${r.notas&&norm(r.notas)!=='n/a'?`<div style="font-size:.8rem;color:var(--muted)">"${r.notas}"</div>`:''}`+`</div>`).join('');
   }catch(e){c.innerHTML='<p style="color:var(--rojo);font-size:.85rem;padding:10px">Error al cargar.</p>';}
 }
+</script>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-PFGPQBHXEW"></script>
+<script>
+  window.dataLayer=window.dataLayer||[];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js',new Date());
+  gtag('config','G-PFGPQBHXEW');
 </script>
 </body>
 </html>
