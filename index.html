@@ -584,7 +584,7 @@ const FB_CONFIG = {
   messagingSenderId: "502507789799",
   appId:             "1:502507789799:web:18c23d38e2d6f657f6f142",
 };
-const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbxUeEcPxgD1s1PHJEwthtoLLe-gt8hE__PCRmlSAQUNSyjeBDLyVnzP9PUI_QJODGsHAQ/exec'; // ← reemplazá con tu URL de Apps Script
+const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbylq8cOQbxriBi-fngQJ0cDjYh9rwpDh04D83fyJITtdDQ1p4kBLjGkIExys0FHAdDfrQ/exec'; // ← reemplazá con tu URL de Apps Script
 const SCRIPT_PWD   = 'sansebastian2025';
 const ADMIN_PWD    = 'admin2025';
 const ADMIN_EMAILS = ['francisco.iacono@gmail.com'];
@@ -1020,16 +1020,25 @@ document.getElementById('btn-otra-rec').addEventListener('click', ()=>{
 document.getElementById('btn-actualizar-admin').addEventListener('click', cargarPendientes);
 async function cargarPendientes(){
   const c=document.getElementById('admin-container');c.innerHTML='<div class="loading"><div class="spinner"></div>Cargando...</div>';
-  try{const r=await apiGet({action:'getPendientes'});if(r.error){c.innerHTML=`<div class="admin-empty"><div class="icon">⚠️</div><p>${r.error}</p></div>`;return;}renderPendientes(r.pendientes||[]);}
+  try{
+    const r=await apiGet({action:'getPendientes'});
+    if(r.error){c.innerHTML=`<div class="admin-empty"><div class="icon">⚠️</div><p>${r.error}</p></div>`;return;}
+    renderPendientes(r.pendientes||[], r.aprobados||[]);
+  }
   catch(e){c.innerHTML='<div class="admin-empty"><div class="icon">❌</div><p>Error al cargar.</p></div>';}
 }
-function renderPendientes(rows){
+function renderPendientes(pendientes, aprobados){
   const c=document.getElementById('admin-container');
-  const pend=rows.filter(r=>r.estado==='Pendiente'),proc=rows.filter(r=>r.estado!=='Pendiente');
-  if(!rows.length){c.innerHTML='<div class="admin-empty"><div class="icon">✅</div><h3>Todo al día</h3></div>';return;}
+  if(!pendientes.length&&!aprobados.length){c.innerHTML='<div class="admin-empty"><div class="icon">✅</div><h3>Todo al día</h3></div>';return;}
   let html='';
-  if(pend.length){html+=`<div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--naranja);margin-bottom:10px">⏳ Pendientes (${pend.length})</div>`;html+=pend.map((r,i)=>adminCardHTML(r,i,true)).join('');}
-  if(proc.length){html+=`<div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin:20px 0 10px">✔ Procesados recientemente</div>`;html+=proc.slice(0,5).map((r,i)=>adminCardHTML(r,i+1000,false)).join('');}
+  if(pendientes.length){
+    html+=`<div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--naranja);margin-bottom:10px">⏳ Pendientes (${pendientes.length})</div>`;
+    html+=pendientes.map((r,i)=>adminCardHTML(r,i,true)).join('');
+  }
+  if(aprobados.length){
+    html+=`<div style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin:20px 0 10px">✔ Procesados recientemente</div>`;
+    html+=aprobados.map((r,i)=>adminCardHTML(r,i+1000,false)).join('');
+  }
   c.innerHTML=html;
   c.querySelectorAll('.btn-aprobar').forEach(btn=>btn.addEventListener('click',()=>accionPendiente(btn.dataset.idx,btn.dataset.fila,'Aprobado')));
   c.querySelectorAll('.btn-rechazar').forEach(btn=>btn.addEventListener('click',()=>accionPendiente(btn.dataset.idx,btn.dataset.fila,'Rechazado')));
