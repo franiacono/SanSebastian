@@ -643,6 +643,7 @@ onAuthStateChanged(auth, async user => {
     const data = await apiGet({ action:'getUsuario', uid:user.uid });
     if (data.usuario && data.usuario.nombre) {
       perfilUsuario = data.usuario;
+      gaEvent('login', {method: currentUser.providerData?.[0]?.providerId||'unknown'});
       entrarALaApp();
     } else {
       document.getElementById('app').style.display='none';
@@ -723,6 +724,11 @@ function entrarALaApp() {
   document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') cargarProveedores(); });
 }
 
+// ── GOOGLE ANALYTICS EVENTOS ──────────────────────────────────────────────
+function gaEvent(name, params){
+  if(typeof gtag==='function') gtag('event', name, params||{});
+}
+
 // ── LOGOUT ─────────────────────────────────────────────────────────────────
 async function doSignOut(){ try{await signOut(auth);}catch(e){} location.reload(); }
 document.getElementById('dd-salir').addEventListener('click', doSignOut);
@@ -737,7 +743,10 @@ document.getElementById('dd-configuracion').addEventListener('click',()=>{avatar
 document.getElementById('dd-mis-recs').addEventListener('click',()=>{avatarDrop.classList.remove('open'); abrirModalPerfil('misrecs');});
 
 // ── TELÉFONOS ÚTILES ───────────────────────────────────────────────────────
-document.getElementById('nav-telefonos').addEventListener('click', abrirTelefonosUtiles);
+document.getElementById('nav-telefonos').addEventListener('click', ()=>{
+  gaEvent('view_telefonos_utiles');
+  abrirTelefonosUtiles();
+});
 document.getElementById('tel-close-btn').addEventListener('click', ()=>document.getElementById('modal-telefonos').classList.remove('open'));
 document.getElementById('modal-telefonos').addEventListener('click', e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});
 
@@ -784,9 +793,25 @@ document.getElementById('nav-admin').addEventListener('click',     ()=>showPage(
 document.getElementById('nav-mensajes').addEventListener('click',  ()=>showPage('mensajes'));
 
 // ── FILTROS ────────────────────────────────────────────────────────────────
-document.getElementById('search-input').addEventListener('input',   ()=>renderResults());
-document.getElementById('rubros-select').addEventListener('change', ()=>renderResults());
-document.getElementById('barrio-select').addEventListener('change', ()=>renderResults());
+let searchTimer=null;
+document.getElementById('search-input').addEventListener('input', ()=>{
+  renderResults();
+  clearTimeout(searchTimer);
+  const q=document.getElementById('search-input').value.trim();
+  if(q.length>=3){
+    searchTimer=setTimeout(()=>gaEvent('search',{search_term:q}),1000);
+  }
+});
+document.getElementById('rubros-select').addEventListener('change', ()=>{
+  renderResults();
+  const v=document.getElementById('rubros-select').value;
+  if(v!=='todos') gaEvent('filter_rubro',{rubro:v});
+});
+document.getElementById('barrio-select').addEventListener('change', ()=>{
+  renderResults();
+  const v=document.getElementById('barrio-select').value;
+  if(v!=='todos') gaEvent('filter_barrio',{valor:v});
+});
 document.getElementById('sort-select').addEventListener('change',   ()=>renderResults());
 document.getElementById('link-publicar').addEventListener('click',  ()=>showPage('recomendar'));
 document.querySelectorAll('.chip').forEach(chip=>{
@@ -888,7 +913,13 @@ function renderResults(){
   if(reg.length)html+=`<div class="regular-section" style="display:flex;flex-direction:column;gap:10px">${dest.length?'<div class="section-label">Todos los proveedores</div>':''}${reg.map(p=>cardHTML(p,false)).join('')}</div>`;
   cont.innerHTML=html;
   cont.querySelectorAll('.card-main,.card-resenas-toggle').forEach(el=>{
-    el.addEventListener('click', e=>{e.stopPropagation();toggleCard(el.closest('.proveedor-card'));});
+    el.addEventListener('click', e=>{
+      e.stopPropagation();
+      const card=el.closest('.proveedor-card');
+      const nombre=card.querySelector('.card-nombre')?.textContent||'';
+      gaEvent('view_proveedor',{nombre});
+      toggleCard(card);
+    });
   });
   cont.querySelectorAll('.btn-recomendar-card').forEach(btn=>{
     btn.addEventListener('click', e=>{e.stopPropagation();recomendarDesdeCard(btn.dataset.p);});
@@ -963,7 +994,11 @@ document.getElementById('btn-submit').addEventListener('click', async ()=>{
   try{
     const res=await fetch(SCRIPT_URL+'?'+new URLSearchParams({...payload,password:SCRIPT_PWD}),{redirect:'follow'});
     const data=await res.json();
-    if(data.ok){document.getElementById('form-body').style.display='none';document.getElementById('form-success').style.display='block';}
+    if(data.ok){
+      gaEvent('recomendacion_enviada',{servicio,recomendacion:recomen});
+      document.getElementById('form-body').style.display='none';
+      document.getElementById('form-success').style.display='block';
+    }
     else if(data.error==='duplicado'){msg.textContent='⚠️ Ya enviaste una recomendación para este proveedor.';msg.className='form-msg err';msg.style.display='block';btn.disabled=false;btn.textContent='Enviar recomendación';}
     else throw new Error(data.error);
   }catch(e){msg.textContent='❌ Error al enviar.';msg.className='form-msg err';msg.style.display='block';btn.disabled=false;btn.textContent='Enviar recomendación';}
