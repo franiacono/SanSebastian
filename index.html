@@ -29,7 +29,17 @@ body{font-family:'DM Sans',sans-serif;background:var(--crema);color:var(--text);
 .tel-util-btn:hover{background:var(--verde2)}
 .tel-util-separator{height:1px;background:var(--border);margin:4px 0;opacity:.5}
 
-/* ── LEGAL ── */
+/* ── AYUDA ── */
+.ayuda-section{margin-bottom:24px}
+.ayuda-section:last-child{margin-bottom:0}
+.ayuda-section h4{font-family:'Playfair Display',serif;font-size:1rem;color:var(--verde);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--crema2)}
+.ayuda-step{display:flex;gap:12px;margin-bottom:10px;align-items:flex-start}
+.ayuda-step-num{width:24px;height:24px;background:var(--verde);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0;margin-top:1px}
+.ayuda-step-text{font-size:.87rem;color:var(--text);line-height:1.55}
+.ayuda-step-text strong{color:var(--verde)}
+.ayuda-platform{background:var(--crema);border-radius:10px;padding:12px 14px;margin-bottom:8px}
+.ayuda-platform-title{font-size:.85rem;font-weight:600;color:var(--text);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.ayuda-platform-steps{font-size:.82rem;color:var(--muted);line-height:1.7;padding-left:4px}
 .legal-footer{text-align:center;padding:16px;font-size:.72rem;color:var(--muted);max-width:600px;margin:0 auto;line-height:1.6;cursor:pointer}
 .legal-footer a{color:var(--muted);text-decoration:underline;text-decoration-style:dotted}
 
@@ -262,6 +272,67 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 </head>
 <body>
 
+<!-- ── MODAL AYUDA ── -->
+<div class="modal-overlay" id="modal-ayuda">
+  <div class="modal-box" style="max-width:540px">
+    <button class="modal-close" id="ayuda-close-btn">✕</button>
+    <h3>ℹ️ Ayuda y guía de uso</h3>
+    <p style="color:var(--muted);font-size:.83rem;margin-bottom:20px">Todo lo que necesitás saber para usar el directorio de proveedores de San Sebastián.</p>
+
+    <div class="ayuda-section">
+      <h4>🔍 ¿Cómo buscar un proveedor?</h4>
+      <div class="ayuda-step"><div class="ayuda-step-num">1</div><div class="ayuda-step-text">Escribí en el buscador el <strong>nombre, servicio, teléfono o DNI</strong> del proveedor que buscás.</div></div>
+      <div class="ayuda-step"><div class="ayuda-step-num">2</div><div class="ayuda-step-text">Usá los filtros de <strong>Rubros</strong> (plomería, limpieza, comida, etc.) y <strong>Barrio</strong> para acotar los resultados.</div></div>
+      <div class="ayuda-step"><div class="ayuda-step-num">3</div><div class="ayuda-step-text">Hacé clic en una card para ver las <strong>reseñas de otros vecinos</strong> y el teléfono de contacto.</div></div>
+    </div>
+
+    <div class="ayuda-section">
+      <h4>✍️ ¿Cómo recomendar o registrar un proveedor?</h4>
+      <div class="ayuda-step"><div class="ayuda-step-num">1</div><div class="ayuda-step-text">Tocá el botón <strong>Recomendar</strong> en el menú superior o hacé clic en "Recomendar este proveedor" dentro de una card.</div></div>
+      <div class="ayuda-step"><div class="ayuda-step-num">2</div><div class="ayuda-step-text">Completá los datos del proveedor, tu opinión y puntuación. <strong>Tu identidad es confidencial</strong> — solo la ve el administrador.</div></div>
+      <div class="ayuda-step"><div class="ayuda-step-num">3</div><div class="ayuda-step-text">Tu recomendación queda <strong>pendiente de revisión</strong> y aparece en el directorio una vez aprobada por el administrador.</div></div>
+    </div>
+
+    <div class="ayuda-section">
+      <h4>📞 Teléfonos útiles</h4>
+      <div class="ayuda-step"><div class="ayuda-step-num" style="background:var(--naranja)">!</div><div class="ayuda-step-text">Tocá el botón <strong>Útiles</strong> en el menú para ver los contactos de emergencia del barrio: guardia, bomberos, ambulancia y más.</div></div>
+    </div>
+
+    <div class="ayuda-section">
+      <h4>📱 Instalá la app en tu dispositivo</h4>
+      <div class="ayuda-platform">
+        <div class="ayuda-platform-title">🍎 iPhone / iPad (Safari)</div>
+        <div class="ayuda-platform-steps">
+          1. Abrí la página en <strong>Safari</strong><br>
+          2. Tocá el botón de compartir <strong>⎙</strong> (abajo en el centro)<br>
+          3. Deslizá y tocá <strong>"Agregar a pantalla de inicio"</strong><br>
+          4. Confirmá tocando <strong>"Agregar"</strong>
+        </div>
+      </div>
+      <div class="ayuda-platform">
+        <div class="ayuda-platform-title">🤖 Android (Chrome)</div>
+        <div class="ayuda-platform-steps">
+          1. Abrí la página en <strong>Chrome</strong><br>
+          2. Tocá el menú <strong>⋮</strong> (arriba a la derecha)<br>
+          3. Tocá <strong>"Agregar a pantalla de inicio"</strong> o <strong>"Instalar app"</strong><br>
+          4. Confirmá tocando <strong>"Instalar"</strong>
+        </div>
+      </div>
+      <div class="ayuda-platform">
+        <div class="ayuda-platform-title">🖥️ PC / Mac (Chrome o Edge)</div>
+        <div class="ayuda-platform-steps">
+          1. Abrí la página en <strong>Chrome o Edge</strong><br>
+          2. Buscá el ícono de instalación <strong>⊕</strong> en la barra de direcciones (derecha)<br>
+          3. Hacé clic en <strong>"Instalar"</strong><br>
+          4. La app se abre como ventana independiente
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-primary" id="ayuda-ok-btn" style="margin-top:4px">¡Entendido!</button>
+  </div>
+</div>
+
 <!-- ── MODAL TELÉFONOS ÚTILES ── -->
 <div class="modal-overlay" id="modal-telefonos">
   <div class="modal-box" style="max-width:480px">
@@ -432,6 +503,7 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
         <button class="nav-btn active" id="nav-buscar">🔍 <span class="label">Buscar</span></button>
         <button class="nav-btn" id="nav-telefonos">📞 <span class="label">Útiles</span></button>
         <button class="nav-btn" id="nav-recomendar">✍️ <span class="label">Recomendar</span></button>
+        <button class="nav-btn" id="nav-ayuda">ℹ️ <span class="label">Ayuda</span></button>
         <button class="nav-btn" id="nav-admin" style="display:none">🛠️ <span class="label">Admin</span></button>
         <button class="nav-btn" id="nav-mensajes" style="display:none">💬 <span class="label">Mensajes</span></button>
         <div class="avatar-wrap">
@@ -584,7 +656,7 @@ const FB_CONFIG = {
   messagingSenderId: "502507789799",
   appId:             "1:502507789799:web:18c23d38e2d6f657f6f142",
 };
-const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbxyzqCmLo8jHf3Uxp5_9O8iJe4_77p4KLfBDAS1qGPgl1IflnPusj-gX4ifPQdKOrwb9A/exec'; // ← reemplazá con tu URL de Apps Script
+const SCRIPT_URL   = 'AKfycbxyzqCmLo8jHf3Uxp5_9O8iJe4_77p4KLfBDAS1qGPgl1IflnPusj-gX4ifPQdKOrwb9A'; // ← reemplazá con tu URL de Apps Script
 const SCRIPT_PWD   = 'sansebastian2025';
 const ADMIN_PWD    = 'admin2025';
 const ADMIN_EMAILS = ['francisco.iacono@gmail.com'];
@@ -702,7 +774,7 @@ document.getElementById('btn-guardar-perfil').addEventListener('click', async ()
 });
 
 // ── ENTRAR A LA APP ────────────────────────────────────────────────────────
-function entrarALaApp() {
+function entrarALaApp(yaCargoProveedores) {
   hideScreens();
   document.getElementById('app').style.display='block';
   const av=document.getElementById('user-avatar');
@@ -720,7 +792,9 @@ function entrarALaApp() {
   if(perfilUsuario?.nombre){
     document.getElementById('f-vecino').value=`${perfilUsuario.nombre} · Área: ${perfilUsuario.area||'—'} · Lote: ${perfilUsuario.lote||'—'}`;
   }
-  cargarProveedores();
+  // Solo recargar si no vinieron ya en paralelo
+  if(!yaCargoProveedores) cargarProveedores();
+  else renderResults();
   document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') cargarProveedores(); });
 }
 
@@ -741,6 +815,12 @@ document.addEventListener('click', ()=>avatarDrop.classList.remove('open'));
 avatarDrop.addEventListener('click', e=>e.stopPropagation());
 document.getElementById('dd-configuracion').addEventListener('click',()=>{avatarDrop.classList.remove('open'); abrirModalPerfil('datos');});
 document.getElementById('dd-mis-recs').addEventListener('click',()=>{avatarDrop.classList.remove('open'); abrirModalPerfil('misrecs');});
+
+// ── AYUDA ──────────────────────────────────────────────────────────────────
+document.getElementById('nav-ayuda').addEventListener('click', ()=>document.getElementById('modal-ayuda').classList.add('open'));
+document.getElementById('ayuda-close-btn').addEventListener('click', ()=>document.getElementById('modal-ayuda').classList.remove('open'));
+document.getElementById('ayuda-ok-btn').addEventListener('click',    ()=>document.getElementById('modal-ayuda').classList.remove('open'));
+document.getElementById('modal-ayuda').addEventListener('click', e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});
 
 // ── TELÉFONOS ÚTILES ───────────────────────────────────────────────────────
 document.getElementById('nav-telefonos').addEventListener('click', ()=>{
