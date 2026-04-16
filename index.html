@@ -225,6 +225,8 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 .admin-badge.pendiente{background:#fff3cd;color:#856404}
 .admin-badge.aprobado{background:#d4edda;color:#155724}
 .admin-badge.rechazado{background:#fadbd8;color:var(--rojo)}
+.admin-badge.verificado{background:#d4edda;color:#155724}
+.admin-badge.no-verificado{background:#fff3cd;color:#856404}
 
 /* ── MENSAJES ── */
 .msg-admin-card{background:white;border:1.5px solid var(--border);border-radius:14px;margin-bottom:10px;padding:16px 18px}
@@ -662,7 +664,7 @@ const FB_CONFIG = {
   messagingSenderId: "502507789799",
   appId:             "1:502507789799:web:18c23d38e2d6f657f6f142",
 };
-const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbxyzqCmLo8jHf3Uxp5_9O8iJe4_77p4KLfBDAS1qGPgl1IflnPusj-gX4ifPQdKOrwb9A/exec'; // ← reemplazá con tu URL de Apps Script
+const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbzdiSQo1DwkYVdE5rkiJ35CutNKYmClNLJvn9FcRGsbc3iw0Woxo2FvBIPfvRdYqgsisg/exec'; // ← reemplazá con tu URL de Apps Script
 const SCRIPT_PWD   = 'sansebastian2025';
 const ADMIN_PWD    = 'admin2025';
 const ADMIN_EMAILS = ['francisco.iacono@gmail.com'];
@@ -1151,6 +1153,9 @@ function adminCardHTML(r,idx,acc){
           ${r.vecinoArea?` · <span style="color:var(--muted)">Área: ${r.vecinoArea}</span>`:''}
           ${r.vecinoLote?` · <span style="color:var(--muted)">Lote: ${r.vecinoLote}</span>`:''}
           ${r.vecinoTel?` · <a href="tel:${r.vecinoTel.replace(/\s/g,'')}" style="color:var(--verde)">📞 ${r.vecinoTel}</a>`:''}
+          ${r.vecinoVerificado==='Sí'
+            ? `<span class="admin-badge verificado" style="margin-left:6px">✅ Vecino verificado</span>`
+            : `<span class="admin-badge no-verificado" style="margin-left:6px">⚠️ No verificado</span>`}
         </div>`:''}
         ${r.vecino?`<div style="font-size:.74rem;color:var(--muted);margin-top:4px">${r.vecino}</div>`:''}
       </div>`:''}
