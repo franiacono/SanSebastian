@@ -1162,7 +1162,7 @@ function adminCardHTML(r,idx,acc){
           ${r.vecinoArea?` · <span style="color:var(--muted)">Área: ${r.vecinoArea}</span>`:''}
           ${r.vecinoLote?` · <span style="color:var(--muted)">Lote: ${r.vecinoLote}</span>`:''}
           ${r.vecinoTel?` · <a href="tel:${r.vecinoTel.replace(/\s/g,'')}" style="color:var(--verde)">📞 ${r.vecinoTel}</a>`:''}
-          ${r.vecinoVerificado==='Sí'
+          ${r.vecinoVerificado==='Si'
             ? `<span class="admin-badge verificado" style="margin-left:6px">✅ Vecino verificado</span>`
             : `<span class="admin-badge no-verificado" style="margin-left:6px">⚠️ No verificado</span>`}
         </div>`:''}
