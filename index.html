@@ -774,10 +774,19 @@ document.getElementById('btn-guardar-perfil').addEventListener('click', async ()
   if(!nombre||!barrio||!tel||!area||!lote){showErr('prf-error','Completá todos los campos');return;}
   const btn=document.getElementById('btn-guardar-perfil'); btn.disabled=true; btn.textContent='Guardando...';
   try {
-    await apiGet({action:'saveUsuario',uid:currentUser.uid,email:currentUser.email,nombre,barrio,telefono:tel,area,lote});
-    perfilUsuario={nombre,barrio,telefono:tel,area,lote,email:currentUser.email};
+    let verificado = 'No';
+    try {
+      const verif = await apiGet({ action:'verificarVecino', nombre, telefono:tel });
+      console.log('Resultado verificacion:', JSON.stringify(verif));
+      verificado = verif.verificado === true ? 'Sí' : 'No';
+    } catch(ve) {
+      console.error('Error en verificacion:', ve);
+    }
+    console.log('Guardando con verificado:', verificado);
+    await apiGet({action:'saveUsuario',uid:currentUser.uid,email:currentUser.email,nombre,barrio,telefono:tel,area,lote,verificado});
+    perfilUsuario={nombre,barrio,telefono:tel,area,lote,verificado,email:currentUser.email};
     document.getElementById('screen-perfil').style.display='none';
-    entrarALaApp();
+    entrarALaApp(false);
   } catch(e){ showErr('prf-error','Error al guardar.'); btn.disabled=false; btn.textContent='Guardar y continuar'; }
 });
 
