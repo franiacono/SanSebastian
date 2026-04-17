@@ -793,7 +793,7 @@ const FB_CONFIG = {
   messagingSenderId: "502507789799",
   appId:             "1:502507789799:web:18c23d38e2d6f657f6f142",
 };
-const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbyU4l0pE_Ryc4x8wA9gkvKiPWXNlSKT9avaPKzhUB0yOUrmBKZkEtvQpg24GeOkUtMuLA/exec'; // ← reemplazá con tu URL de Apps Script
+const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbwSU0Ol6pOfx0sAhdo-w3LMGz9gQeqGLr91bg2V-pznjpKejo3629MST48m9FfWrhFzcA/exec'; // ← reemplazá con tu URL de Apps Script
 const SCRIPT_PWD   = 'sansebastian2025';
 const ADMIN_PWD    = 'admin2025';
 const ADMIN_EMAILS = ['francisco.iacono@gmail.com'];
@@ -1489,23 +1489,33 @@ async function cargarMensajes(){
     c.parentNode.replaceChild(nuevo,c);
     nuevo.addEventListener('click', e=>{
       const hdr=e.target.closest('[data-toggle="admin"]');
-      if(hdr){ const b=document.getElementById('cbody-'+hdr.dataset.tid); b.style.display=b.style.display==='none'?'block':'none'; return; }
+      if(hdr){
+        const b=document.getElementById('cbody-'+hdr.dataset.tid);
+        const abrir=b.style.display==='none'||b.style.display==='';
+        b.style.display=abrir?'block':'none';
+        if(abrir){
+          // Marcar mensajes del vecino como leídos en background
+          apiGet({action:'marcarLeidoAdmin',threadId:hdr.dataset.tid}).catch(()=>{});
+        }
+        return;
+      }
       const btn=e.target.closest('[data-send-admin]');
-      if(btn){ enviarRespuestaAdmin(btn.dataset.sendAdmin); }
+      if(btn && !btn.disabled){ enviarRespuestaAdmin(btn.dataset.sendAdmin, btn); }
     });
   }catch(e){document.getElementById('mensajes-container').innerHTML='<div class="admin-empty"><div class="icon">❌</div><p>Error al cargar.</p></div>';}
 }
-async function enviarRespuestaAdmin(threadId){
+async function enviarRespuestaAdmin(threadId, btnEl){
   const input=document.querySelector(`[data-reply-admin="${threadId}"]`);
   const texto=input?.value.trim();
   if(!texto){alert('Escribí una respuesta');return;}
+  if(btnEl){ btnEl.disabled=true; btnEl.textContent='Enviando...'; }
   const emailVecino=input.dataset.email;
   const nombreVecino=input.dataset.nombre;
   try{
     const r=await apiGet({action:'replyMensaje',threadId,mensaje:texto,autor:'admin',emailVecino,nombreVecino});
     if(r.ok){input.value='';cargarMensajes();}
-    else alert('Error: '+(r.error||'desconocido'));
-  }catch(e){alert('Error de conexión');}
+    else{ alert('Error: '+(r.error||'desconocido')); if(btnEl){btnEl.disabled=false;btnEl.textContent='Responder';} }
+  }catch(e){ alert('Error de conexión'); if(btnEl){btnEl.disabled=false;btnEl.textContent='Responder';} }
 }
 
 // ── MIS CONSULTAS (vecino) ─────────────────────────────────────────────────
@@ -1571,19 +1581,23 @@ async function cargarMisConsultas(){
         return;
       }
       const btn=e.target.closest('[data-send-vec]');
-      if(btn){ enviarRespuestaVecino(btn.dataset.sendVec); }
+      if(btn && !btn.disabled){ enviarRespuestaVecino(btn.dataset.sendVec, btn); }
     });
   }catch(e){document.getElementById('misconsultas-container').innerHTML='<p style="color:var(--rojo);font-size:.83rem">Error al cargar.</p>';}
 }
-async function enviarRespuestaVecino(threadId){
+async function enviarRespuestaVecino(threadId, btnEl){
   const input=document.querySelector(`[data-reply-vec="${threadId}"]`);
   const texto=input?.value.trim();
   if(!texto)return;
+  if(btnEl){ btnEl.disabled=true; btnEl.textContent='Enviando...'; }
   try{
     const r=await apiGet({action:'replyMensaje',threadId,mensaje:texto,autor:'vecino',uid:currentUser.uid});
-    if(r.ok){input.value='';cargarMisConsultas();}
-    else alert('Error: '+(r.error||'desconocido'));
-  }catch(e){alert('Error de conexión');}
+    if(r.ok){
+      input.value='';
+      // Recargar solo este thread sin cerrar los demás
+      cargarMisConsultas();
+    } else{ alert('Error: '+(r.error||'desconocido')); if(btnEl){btnEl.disabled=false;btnEl.textContent='Responder';} }
+  }catch(e){ alert('Error de conexión'); if(btnEl){btnEl.disabled=false;btnEl.textContent='Responder';} }
 }
 function actualizarBadgeConsultas(n){
   const badge=document.getElementById('notif-badge');
