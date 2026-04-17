@@ -227,6 +227,20 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 .admin-badge.rechazado{background:#fadbd8;color:var(--rojo)}
 .admin-badge.verificado{background:#d4edda;color:#155724}
 .admin-badge.no-verificado{background:#fff3cd;color:#856404}
+.admin-badge.datos-incorrectos{background:#fadbd8;color:var(--rojo)}
+.btn-marcar-datos{padding:6px 14px;background:white;color:var(--rojo);border:1.5px solid var(--rojo);border-radius:8px;font-size:.78rem;font-family:'DM Sans',sans-serif;cursor:pointer;font-weight:500;transition:all .2s;margin-top:6px}
+.btn-marcar-datos:hover{background:var(--rojo);color:white}
+.btn-marcar-datos.marcado{background:#fadbd8;color:var(--rojo);border-color:var(--rojo);cursor:default}
+
+/* ── MODAL AVISO DATOS ── */
+.aviso-datos-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;align-items:center;justify-content:center;padding:20px}
+.aviso-datos-overlay.open{display:flex}
+.aviso-datos-box{background:white;border-radius:16px;padding:32px 28px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.35);text-align:center}
+.aviso-datos-icon{font-size:2.8rem;margin-bottom:12px}
+.aviso-datos-box h3{font-family:'Playfair Display',serif;color:var(--rojo);font-size:1.2rem;margin-bottom:10px}
+.aviso-datos-box p{color:var(--muted);font-size:.88rem;line-height:1.6;margin-bottom:20px}
+.aviso-datos-banner{background:#fff3cd;border:1px solid #f0c040;border-radius:10px;padding:10px 14px;font-size:.83rem;color:#856404;display:none;margin-bottom:14px;text-align:left;cursor:pointer}
+.aviso-datos-banner:hover{background:#ffeaa0}
 
 /* ── MENSAJES ── */
 .msg-admin-card{background:white;border:1.5px solid var(--border);border-radius:14px;margin-bottom:10px;padding:16px 18px}
@@ -366,6 +380,17 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
   </div>
 </div>
 
+<!-- ── MODAL AVISO DATOS INCORRECTOS ── -->
+<div class="aviso-datos-overlay" id="modal-aviso-datos">
+  <div class="aviso-datos-box">
+    <div class="aviso-datos-icon">⚠️</div>
+    <h3>Revisá tus datos</h3>
+    <p>El administrador detectó que algunos de tus datos de perfil podrían ser incorrectos (nombre, área o lote). Por favor actualizalos para poder seguir haciendo recomendaciones.</p>
+    <button class="btn-primary" id="aviso-datos-ir-perfil" style="width:100%;margin-bottom:10px">✏️ Actualizar mis datos</button>
+    <button class="btn-secondary" id="aviso-datos-cerrar" style="width:100%;font-size:.83rem">Cerrar por ahora</button>
+  </div>
+</div>
+
 <!-- ── FAB ── -->
 <button class="fab-contacto" id="fab-contacto" style="display:none">💬 Contactar admin</button>
 
@@ -398,6 +423,7 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
       <button class="perfil-tab" data-panel="misrecs">Mis recomendaciones</button>
     </div>
     <div class="perfil-panel active" id="panel-datos">
+      <div class="aviso-datos-banner" id="cfg-aviso-banner">⚠️ <strong>El administrador indicó que tus datos podrían ser incorrectos.</strong> Por favor revisá tu nombre, área y lote, y guardá los cambios.</div>
       <div class="auth-row"><label>Email (no editable)</label><input class="auth-input" id="cfg-email" readonly></div>
       <div class="auth-row"><label>Nombre y apellido *</label><input class="auth-input" id="cfg-nombre" placeholder="Juan García"></div>
       <div class="auth-row"><label>Barrio *</label>
@@ -664,7 +690,7 @@ const FB_CONFIG = {
   messagingSenderId: "502507789799",
   appId:             "1:502507789799:web:18c23d38e2d6f657f6f142",
 };
-const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbxIMV-cbSArILP_vD1uhWOG6hHY437h1mwKHRSq5yxbA-Zt6VNOHmtWUzyDeHeJO_PW5g/exec'; // ← reemplazá con tu URL de Apps Script
+const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycby2XqfA4AGlftZSW-a9VzyCtkJjvasjBeWn8Wsm-CaW3rniaBjOEzzW_ONrss-Ls4RODQ/exec'; // ← reemplazá con tu URL de Apps Script
 const SCRIPT_PWD   = 'sansebastian2025';
 const ADMIN_PWD    = 'admin2025';
 const ADMIN_EMAILS = ['francisco.iacono@gmail.com'];
@@ -813,7 +839,17 @@ function entrarALaApp(yaCargoProveedores) {
   if(!yaCargoProveedores) cargarProveedores();
   else renderResults();
   document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') cargarProveedores(); });
+  // Mostrar aviso si el admin marcó datos incorrectos
+  if(perfilUsuario?.avisoAdmin === 'Si'){
+    document.getElementById('modal-aviso-datos').classList.add('open');
+    document.getElementById('cfg-aviso-banner').style.display='block';
+  }
 }
+document.getElementById('aviso-datos-cerrar').addEventListener('click', ()=>document.getElementById('modal-aviso-datos').classList.remove('open'));
+document.getElementById('aviso-datos-ir-perfil').addEventListener('click', ()=>{
+  document.getElementById('modal-aviso-datos').classList.remove('open');
+  abrirModalPerfil('datos');
+});
 
 // ── GOOGLE ANALYTICS EVENTOS ──────────────────────────────────────────────
 function gaEvent(name, params){
@@ -1139,6 +1175,7 @@ function renderPendientes(pendientes, aprobados){
   c.innerHTML=html;
   c.querySelectorAll('.btn-aprobar').forEach(btn=>btn.addEventListener('click',()=>accionPendiente(btn.dataset.idx,btn.dataset.fila,'Aprobado')));
   c.querySelectorAll('.btn-rechazar').forEach(btn=>btn.addEventListener('click',()=>accionPendiente(btn.dataset.idx,btn.dataset.fila,'Rechazado')));
+  c.querySelectorAll('.btn-marcar-datos').forEach(btn=>btn.addEventListener('click',()=>marcarDatosIncorrectos(btn)));
 }
 function adminCardHTML(r,idx,acc){
   const bc=r.estado==='Aprobado'?'aprobado':r.estado==='Rechazado'?'rechazado':'pendiente';
@@ -1165,6 +1202,9 @@ function adminCardHTML(r,idx,acc){
           ${r.vecinoVerificado==='Si'
             ? `<span class="admin-badge verificado" style="margin-left:6px">✅ Vecino verificado</span>`
             : `<span class="admin-badge no-verificado" style="margin-left:6px">⚠️ No verificado</span>`}
+          ${r.vecinoUid||r.vecinoEmail?`<button class="btn-marcar-datos ${r.avisoAdmin?'marcado':''}" data-uid="${r.vecinoUid||''}" data-email="${r.vecinoEmail||''}" data-aviso="${r.avisoAdmin||''}">
+            ${r.avisoAdmin?'⚠️ Datos marcados':'🚩 Marcar datos incorrectos'}
+          </button>`:''}
         </div>`:''}
         ${r.vecino?`<div style="font-size:.74rem;color:var(--muted);margin-top:4px">${r.vecino}</div>`:''}
       </div>`:''}
@@ -1183,6 +1223,28 @@ async function accionPendiente(idx,fila,accion){
     if(d.ok){card.style.opacity='.5';card.querySelector('.admin-actions').innerHTML=`<span style="font-size:.85rem;color:${accion==='Aprobado'?'var(--verde-ok)':'var(--rojo)'}">${accion==='Aprobado'?'✅ Aprobado':'❌ Rechazado'}</span>`;}
     else alert('Error: '+(d.error||'desconocido'));
   }catch(e){alert('Error de conexión');}
+}
+
+async function marcarDatosIncorrectos(btn){
+  const uid   = btn.dataset.uid;
+  const email = btn.dataset.email;
+  const yaEstaMarcado = btn.dataset.aviso === 'Si';
+  const nuevoValor    = yaEstaMarcado ? '' : 'Si';
+  const accionLabel   = yaEstaMarcado ? 'quitar el aviso' : 'marcar datos incorrectos';
+  if(!confirm(`¿Querés ${accionLabel} para este usuario?`)) return;
+  btn.disabled=true; btn.textContent='Guardando...';
+  try{
+    const d=await apiGet({action:'setAvisoAdmin',uid,email,avisoAdmin:nuevoValor});
+    if(d.ok){
+      btn.dataset.aviso=nuevoValor;
+      if(nuevoValor){
+        btn.textContent='⚠️ Datos marcados'; btn.classList.add('marcado');
+      } else {
+        btn.textContent='🚩 Marcar datos incorrectos'; btn.classList.remove('marcado');
+      }
+    } else { alert('Error: '+(d.error||'desconocido')); }
+  }catch(e){ alert('Error de conexión'); }
+  btn.disabled=false;
 }
 
 // ── MENSAJES ───────────────────────────────────────────────────────────────
@@ -1257,6 +1319,12 @@ document.getElementById('btn-guardar-cfg').addEventListener('click', async ()=>{
   try{
     await apiGet({action:'saveUsuario',uid:currentUser.uid,email:currentUser.email,nombre,barrio,telefono:tel,area,lote});
     perfilUsuario={...perfilUsuario,nombre,barrio,telefono:tel,area,lote};
+    // Si tenía aviso del admin, limpiarlo automáticamente al guardar datos nuevos
+    if(perfilUsuario?.avisoAdmin === 'Si'){
+      await apiGet({action:'setAvisoAdmin',uid:currentUser.uid,email:currentUser.email,avisoAdmin:''});
+      perfilUsuario.avisoAdmin='';
+      document.getElementById('cfg-aviso-banner').style.display='none';
+    }
     document.getElementById('dd-nombre').textContent=nombre;
     const av=document.getElementById('user-avatar');
     if(!currentUser?.photoURL) av.textContent=nombre[0].toUpperCase();
