@@ -796,7 +796,7 @@ const FB_CONFIG = {
   messagingSenderId: "502507789799",
   appId:             "1:502507789799:web:18c23d38e2d6f657f6f142",
 };
-const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbwSU0Ol6pOfx0sAhdo-w3LMGz9gQeqGLr91bg2V-pznjpKejo3629MST48m9FfWrhFzcA/exec'; // ← reemplazá con tu URL de Apps Script
+const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbzv9FQii3GwKb9T-tNZy5u3RTdfx5fxaemaD_sBK5Q2h3wLkaPdXrGjYhzsP-noW3jdiA/exec'; // ← reemplazá con tu URL de Apps Script
 const SCRIPT_PWD   = 'sansebastian2025';
 const ADMIN_PWD    = 'admin2025';
 const ADMIN_EMAILS = ['francisco.iacono@gmail.com'];
@@ -1425,7 +1425,7 @@ document.getElementById('btn-enviar-nueva-consulta').addEventListener('click', a
   const btn=document.getElementById('btn-enviar-nueva-consulta');btn.disabled=true;btn.textContent='Enviando...';
   try{
     const threadId='thread_'+currentUser.uid+'_'+Date.now();
-    const r=await apiGet({action:'saveMensaje',uid:currentUser.uid,nombre:perfilUsuario?.nombre||currentUser?.email||'',email:currentUser?.email||'',telefono:perfilUsuario?.telefono||'',barrio:perfilUsuario?.barrio||'',mensaje:texto,threadId,autor:'vecino'});
+    const r=await apiGet({action:'saveMensaje',uid:currentUser.uid,nombre:perfilUsuario?.nombre||currentUser?.email||'',email:currentUser?.email||'',telefono:perfilUsuario?.telefono||'',barrio:perfilUsuario?.barrio||'',area:perfilUsuario?.area||'',lote:perfilUsuario?.lote||'',mensaje:texto,threadId,autor:'vecino'});
     if(r.ok){
       msgEl.textContent='✅ Consulta enviada.';msgEl.style.color='var(--verde-ok)';msgEl.style.display='block';
       document.getElementById('nueva-consulta-texto').value='';
@@ -1443,7 +1443,7 @@ document.getElementById('mc-btn').addEventListener('click', async ()=>{
   const btn=document.getElementById('mc-btn');btn.disabled=true;btn.textContent='Enviando...';
   try{
     const threadId = 'thread_' + currentUser.uid + '_' + Date.now();
-    const r=await apiGet({action:'saveMensaje',uid:currentUser.uid,nombre:perfilUsuario?.nombre||currentUser?.email||'',email:currentUser?.email||'',telefono:perfilUsuario?.telefono||'',barrio:perfilUsuario?.barrio||'San Sebastián - Pilar',mensaje,threadId,autor:'vecino'});
+    const r=await apiGet({action:'saveMensaje',uid:currentUser.uid,nombre:perfilUsuario?.nombre||currentUser?.email||'',email:currentUser?.email||'',telefono:perfilUsuario?.telefono||'',barrio:perfilUsuario?.barrio||'San Sebastián - Pilar',area:perfilUsuario?.area||'',lote:perfilUsuario?.lote||'',mensaje,threadId,autor:'vecino'});
     if(r.ok){
       document.getElementById('mc-mensaje').value='';
       document.getElementById('modal-contacto').classList.remove('open');
@@ -1469,7 +1469,7 @@ async function cargarMensajes(){
             <div class="chat-thread-asunto">👤 ${t.nombre||'Sin nombre'} ${t.email?`<span style="font-weight:400;color:var(--muted);font-size:.8rem">&lt;${t.email}&gt;</span>`:''}
               ${sinLeer?`<span class="chat-thread-badge">${sinLeer} nuevo${sinLeer>1?'s':''}</span>`:''}
             </div>
-            <div class="chat-thread-meta">${t.telefono?`📞 ${t.telefono} · `:''}Último: ${fmtFecha(ultimo?.fecha||'')} · ${t.mensajes.length} mensaje${t.mensajes.length!==1?'s':''}</div>
+            <div class="chat-thread-meta">${t.telefono?`📞 ${t.telefono} · `:''}${t.barrio&&t.barrio!=='San Sebastián - Pilar'?`🏘️ ${t.barrio} · `:''}${t.area?`Área: ${t.area} · `:''}${t.lote?`Lote: ${t.lote} · `:''}Último: ${fmtFecha(ultimo?.fecha||'')} · ${t.mensajes.length} mensaje${t.mensajes.length!==1?'s':''}</div>
           </div>
           <span style="color:var(--muted);font-size:.9rem">▾</span>
         </div>
