@@ -441,7 +441,6 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
       <button class="perfil-tab active" data-panel="datos">Mis datos</button>
       <button class="perfil-tab" data-panel="password">Contraseña</button>
       <button class="perfil-tab" data-panel="misrecs">Mis recomendaciones</button>
-      <button class="perfil-tab" data-panel="misconsultas">💬 Mis consultas</button>
       <button class="perfil-tab" data-panel="miservicio">🏪 Mi servicio</button>
     </div>
     <div class="perfil-panel active" id="panel-datos">
@@ -471,18 +470,6 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
     </div>
     <div class="perfil-panel" id="panel-misrecs">
       <div id="misrecs-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
-    </div>
-    <div class="perfil-panel" id="panel-misconsultas">
-      <div id="misconsultas-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
-      <button class="chat-nuevo-btn" id="btn-nueva-consulta" style="margin-top:12px">+ Nueva consulta al administrador</button>
-      <div id="nueva-consulta-box" style="display:none;margin-top:10px">
-        <textarea class="chat-reply-input" id="nueva-consulta-texto" placeholder="Escribí tu consulta..."></textarea>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <button class="btn-submit" id="btn-enviar-nueva-consulta" style="padding:9px 20px;font-size:.85rem">Enviar</button>
-          <button class="btn-secondary" id="btn-cancelar-nueva-consulta" style="padding:9px 16px;font-size:.85rem">Cancelar</button>
-        </div>
-        <span id="nueva-consulta-msg" style="font-size:.82rem;display:none;margin-top:6px;display:block"></span>
-      </div>
     </div>
     <div class="perfil-panel" id="panel-miservicio">
       <p style="font-size:.83rem;color:var(--muted);margin-bottom:16px">Registrá tu servicio o emprendimiento para que los vecinos puedan encontrarte. El admin lo revisará antes de publicarlo.</p>
@@ -628,12 +615,12 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
         <button class="nav-btn active" id="nav-buscar">🔍 <span class="label">Buscar</span></button>
         <button class="nav-btn" id="nav-telefonos">📞 <span class="label">Útiles</span></button>
         <button class="nav-btn" id="nav-recomendar">✍️ <span class="label">Recomendar</span></button>
+        <button class="nav-btn" id="nav-consultas" style="position:relative;display:none">💬 <span class="label">Consultas</span><span id="notif-badge" class="notif-badge" style="display:none">0</span></button>
         <button class="nav-btn" id="nav-ayuda">ℹ️ <span class="label">Ayuda</span></button>
         <button class="nav-btn" id="nav-admin" style="display:none">🛠️ <span class="label">Admin</span></button>
         <button class="nav-btn" id="nav-mensajes" style="display:none">💬 <span class="label">Mensajes</span></button>
         <div class="avatar-wrap" style="position:relative">
           <div class="user-avatar" id="user-avatar">👤</div>
-          <span id="notif-badge" class="notif-badge" style="display:none">0</span>
           <div class="avatar-dropdown" id="avatar-dropdown">
             <div class="avatar-dd-header">
               <div class="avatar-dd-name" id="dd-nombre">—</div>
@@ -746,6 +733,25 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
           <p>Fue recibida y será revisada antes de publicarse.</p>
           <button class="btn-secondary" id="btn-otra-rec">Enviar otra recomendación</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page" id="page-consultas">
+    <div style="max-width:700px;margin:0 auto">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <div><h2 style="font-family:'Playfair Display',serif;color:var(--verde);font-size:1.4rem">💬 Mis consultas</h2>
+        <p style="color:var(--muted);font-size:.85rem">Conversaciones con el administrador</p></div>
+      </div>
+      <div id="misconsultas-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
+      <button class="chat-nuevo-btn" id="btn-nueva-consulta" style="margin-top:12px">+ Nueva consulta al administrador</button>
+      <div id="nueva-consulta-box" style="display:none;margin-top:10px">
+        <textarea class="chat-reply-input" id="nueva-consulta-texto" placeholder="Escribí tu consulta..."></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn-submit" id="btn-enviar-nueva-consulta" style="padding:9px 20px;font-size:.85rem">Enviar</button>
+          <button class="btn-secondary" id="btn-cancelar-nueva-consulta" style="padding:9px 16px;font-size:.85rem">Cancelar</button>
+        </div>
+        <p id="nueva-consulta-msg" style="font-size:.82rem;display:none;margin-top:6px"></p>
       </div>
     </div>
   </div>
@@ -968,6 +974,7 @@ function entrarALaApp(yaCargoProveedores) {
     document.getElementById('nav-mensajes').style.display='inline-flex';
   } else {
     document.getElementById('fab-contacto').style.display='flex';
+    document.getElementById('nav-consultas').style.display='inline-flex';
   }
   document.getElementById('f-email').value=currentUser?.email||'';
   if(perfilUsuario?.nombre){
@@ -1008,7 +1015,7 @@ document.addEventListener('click', ()=>avatarDrop.classList.remove('open'));
 avatarDrop.addEventListener('click', e=>e.stopPropagation());
 document.getElementById('dd-configuracion').addEventListener('click',()=>{avatarDrop.classList.remove('open'); abrirModalPerfil('datos');});
 document.getElementById('dd-mis-recs').addEventListener('click',()=>{avatarDrop.classList.remove('open'); abrirModalPerfil('misrecs');});
-document.getElementById('dd-mis-consultas').addEventListener('click',()=>{avatarDrop.classList.remove('open'); abrirModalPerfil('misconsultas');});
+document.getElementById('dd-mis-consultas').addEventListener('click',()=>{avatarDrop.classList.remove('open'); showPage('consultas');});
 
 // ── AYUDA ──────────────────────────────────────────────────────────────────
 document.getElementById('nav-ayuda').addEventListener('click', ()=>document.getElementById('modal-ayuda').classList.add('open'));
@@ -1058,11 +1065,13 @@ function showPage(pageId){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+pageId).classList.add('active');
   document.getElementById('nav-'+pageId)?.classList.add('active');
-  if(pageId==='admin')    cargarPendientes();
-  if(pageId==='mensajes') cargarMensajes();
+  if(pageId==='admin')     cargarPendientes();
+  if(pageId==='mensajes')  cargarMensajes();
+  if(pageId==='consultas') cargarMisConsultas();
 }
 document.getElementById('nav-buscar').addEventListener('click',    ()=>showPage('buscar'));
 document.getElementById('nav-recomendar').addEventListener('click',()=>showPage('recomendar'));
+document.getElementById('nav-consultas').addEventListener('click', ()=>showPage('consultas'));
 document.getElementById('nav-admin').addEventListener('click',     ()=>showPage('admin'));
 document.getElementById('nav-mensajes').addEventListener('click',  ()=>showPage('mensajes'));
 
@@ -1392,157 +1401,11 @@ async function marcarDatosIncorrectos(btn){
 
 // ── MENSAJES ───────────────────────────────────────────────────────────────
 document.getElementById('btn-actualizar-mensajes').addEventListener('click', cargarMensajes);
-document.getElementById('fab-contacto').addEventListener('click', ()=>document.getElementById('modal-contacto').classList.add('open'));
+document.getElementById('fab-contacto').addEventListener('click', ()=>showPage('consultas'));
 document.getElementById('modal-close-btn').addEventListener('click', ()=>document.getElementById('modal-contacto').classList.remove('open'));
 document.getElementById('modal-contacto').addEventListener('click', e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});
-document.getElementById('mc-btn').addEventListener('click', async ()=>{
-  const mensaje=document.getElementById('mc-mensaje').value.trim();
-  const msgEl=document.getElementById('mc-msg');
-  if(!mensaje){msgEl.textContent='⚠️ Escribí un mensaje';msgEl.style.color='var(--rojo)';msgEl.style.display='block';return;}
-  const btn=document.getElementById('mc-btn');btn.disabled=true;btn.textContent='Enviando...';
-  try{
-    const threadId = 'thread_' + currentUser.uid + '_' + Date.now();
-    const r=await apiGet({action:'saveMensaje',uid:currentUser.uid,nombre:perfilUsuario?.nombre||currentUser?.email||'',email:currentUser?.email||'',telefono:perfilUsuario?.telefono||'',barrio:perfilUsuario?.barrio||'San Sebastián - Pilar',mensaje,threadId,autor:'vecino'});
-    if(r.ok){
-      msgEl.textContent='✅ Mensaje enviado. Seguí la conversación en ⚙️ Configuración → Mis consultas.';
-      msgEl.style.color='var(--verde-ok)';msgEl.style.display='block';
-      document.getElementById('mc-mensaje').value='';btn.textContent='Enviado ✓';
-      setTimeout(()=>document.getElementById('modal-contacto').classList.remove('open'),2500);
-    } else throw new Error(r.error);
-  }catch(e){msgEl.textContent='❌ Error al enviar.';msgEl.style.color='var(--rojo)';msgEl.style.display='block';btn.disabled=false;btn.textContent='Enviar mensaje';}
-});
 
-// ── MENSAJES ADMIN ─────────────────────────────────────────────────────────
-async function cargarMensajes(){
-  const c=document.getElementById('mensajes-container');c.innerHTML='<div class="loading"><div class="spinner"></div>Cargando...</div>';
-  try{
-    const d=await apiGet({action:'getMensajes'});
-    if(d.error){c.innerHTML=`<div class="admin-empty"><div class="icon">⚠️</div><p>${d.error}</p></div>`;return;}
-    const threads=d.threads||[];
-    if(!threads.length){c.innerHTML='<div class="admin-empty"><div class="icon">💬</div><h3>Sin mensajes</h3></div>';return;}
-    c.innerHTML=threads.map(t=>{
-      const sinLeer=t.mensajes.filter(m=>m.autor==='vecino'&&!m.leido).length;
-      const ultimo=t.mensajes[t.mensajes.length-1];
-      return `<div class="chat-thread" id="thread-${t.threadId}">
-        <div class="chat-thread-header" onclick="toggleThread('${t.threadId}')">
-          <div>
-            <div class="chat-thread-asunto">👤 ${t.nombre||'Sin nombre'} ${t.email?`<span style="font-weight:400;color:var(--muted);font-size:.8rem">&lt;${t.email}&gt;</span>`:''}
-              ${sinLeer?`<span class="chat-thread-badge">${sinLeer} nuevo${sinLeer>1?'s':''}</span>`:''}
-            </div>
-            <div class="chat-thread-meta">${t.telefono?`📞 ${t.telefono} · `:''}Último: ${fmtFecha(ultimo?.fecha||'')} · ${t.mensajes.length} mensaje${t.mensajes.length!==1?'s':''}</div>
-          </div>
-          <span style="color:var(--muted);font-size:.9rem">▾</span>
-        </div>
-        <div class="chat-mensajes" id="chat-body-${t.threadId}" style="display:none">
-          ${t.mensajes.map(m=>`<div>
-            <div class="chat-burbuja ${m.autor==='admin'?'admin':'vecino'}">${m.mensaje}
-              <div class="chat-burbuja-meta">${m.autor==='admin'?'Admin':'Vecino'} · ${fmtFecha(m.fecha)}</div>
-            </div>
-          </div>`).join('')}
-          <div class="chat-reply-box">
-            <textarea class="chat-reply-input" id="reply-input-${t.threadId}" placeholder="Escribí tu respuesta..."></textarea>
-            <div style="display:flex;gap:8px;margin-top:8px">
-              <button class="btn-aprobar" onclick="enviarRespuestaAdmin('${t.threadId}','${t.email||''}','${t.nombre||''}')">Responder</button>
-            </div>
-          </div>
-        </div>
-      </div>`;
-    }).join('');
-  }catch(e){c.innerHTML='<div class="admin-empty"><div class="icon">❌</div><p>Error al cargar.</p></div>';}
-}
-function toggleThread(threadId){
-  const body=document.getElementById('chat-body-'+threadId);
-  body.style.display=body.style.display==='none'?'flex':'none';
-  if(body.style.display==='flex') body.style.flexDirection='column';
-}
-async function enviarRespuestaAdmin(threadId,emailVecino,nombreVecino){
-  const input=document.getElementById('reply-input-'+threadId);
-  const texto=input.value.trim();
-  if(!texto){alert('Escribí una respuesta');return;}
-  try{
-    const r=await apiGet({action:'replyMensaje',threadId,mensaje:texto,autor:'admin',emailVecino,nombreVecino});
-    if(r.ok){input.value='';cargarMensajes();}
-    else alert('Error: '+(r.error||'desconocido'));
-  }catch(e){alert('Error de conexión');}
-}
-
-// ── MIS CONSULTAS (vecino) ─────────────────────────────────────────────────
-async function cargarMisConsultas(){
-  const c=document.getElementById('misconsultas-container');
-  c.innerHTML='<div class="loading"><div class="spinner"></div>Cargando...</div>';
-  try{
-    const d=await apiGet({action:'getMisConsultas',uid:currentUser.uid});
-    if(d.error){c.innerHTML=`<p style="color:var(--rojo);font-size:.83rem">${d.error}</p>`;return;}
-    const threads=d.threads||[];
-    if(!threads.length){c.innerHTML='<p style="color:var(--muted);font-size:.83rem;text-align:center;padding:20px 0">Todavía no enviaste ninguna consulta.</p>';
-      actualizarBadgeConsultas(0);return;}
-    let sinLeerTotal=0;
-    c.innerHTML=threads.map(t=>{
-      const sinLeer=t.mensajes.filter(m=>m.autor==='admin'&&!m.leido).length;
-      sinLeerTotal+=sinLeer;
-      const ultimo=t.mensajes[t.mensajes.length-1];
-      return `<div class="chat-thread" id="vec-thread-${t.threadId}">
-        <div class="chat-thread-header" onclick="toggleVecThread('${t.threadId}')">
-          <div>
-            <div class="chat-thread-asunto">Consulta ${fmtFecha(t.mensajes[0]?.fecha||'')}
-              ${sinLeer?`<span class="chat-thread-badge">${sinLeer} respuesta${sinLeer>1?'s':''} nueva${sinLeer>1?'s':''}</span>`:''}
-            </div>
-            <div class="chat-thread-meta">Último: ${fmtFecha(ultimo?.fecha||'')} · ${t.mensajes.length} mensaje${t.mensajes.length!==1?'s':''}</div>
-          </div>
-          <span style="color:var(--muted);font-size:.9rem">▾</span>
-        </div>
-        <div class="chat-mensajes" id="vec-chat-body-${t.threadId}" style="display:none;flex-direction:column">
-          ${t.mensajes.map(m=>`<div>
-            <div class="chat-burbuja ${m.autor==='admin'?'admin':'vecino'}">${m.mensaje}
-              <div class="chat-burbuja-meta">${m.autor==='admin'?'Admin':'Vos'} · ${fmtFecha(m.fecha)}</div>
-            </div>
-          </div>`).join('')}
-          <div class="chat-reply-box">
-            <textarea class="chat-reply-input" id="vec-reply-${t.threadId}" placeholder="Continuá la conversación..."></textarea>
-            <div style="display:flex;gap:8px;margin-top:8px">
-              <button class="btn-aprobar" onclick="enviarRespuestaVecino('${t.threadId}')">Responder</button>
-            </div>
-          </div>
-        </div>
-      </div>`;
-    }).join('');
-    actualizarBadgeConsultas(sinLeerTotal);
-  }catch(e){c.innerHTML='<p style="color:var(--rojo);font-size:.83rem">Error al cargar.</p>';}
-}
-async function toggleVecThread(threadId){
-  const body=document.getElementById('vec-chat-body-'+threadId);
-  const isOpen=body.style.display!=='none'&&body.style.display!=='';
-  body.style.display=isOpen?'none':'flex';
-  if(!isOpen){
-    body.style.flexDirection='column';
-    // Marcar como leídos los del admin
-    await apiGet({action:'marcarLeido',threadId,uid:currentUser.uid}).catch(()=>{});
-    cargarMisConsultas();
-  }
-}
-async function enviarRespuestaVecino(threadId){
-  const input=document.getElementById('vec-reply-'+threadId);
-  const texto=input.value.trim();
-  if(!texto){return;}
-  try{
-    const r=await apiGet({action:'replyMensaje',threadId,mensaje:texto,autor:'vecino',uid:currentUser.uid});
-    if(r.ok){input.value='';cargarMisConsultas();}
-    else alert('Error: '+(r.error||'desconocido'));
-  }catch(e){alert('Error de conexión');}
-}
-function actualizarBadgeConsultas(n){
-  const badge=document.getElementById('notif-badge');
-  const ddBadge=document.getElementById('dd-notif-consultas');
-  if(n>0){
-    badge.textContent=n;badge.style.display='inline';
-    ddBadge.textContent=n;ddBadge.style.display='inline';
-  } else {
-    badge.style.display='none';
-    ddBadge.style.display='none';
-  }
-}
-
-// Nueva consulta desde el panel
+// ── NUEVA CONSULTA ─────────────────────────────────────────────────────────
 document.getElementById('btn-nueva-consulta').addEventListener('click',()=>{
   document.getElementById('nueva-consulta-box').style.display='block';
   document.getElementById('btn-nueva-consulta').style.display='none';
@@ -1570,6 +1433,148 @@ document.getElementById('btn-enviar-nueva-consulta').addEventListener('click', a
   }catch(e){msgEl.textContent='❌ Error al enviar.';msgEl.style.color='var(--rojo)';msgEl.style.display='block';}
   btn.disabled=false;btn.textContent='Enviar';
 });
+document.getElementById('mc-btn').addEventListener('click', async ()=>{
+  const mensaje=document.getElementById('mc-mensaje').value.trim();
+  const msgEl=document.getElementById('mc-msg');
+  if(!mensaje){msgEl.textContent='⚠️ Escribí un mensaje';msgEl.style.color='var(--rojo)';msgEl.style.display='block';return;}
+  const btn=document.getElementById('mc-btn');btn.disabled=true;btn.textContent='Enviando...';
+  try{
+    const threadId = 'thread_' + currentUser.uid + '_' + Date.now();
+    const r=await apiGet({action:'saveMensaje',uid:currentUser.uid,nombre:perfilUsuario?.nombre||currentUser?.email||'',email:currentUser?.email||'',telefono:perfilUsuario?.telefono||'',barrio:perfilUsuario?.barrio||'San Sebastián - Pilar',mensaje,threadId,autor:'vecino'});
+    if(r.ok){
+      document.getElementById('mc-mensaje').value='';
+      document.getElementById('modal-contacto').classList.remove('open');
+      showPage('consultas');
+    } else throw new Error(r.error);
+  }catch(e){msgEl.textContent='❌ Error al enviar.';msgEl.style.color='var(--rojo)';msgEl.style.display='block';btn.disabled=false;btn.textContent='Enviar mensaje';}
+});
+
+// ── MENSAJES ADMIN ─────────────────────────────────────────────────────────
+async function cargarMensajes(){
+  const c=document.getElementById('mensajes-container');c.innerHTML='<div class="loading"><div class="spinner"></div>Cargando...</div>';
+  try{
+    const d=await apiGet({action:'getMensajes'});
+    if(d.error){c.innerHTML=`<div class="admin-empty"><div class="icon">⚠️</div><p>${d.error}</p></div>`;return;}
+    const threads=d.threads||[];
+    if(!threads.length){c.innerHTML='<div class="admin-empty"><div class="icon">💬</div><h3>Sin mensajes</h3></div>';return;}
+    c.innerHTML=threads.map(t=>{
+      const sinLeer=t.mensajes.filter(m=>m.autor==='vecino'&&m.leido==='No').length;
+      const ultimo=t.mensajes[t.mensajes.length-1];
+      return `<div class="chat-thread" data-thread="${t.threadId}">
+        <div class="chat-thread-header" data-toggle="admin" data-tid="${t.threadId}">
+          <div>
+            <div class="chat-thread-asunto">👤 ${t.nombre||'Sin nombre'} ${t.email?`<span style="font-weight:400;color:var(--muted);font-size:.8rem">&lt;${t.email}&gt;</span>`:''}
+              ${sinLeer?`<span class="chat-thread-badge">${sinLeer} nuevo${sinLeer>1?'s':''}</span>`:''}
+            </div>
+            <div class="chat-thread-meta">${t.telefono?`📞 ${t.telefono} · `:''}Último: ${fmtFecha(ultimo?.fecha||'')} · ${t.mensajes.length} mensaje${t.mensajes.length!==1?'s':''}</div>
+          </div>
+          <span style="color:var(--muted);font-size:.9rem">▾</span>
+        </div>
+        <div class="chat-body" id="cbody-${t.threadId}" style="display:none">
+          <div class="chat-mensajes">
+            ${t.mensajes.map(m=>`<div class="chat-burbuja ${m.autor==='admin'?'admin':'vecino'}">${m.mensaje}<div class="chat-burbuja-meta">${m.autor==='admin'?'Admin':'Vecino'} · ${fmtFecha(m.fecha)}</div></div>`).join('')}
+          </div>
+          <div class="chat-reply-box">
+            <textarea class="chat-reply-input" data-reply-admin="${t.threadId}" data-email="${t.email||''}" data-nombre="${t.nombre||''}" placeholder="Escribí tu respuesta..."></textarea>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="btn-aprobar" data-send-admin="${t.threadId}">Responder</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+    // Event delegation
+    c.addEventListener('click', e=>{
+      const hdr=e.target.closest('[data-toggle="admin"]');
+      if(hdr){ const b=document.getElementById('cbody-'+hdr.dataset.tid); b.style.display=b.style.display==='none'?'block':'none'; return; }
+      const btn=e.target.closest('[data-send-admin]');
+      if(btn){ enviarRespuestaAdmin(btn.dataset.sendAdmin); }
+    },{once:false});
+  }catch(e){c.innerHTML='<div class="admin-empty"><div class="icon">❌</div><p>Error al cargar.</p></div>';}
+}
+async function enviarRespuestaAdmin(threadId){
+  const input=document.querySelector(`[data-reply-admin="${threadId}"]`);
+  const texto=input?.value.trim();
+  if(!texto){alert('Escribí una respuesta');return;}
+  const emailVecino=input.dataset.email;
+  const nombreVecino=input.dataset.nombre;
+  try{
+    const r=await apiGet({action:'replyMensaje',threadId,mensaje:texto,autor:'admin',emailVecino,nombreVecino});
+    if(r.ok){input.value='';cargarMensajes();}
+    else alert('Error: '+(r.error||'desconocido'));
+  }catch(e){alert('Error de conexión');}
+}
+
+// ── MIS CONSULTAS (vecino) ─────────────────────────────────────────────────
+async function cargarMisConsultas(){
+  const c=document.getElementById('misconsultas-container');
+  if(!c)return;
+  c.innerHTML='<div class="loading"><div class="spinner"></div>Cargando...</div>';
+  try{
+    const d=await apiGet({action:'getMisConsultas',uid:currentUser.uid});
+    if(d.error){c.innerHTML=`<p style="color:var(--rojo);font-size:.83rem">${d.error}</p>`;return;}
+    const threads=d.threads||[];
+    if(!threads.length){c.innerHTML='<p style="color:var(--muted);font-size:.83rem;text-align:center;padding:20px 0">Todavía no enviaste ninguna consulta.</p>';actualizarBadgeConsultas(0);return;}
+    let sinLeerTotal=0;
+    c.innerHTML=threads.map(t=>{
+      const sinLeer=t.mensajes.filter(m=>m.autor==='admin'&&m.leido==='No').length;
+      sinLeerTotal+=sinLeer;
+      const ultimo=t.mensajes[t.mensajes.length-1];
+      return `<div class="chat-thread" data-vthread="${t.threadId}">
+        <div class="chat-thread-header" data-toggle="vec" data-tid="${t.threadId}">
+          <div>
+            <div class="chat-thread-asunto">Consulta ${fmtFecha(t.mensajes[0]?.fecha||'')}
+              ${sinLeer?`<span class="chat-thread-badge">${sinLeer} respuesta${sinLeer>1?'s':''} nueva${sinLeer>1?'s':''}</span>`:''}
+            </div>
+            <div class="chat-thread-meta">Último: ${fmtFecha(ultimo?.fecha||'')} · ${t.mensajes.length} mensaje${t.mensajes.length!==1?'s':''}</div>
+          </div>
+          <span style="color:var(--muted);font-size:.9rem">▾</span>
+        </div>
+        <div class="chat-body" id="vbody-${t.threadId}" style="display:none">
+          <div class="chat-mensajes">
+            ${t.mensajes.map(m=>`<div class="chat-burbuja ${m.autor==='admin'?'admin':'vecino'}">${m.mensaje}<div class="chat-burbuja-meta">${m.autor==='admin'?'Admin':'Vos'} · ${fmtFecha(m.fecha)}</div></div>`).join('')}
+          </div>
+          <div class="chat-reply-box">
+            <textarea class="chat-reply-input" data-reply-vec="${t.threadId}" placeholder="Continuá la conversación..."></textarea>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="btn-aprobar" data-send-vec="${t.threadId}">Responder</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+    actualizarBadgeConsultas(sinLeerTotal);
+    // Event delegation
+    c.addEventListener('click', async e=>{
+      const hdr=e.target.closest('[data-toggle="vec"]');
+      if(hdr){
+        const b=document.getElementById('vbody-'+hdr.dataset.tid);
+        const abrir=b.style.display==='none';
+        b.style.display=abrir?'block':'none';
+        if(abrir){ await apiGet({action:'marcarLeido',threadId:hdr.dataset.tid,uid:currentUser.uid}).catch(()=>{}); cargarMisConsultas(); }
+        return;
+      }
+      const btn=e.target.closest('[data-send-vec]');
+      if(btn){ enviarRespuestaVecino(btn.dataset.sendVec); }
+    },{once:false});
+  }catch(e){c.innerHTML='<p style="color:var(--rojo);font-size:.83rem">Error al cargar.</p>';}
+}
+async function enviarRespuestaVecino(threadId){
+  const input=document.querySelector(`[data-reply-vec="${threadId}"]`);
+  const texto=input?.value.trim();
+  if(!texto)return;
+  try{
+    const r=await apiGet({action:'replyMensaje',threadId,mensaje:texto,autor:'vecino',uid:currentUser.uid});
+    if(r.ok){input.value='';cargarMisConsultas();}
+    else alert('Error: '+(r.error||'desconocido'));
+  }catch(e){alert('Error de conexión');}
+}
+function actualizarBadgeConsultas(n){
+  const badge=document.getElementById('notif-badge');
+  const ddBadge=document.getElementById('dd-notif-consultas');
+  if(badge){ badge.textContent=n; badge.style.display=n>0?'inline':'none'; }
+  if(ddBadge){ ddBadge.textContent=n; ddBadge.style.display=n>0?'inline':'none'; }
+}
 
 // ── MODAL PERFIL ───────────────────────────────────────────────────────────
 function abrirModalPerfil(panelId){
@@ -1586,14 +1591,13 @@ function abrirModalPerfil(panelId){
   activarPanelPerfil(panelId);
   document.getElementById('modal-perfil').classList.add('open');
   if(panelId==='misrecs') cargarMisRecomendaciones();
-  if(panelId==='misconsultas') cargarMisConsultas();
 }
 function activarPanelPerfil(panelId){
   document.querySelectorAll('.perfil-tab').forEach(t=>t.classList.toggle('active',t.dataset.panel===panelId));
   document.querySelectorAll('.perfil-panel').forEach(p=>p.classList.toggle('active',p.id==='panel-'+panelId));
 }
 document.querySelectorAll('.perfil-tab').forEach(tab=>{
-  tab.addEventListener('click',()=>{activarPanelPerfil(tab.dataset.panel);if(tab.dataset.panel==='misrecs')cargarMisRecomendaciones();if(tab.dataset.panel==='misconsultas')cargarMisConsultas();});
+  tab.addEventListener('click',()=>{activarPanelPerfil(tab.dataset.panel);if(tab.dataset.panel==='misrecs')cargarMisRecomendaciones();});
 });
 
 // ── RADIO DEL BARRIO EN PANEL MI SERVICIO ─────────────────────────────────
