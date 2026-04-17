@@ -1483,14 +1483,17 @@ async function cargarMensajes(){
         </div>
       </div>`;
     }).join('');
-    // Event delegation
-    c.addEventListener('click', e=>{
+    // Reemplazar contenedor para eliminar listeners acumulados
+    const nuevo=c.cloneNode(false);
+    nuevo.innerHTML=c.innerHTML;
+    c.parentNode.replaceChild(nuevo,c);
+    nuevo.addEventListener('click', e=>{
       const hdr=e.target.closest('[data-toggle="admin"]');
       if(hdr){ const b=document.getElementById('cbody-'+hdr.dataset.tid); b.style.display=b.style.display==='none'?'block':'none'; return; }
       const btn=e.target.closest('[data-send-admin]');
       if(btn){ enviarRespuestaAdmin(btn.dataset.sendAdmin); }
-    },{once:false});
-  }catch(e){c.innerHTML='<div class="admin-empty"><div class="icon">❌</div><p>Error al cargar.</p></div>';}
+    });
+  }catch(e){document.getElementById('mensajes-container').innerHTML='<div class="admin-empty"><div class="icon">❌</div><p>Error al cargar.</p></div>';}
 }
 async function enviarRespuestaAdmin(threadId){
   const input=document.querySelector(`[data-reply-admin="${threadId}"]`);
@@ -1544,20 +1547,33 @@ async function cargarMisConsultas(){
       </div>`;
     }).join('');
     actualizarBadgeConsultas(sinLeerTotal);
-    // Event delegation
-    c.addEventListener('click', async e=>{
+    // Reemplazar contenedor para eliminar listeners acumulados
+    const nuevo=c.cloneNode(false);
+    nuevo.innerHTML=c.innerHTML;
+    c.parentNode.replaceChild(nuevo,c);
+    nuevo.addEventListener('click', async e=>{
       const hdr=e.target.closest('[data-toggle="vec"]');
       if(hdr){
         const b=document.getElementById('vbody-'+hdr.dataset.tid);
-        const abrir=b.style.display==='none';
+        const abrir=b.style.display==='none'||b.style.display==='';
         b.style.display=abrir?'block':'none';
-        if(abrir){ await apiGet({action:'marcarLeido',threadId:hdr.dataset.tid,uid:currentUser.uid}).catch(()=>{}); cargarMisConsultas(); }
+        if(abrir){
+          // Marcar leído en background sin recargar toda la lista
+          apiGet({action:'marcarLeido',threadId:hdr.dataset.tid,uid:currentUser.uid}).then(()=>{
+            // Solo actualizar badge sin recargar
+            const badge=document.getElementById('notif-badge');
+            const ddBadge=document.getElementById('dd-notif-consultas');
+            const n=parseInt(badge?.textContent||'0')-1;
+            if(badge) badge.style.display=n>0?'inline':'none';
+            if(ddBadge) ddBadge.style.display=n>0?'inline':'none';
+          }).catch(()=>{});
+        }
         return;
       }
       const btn=e.target.closest('[data-send-vec]');
       if(btn){ enviarRespuestaVecino(btn.dataset.sendVec); }
-    },{once:false});
-  }catch(e){c.innerHTML='<p style="color:var(--rojo);font-size:.83rem">Error al cargar.</p>';}
+    });
+  }catch(e){document.getElementById('misconsultas-container').innerHTML='<p style="color:var(--rojo);font-size:.83rem">Error al cargar.</p>';}
 }
 async function enviarRespuestaVecino(threadId){
   const input=document.querySelector(`[data-reply-vec="${threadId}"]`);
