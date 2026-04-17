@@ -258,10 +258,13 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 .chat-thread-meta{font-size:.75rem;color:var(--muted)}
 .chat-thread-badge{background:var(--naranja);color:white;border-radius:20px;padding:2px 8px;font-size:.7rem;font-weight:700}
 .chat-mensajes{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
-.chat-burbuja{max-width:85%;padding:10px 14px;border-radius:12px;font-size:.85rem;line-height:1.55}
+.chat-burbuja{max-width:78%;padding:10px 14px;border-radius:12px;font-size:.85rem;line-height:1.55}
 .chat-burbuja.vecino{background:#f0f7ec;border:1px solid rgba(74,124,47,.2);align-self:flex-end;border-bottom-right-radius:4px}
 .chat-burbuja.admin{background:#e8f4fd;border:1px solid #b3d9f5;align-self:flex-start;border-bottom-left-radius:4px}
+.chat-burbuja.enviado{background:#dcf8c6;border:1px solid rgba(74,124,47,.25);align-self:flex-end;border-bottom-right-radius:4px}
+.chat-burbuja.recibido{background:white;border:1px solid var(--border);align-self:flex-start;border-bottom-left-radius:4px}
 .chat-burbuja-meta{font-size:.72rem;color:var(--muted);margin-top:4px;text-align:right}
+.chat-burbuja.recibido .chat-burbuja-meta{text-align:left}
 .chat-burbuja.admin .chat-burbuja-meta{text-align:left}
 .chat-reply-box{padding:12px 16px;border-top:1px solid var(--crema2);background:var(--crema)}
 .chat-reply-input{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:.85rem;font-family:'DM Sans',sans-serif;resize:vertical;min-height:70px;background:white}
@@ -1472,7 +1475,7 @@ async function cargarMensajes(){
         </div>
         <div class="chat-body" id="cbody-${t.threadId}" style="display:none">
           <div class="chat-mensajes">
-            ${t.mensajes.map(m=>`<div class="chat-burbuja ${m.autor==='admin'?'admin':'vecino'}">${m.mensaje}<div class="chat-burbuja-meta">${m.autor==='admin'?'Admin':'Vecino'} · ${fmtFecha(m.fecha)}</div></div>`).join('')}
+            ${t.mensajes.map(m=>`<div class="chat-burbuja ${m.autor==='admin'?'enviado':'recibido'}">${m.mensaje}<div class="chat-burbuja-meta">${m.autor==='admin'?'Vos':'Vecino'} · ${fmtFecha(m.fecha)}</div></div>`).join('')}
           </div>
           <div class="chat-reply-box">
             <textarea class="chat-reply-input" data-reply-admin="${t.threadId}" data-email="${t.email||''}" data-nombre="${t.nombre||''}" placeholder="Escribí tu respuesta..."></textarea>
@@ -1545,7 +1548,7 @@ async function cargarMisConsultas(){
         </div>
         <div class="chat-body" id="vbody-${t.threadId}" style="display:none">
           <div class="chat-mensajes">
-            ${t.mensajes.map(m=>`<div class="chat-burbuja ${m.autor==='admin'?'admin':'vecino'}">${m.mensaje}<div class="chat-burbuja-meta">${m.autor==='admin'?'Admin':'Vos'} · ${fmtFecha(m.fecha)}</div></div>`).join('')}
+            ${t.mensajes.map(m=>`<div class="chat-burbuja ${m.autor==='vecino'?'enviado':'recibido'}">${m.mensaje}<div class="chat-burbuja-meta">${m.autor==='vecino'?'Vos':'Admin'} · ${fmtFecha(m.fecha)}</div></div>`).join('')}
           </div>
           <div class="chat-reply-box">
             <textarea class="chat-reply-input" data-reply-vec="${t.threadId}" placeholder="Continuá la conversación..."></textarea>
