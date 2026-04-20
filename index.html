@@ -822,7 +822,7 @@ const FB_CONFIG = {
   messagingSenderId: "502507789799",
   appId:             "1:502507789799:web:18c23d38e2d6f657f6f142",
 };
-const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbxy4WJ9LWkvUMkHPXS-K8sSxZPjD7NjqO_oWaZlwCt7lZIIfgoHVF0zI51U57YnMPVzlw/exec/exec/exec'; // ← reemplazá con tu URL de Apps Script
+const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbz82M47FV5MSJwCEes-FgG5h6eJyg6uZ1HvW8JDS7GvG_dtsJJpjEaR65Sn_oP_aPhDqQ/exec'; // ← reemplazá con tu URL de Apps Script
 const SCRIPT_PWD   = 'sansebastian2025';
 const ADMIN_PWD    = 'admin2025';
 const ADMIN_EMAILS = ['francisco.iacono@gmail.com'];
@@ -1004,7 +1004,7 @@ document.getElementById('btn-guardar-perfil').addEventListener('click', async ()
     try {
       let verificado = 'No';
       try {
-        const verif = await apiGet({ action:'verificarVecino', nombre, telefono:tel });
+        const verif = await apiGet({ action:'verificarVecino', nombre, telefono:tel, area, lote });
         verificado = verif.verificado === true ? 'Si' : 'No';
       } catch(ve) { console.error('Error en verificacion:', ve); }
       await apiGet({action:'saveUsuario',uid:currentUser.uid,email:currentUser.email,nombre,barrio,telefono:tel,area,lote,verificado,tipoUsuario:'vecino'});
@@ -1813,7 +1813,7 @@ document.getElementById('btn-registrar-servicio').addEventListener('click', asyn
     let verificadoBarrio = 'No';
     if(delBarrio==='Sí'){
       try{
-        const verif = await apiGet({action:'verificarVecino', nombre:perfilUsuario?.nombre||nombre, telefono:perfilUsuario?.telefono||telefono});
+        const verif = await apiGet({action:'verificarVecino', nombre:perfilUsuario?.nombre||nombre, telefono:perfilUsuario?.telefono||telefono, area, lote});
         verificadoBarrio = verif.verificado === true ? 'Sí' : 'No';
       }catch(ve){ console.error('Error verificacion barrio:', ve); }
     }
