@@ -812,6 +812,8 @@ import { getAuth, GoogleAuthProvider, signInWithPopup,
          createUserWithEmailAndPassword, signInWithEmailAndPassword,
          onAuthStateChanged, signOut, updatePassword, sendPasswordResetEmail }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getMessaging, getToken, onMessage }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js';
 
 // ── CONFIG ─────────────────────────────────────────────────────────────────
 const FB_CONFIG = {
@@ -822,7 +824,7 @@ const FB_CONFIG = {
   messagingSenderId: "502507789799",
   appId:             "1:502507789799:web:18c23d38e2d6f657f6f142",
 };
-const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbwlZ385pBWJPK1T4FJqXPHHjHLEdoytRJUjUfg6pqqdqwPgsmmWRJ4hMpD_GRW0Fn2jag/exec';
+const SCRIPT_URL   = 'https://https://script.google.com/macros/s/AKfycbwZzAH3nY0ZVRIx99-RLJEAhxoAuzNkwZPFL0b3n20SESC5BuYKw3w8aOVcwu-KvMDdfg/exec';
 const SCRIPT_PWD   = 'sansebastian2025';
 const ADMIN_PWD    = 'admin2025';
 const ADMIN_EMAILS = ['francisco.iacono@gmail.com', 'adminproveedoressansebastian@gmail.com'];
@@ -830,6 +832,42 @@ const ADMIN_EMAILS = ['francisco.iacono@gmail.com', 'adminproveedoressansebastia
 // ── FIREBASE ───────────────────────────────────────────────────────────────
 const fbApp = initializeApp(FB_CONFIG);
 const auth  = getAuth(fbApp);
+let messaging = null;
+try { messaging = getMessaging(fbApp); } catch(e) { console.log('Messaging no disponible:', e); }
+
+const VAPID_KEY = 'BGjJSrPaiqpz3GMqJto5_U9HqBxeZ8RXKvsgj3cE8YX5uPMbafNK6gL1l7wDTTV_Xvid578kRXiR5QG9t4l8Jnc';
+
+// Registrar service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').then(reg => {
+    console.log('SW registrado:', reg.scope);
+  }).catch(err => console.log('SW error:', err));
+}
+
+async function pedirPermisoNotificaciones(uid) {
+  if (!messaging || !uid) return;
+  try {
+    const permiso = await Notification.requestPermission();
+    if (permiso !== 'granted') return;
+    const swReg = await navigator.serviceWorker.ready;
+    const token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: swReg });
+    if (token) {
+      await apiGet({ action: 'saveFcmToken', uid, token });
+      console.log('FCM token guardado');
+    }
+  } catch(e) { console.log('Error FCM:', e); }
+}
+
+// Notificaciones cuando la app está en primer plano
+if (messaging) {
+  onMessage(messaging, payload => {
+    const title = payload.notification?.title || 'San Sebastián Proveedores';
+    const body  = payload.notification?.body  || '';
+    if (Notification.permission === 'granted') {
+      new Notification(title, { body, icon: '/icon-192.png' });
+    }
+  });
+}
 
 
 const gprov = new GoogleAuthProvider();
@@ -1041,6 +1079,8 @@ function entrarALaApp(yaCargoProveedores) {
   document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') cargarProveedores(); });
   // Cargar badge de consultas sin leer
   if(!isAdmin()) setTimeout(()=>cargarMisConsultas(), 1500);
+  // Pedir permiso para notificaciones (con delay para no interrumpir el login)
+  setTimeout(()=>pedirPermisoNotificaciones(currentUser?.uid), 3000);
   // Mostrar aviso si el admin marcó datos incorrectos
   if(perfilUsuario?.avisoAdmin === 'Si'){
     document.getElementById('modal-aviso-datos').classList.add('open');
