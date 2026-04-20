@@ -831,11 +831,7 @@ const ADMIN_EMAILS = ['francisco.iacono@gmail.com'];
 const fbApp = initializeApp(FB_CONFIG);
 const auth  = getAuth(fbApp);
 
-// Poblar selects de área
-['prf-area','cfg-area'].forEach(id=>{
-  const el=document.getElementById(id);
-  if(el) el.innerHTML=areasOptsHtml;
-});
+
 const gprov = new GoogleAuthProvider();
 
 // ── ESTADO ─────────────────────────────────────────────────────────────────
@@ -861,6 +857,12 @@ const AREAS = [
   {num:'13', nombre:'Nuestra Señora del Carmen'},
 ];
 const areasOptsHtml = '<option value="">— Seleccioná tu área —</option>' + AREAS.map(a=>`<option value="${a.num}">${a.num} - ${a.nombre}</option>`).join('');
+
+// Poblar selects de área
+['prf-area','cfg-area'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el) el.innerHTML=areasOptsHtml;
+});
 
 const CATS = [
   {label:'🍕 Comida & Delivery',kw:['comid','delivery','empanada','pizza','panad','sushi','helad','restau','catering','alfajor','torta','dulce','miel']},
