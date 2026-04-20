@@ -822,7 +822,7 @@ const FB_CONFIG = {
   messagingSenderId: "502507789799",
   appId:             "1:502507789799:web:18c23d38e2d6f657f6f142",
 };
-const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbyiITDB7iLPX2TzJgIAahU-4llFD7vnL5Xy2ZDqut_5DMoCSdeataznmTnmvnjP4pXi9g/exec'; // ← reemplazá con tu URL de Apps Script
+const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbyn9eMqOT31oo5FgZ5p9XqtQM06-OxUlqXtL15ct6cAGSyoZCZkj_mDjRDL2xJhXg4pMQ/exec/exec'; // ← reemplazá con tu URL de Apps Script
 const SCRIPT_PWD   = 'sansebastian2025';
 const ADMIN_PWD    = 'admin2025';
 const ADMIN_EMAILS = ['francisco.iacono@gmail.com'];
@@ -1534,9 +1534,8 @@ document.getElementById('btn-admin-enviar-nuevo').addEventListener('click', asyn
       telefono:'', barrio:'', area:'', lote:'',
       mensaje:texto, threadId, autor:'admin'});
     if(r.ok){
-      // Enviar email de notificación al vecino
-      await apiGet({action:'replyMensaje', threadId, mensaje:texto,
-        autor:'admin', emailVecino:adminMsgDestino.email, nombreVecino:adminMsgDestino.nombre}).catch(()=>{});
+      // Solo notificar por email sin guardar otro mensaje
+      await apiGet({action:'notificarVecino', emailVecino:adminMsgDestino.email, nombreVecino:adminMsgDestino.nombre, threadId}).catch(()=>{});
       status.textContent='✅ Mensaje enviado.'; status.style.color='var(--verde-ok)'; status.style.display='block';
       document.getElementById('admin-nuevo-msg-texto').value='';
       adminMsgDestino=null;
