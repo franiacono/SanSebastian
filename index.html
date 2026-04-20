@@ -44,7 +44,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--crema);color:var(--text);
 .legal-footer a{color:var(--muted);text-decoration:underline;text-decoration-style:dotted}
 
 /* ── AUTH ── */
-.auth-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--verde);background-image:radial-gradient(ellipse at 20% 50%,rgba(74,124,47,.4) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(45,80,22,.6) 0%,transparent 50%)}
+.auth-screen{position:fixed;inset:0;z-index:600;display:flex;align-items:center;justify-content:center;background:var(--verde);background-image:radial-gradient(ellipse at 20% 50%,rgba(74,124,47,.4) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(45,80,22,.6) 0%,transparent 50%);overflow-y:auto}
 .auth-card{background:var(--crema);border-radius:16px;padding:40px;width:100%;max-width:420px;box-shadow:0 24px 60px rgba(0,0,0,.3)}
 .auth-logo{width:60px;height:60px;background:var(--verde);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:26px}
 .auth-card h1{font-family:'Playfair Display',serif;font-size:1.7rem;color:var(--verde);text-align:center;margin-bottom:4px}
@@ -457,7 +457,9 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
         </select>
       </div>
       <div class="auth-row"><label>Teléfono *</label><input class="auth-input" type="tel" id="cfg-tel" placeholder="11 2345-6789"></div>
-      <div class="auth-row"><label>Área *</label><input class="auth-input" type="text" id="cfg-area" placeholder="Ej: Sector A, Los Robles..."></div>
+      <div class="auth-row"><label>Área *</label>
+        <select class="auth-select" id="cfg-area"><option value="">— Seleccioná tu área —</option></select>
+      </div>
       <div class="auth-row"><label>Lote *</label><input class="auth-input" type="text" id="cfg-lote" placeholder="Ej: 42"></div>
       <button class="btn-primary" id="btn-guardar-cfg" style="margin-top:8px">Guardar cambios</button>
       <p class="auth-error" id="cfg-error"></p>
@@ -570,7 +572,9 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
           <option value="San Sebastián - Pilar">San Sebastián - Pilar</option>
         </select>
       </div>
-      <div class="auth-row"><label>Área *</label><input class="auth-input" type="text" id="prf-area" placeholder="Ej: 14"></div>
+      <div class="auth-row"><label>Área *</label>
+        <select class="auth-select" id="prf-area"><option value="">— Seleccioná tu área —</option></select>
+      </div>
       <div class="auth-row"><label>Lote *</label><input class="auth-input" type="text" id="prf-lote" placeholder="Ej: 42"></div>
     </div>
 
@@ -773,7 +777,28 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
     <div style="max-width:900px;margin:0 auto">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
         <div><h2 style="font-family:'Playfair Display',serif;color:var(--verde);font-size:1.4rem">💬 Mensajes de vecinos</h2></div>
-        <button class="nav-btn" id="btn-actualizar-mensajes" style="background:var(--verde);border-color:var(--verde)">↺ Actualizar</button>
+        <div style="display:flex;gap:8px">
+          <button class="nav-btn" id="btn-nuevo-msg-admin" style="background:var(--verde);border-color:var(--verde)">✉️ Nuevo mensaje</button>
+          <button class="nav-btn" id="btn-actualizar-mensajes" style="background:var(--verde);border-color:var(--verde)">↺ Actualizar</button>
+        </div>
+      </div>
+      <!-- Buscador de usuarios para mensaje nuevo -->
+      <div id="nuevo-msg-admin-box" style="display:none;background:white;border:1.5px solid var(--border);border-radius:14px;padding:18px;margin-bottom:16px">
+        <h4 style="font-size:.95rem;color:var(--verde);margin-bottom:12px">✉️ Nuevo mensaje a un usuario</h4>
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <input type="text" id="admin-buscar-usuario" placeholder="Buscar por nombre o email..." class="form-input" style="flex:1">
+          <button class="btn-aprobar" id="btn-admin-buscar">Buscar</button>
+        </div>
+        <div id="admin-resultados-usuario" style="margin-bottom:12px"></div>
+        <div id="admin-nuevo-thread-form" style="display:none">
+          <div style="background:var(--crema);border-radius:8px;padding:10px 12px;font-size:.83rem;color:var(--muted);margin-bottom:10px" id="admin-dest-label"></div>
+          <textarea class="chat-reply-input" id="admin-nuevo-msg-texto" placeholder="Escribí tu mensaje..."></textarea>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn-aprobar" id="btn-admin-enviar-nuevo">Enviar</button>
+            <button class="btn-rechazar" id="btn-admin-cancelar-nuevo">Cancelar</button>
+          </div>
+          <p id="admin-nuevo-msg-status" style="font-size:.82rem;display:none;margin-top:6px"></p>
+        </div>
       </div>
       <div id="mensajes-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
     </div>
@@ -796,7 +821,7 @@ const FB_CONFIG = {
   messagingSenderId: "502507789799",
   appId:             "1:502507789799:web:18c23d38e2d6f657f6f142",
 };
-const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbzv9FQii3GwKb9T-tNZy5u3RTdfx5fxaemaD_sBK5Q2h3wLkaPdXrGjYhzsP-noW3jdiA/exec'; // ← reemplazá con tu URL de Apps Script
+const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbyiITDB7iLPX2TzJgIAahU-4llFD7vnL5Xy2ZDqut_5DMoCSdeataznmTnmvnjP4pXi9g/exec'; // ← reemplazá con tu URL de Apps Script
 const SCRIPT_PWD   = 'sansebastian2025';
 const ADMIN_PWD    = 'admin2025';
 const ADMIN_EMAILS = ['francisco.iacono@gmail.com'];
@@ -804,6 +829,12 @@ const ADMIN_EMAILS = ['francisco.iacono@gmail.com'];
 // ── FIREBASE ───────────────────────────────────────────────────────────────
 const fbApp = initializeApp(FB_CONFIG);
 const auth  = getAuth(fbApp);
+
+// Poblar selects de área
+['prf-area','cfg-area'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el) el.innerHTML=areasOptsHtml;
+});
 const gprov = new GoogleAuthProvider();
 
 // ── ESTADO ─────────────────────────────────────────────────────────────────
@@ -813,6 +844,23 @@ let activeFilter  = 'todos';
 let openCard      = null;
 
 // ── CATEGORÍAS — declaradas antes de cualquier uso ─────────────────────────
+const AREAS = [
+  {num:'1', nombre:'Nuestra Señora del Pilar'},
+  {num:'2', nombre:'Nuestra Señora del Rosario'},
+  {num:'3', nombre:'Nuestra Señora de las Mercedes'},
+  {num:'4', nombre:'Nuestra Señora de los Dolores'},
+  {num:'5', nombre:'Nuestra Señora de Itatí'},
+  {num:'6', nombre:'Nuestra Señora de Loreto'},
+  {num:'7', nombre:'Nuestra Señora de Luján'},
+  {num:'8', nombre:'Nuestra Señora de Torreciudad'},
+  {num:'9', nombre:'Nuestra Señora de la Paz'},
+  {num:'10', nombre:'Nuestra Señora de Fátima'},
+  {num:'11', nombre:'Nuestra Señora de Lourdes'},
+  {num:'12', nombre:'Nuestra Señora de la Asunción'},
+  {num:'13', nombre:'Nuestra Señora del Carmen'},
+];
+const areasOptsHtml = '<option value="">— Seleccioná tu área —</option>' + AREAS.map(a=>`<option value="${a.num}">${a.num} - ${a.nombre}</option>`).join('');
+
 const CATS = [
   {label:'🍕 Comida & Delivery',kw:['comid','delivery','empanada','pizza','panad','sushi','helad','restau','catering','alfajor','torta','dulce','miel']},
   {label:'🧹 Limpieza',kw:['limp','cleaning']},
@@ -1233,7 +1281,6 @@ function cardHTML(p,isDest){
     </div>
     <div class="card-contacto">
       ${telOk?`<a class="contacto-item tel" href="tel:${p.telefono.replace(/\s/g,'')}">📞 ${p.telefono}</a>`:''}
-      ${dniOk?`<span class="contacto-item">🪪 ${p.dni}</span>`:''}
       ${empOk?`<span class="contacto-item">🏢 ${p.empresa}</span>`:''}
       ${p.barrio==='Si'?`<span class="contacto-item" style="color:var(--verde);border-color:rgba(74,124,47,.4);background:rgba(74,124,47,.06)">🏘️ Del barrio</span>`:p.barrio==='No'?`<span class="contacto-item">🔄 Externo</span>`:''}
     </div>
@@ -1329,7 +1376,12 @@ function renderPendientes(pendientes, aprobados){
   c.innerHTML=html;
   c.querySelectorAll('.btn-aprobar').forEach(btn=>btn.addEventListener('click',()=>accionPendiente(btn.dataset.idx,btn.dataset.fila,'Aprobado')));
   c.querySelectorAll('.btn-rechazar').forEach(btn=>btn.addEventListener('click',()=>accionPendiente(btn.dataset.idx,btn.dataset.fila,'Rechazado')));
-  c.querySelectorAll('.btn-marcar-datos').forEach(btn=>btn.addEventListener('click',()=>marcarDatosIncorrectos(btn)));
+  c.querySelectorAll('.btn-marcar-datos').forEach(btn=>{
+    if(btn.dataset.uid||btn.dataset.email) btn.addEventListener('click',()=>marcarDatosIncorrectos(btn));
+  });
+  c.querySelectorAll('[data-msg-uid],[data-msg-email]').forEach(btn=>btn.addEventListener('click',()=>{
+    abrirNuevoMsgAdmin(btn.dataset.msgUid||'', btn.dataset.msgEmail||'', btn.dataset.msgNombre||'');
+  }));
 }
 function adminCardHTML(r,idx,acc){
   const bc=r.estado==='Aprobado'?'aprobado':r.estado==='Rechazado'?'rechazado':'pendiente';
@@ -1359,6 +1411,9 @@ function adminCardHTML(r,idx,acc){
             : `<span class="admin-badge no-verificado" style="margin-left:6px">⚠️ No verificado</span>`}
           ${r.vecinoUid||r.vecinoEmail?`<button class="btn-marcar-datos ${r.avisoAdmin?'marcado':''}" data-uid="${r.vecinoUid||''}" data-email="${r.vecinoEmail||''}" data-aviso="${r.avisoAdmin||''}">
             ${r.avisoAdmin?'⚠️ Datos marcados':'🚩 Marcar datos incorrectos'}
+          </button>
+          <button class="btn-marcar-datos" style="color:var(--verde);border-color:var(--verde);margin-left:4px" data-msg-uid="${r.vecinoUid||''}" data-msg-email="${r.vecinoEmail||''}" data-msg-nombre="${r.vecinoNombre||''}">
+            💬 Enviar mensaje
           </button>`:''}
         </div>`:''}
         ${r.vecino?`<div style="font-size:.74rem;color:var(--muted);margin-top:4px">${r.vecino}</div>`:''}
@@ -1404,6 +1459,95 @@ async function marcarDatosIncorrectos(btn){
 
 // ── MENSAJES ───────────────────────────────────────────────────────────────
 document.getElementById('btn-actualizar-mensajes').addEventListener('click', cargarMensajes);
+document.getElementById('btn-nuevo-msg-admin').addEventListener('click',()=>{
+  const box=document.getElementById('nuevo-msg-admin-box');
+  box.style.display=box.style.display==='none'?'block':'none';
+  if(box.style.display==='block') document.getElementById('admin-buscar-usuario').focus();
+});
+document.getElementById('btn-admin-buscar').addEventListener('click', buscarUsuarioAdmin);
+document.getElementById('admin-buscar-usuario').addEventListener('keydown', e=>{ if(e.key==='Enter') buscarUsuarioAdmin(); });
+document.getElementById('btn-admin-cancelar-nuevo').addEventListener('click',()=>{
+  document.getElementById('admin-nuevo-thread-form').style.display='none';
+  document.getElementById('admin-resultados-usuario').innerHTML='';
+  document.getElementById('admin-buscar-usuario').value='';
+  document.getElementById('admin-nuevo-msg-texto').value='';
+});
+
+let adminMsgDestino = null;
+
+async function buscarUsuarioAdmin(){
+  const q = document.getElementById('admin-buscar-usuario').value.trim().toLowerCase();
+  const res = document.getElementById('admin-resultados-usuario');
+  if(!q){ res.innerHTML='<p style="font-size:.82rem;color:var(--muted)">Ingresá un nombre o email.</p>'; return; }
+  res.innerHTML='<p style="font-size:.82rem;color:var(--muted)">Buscando...</p>';
+  try{
+    const d = await apiGet({action:'getUsuarios', q});
+    if(!d.usuarios||!d.usuarios.length){ res.innerHTML='<p style="font-size:.82rem;color:var(--muted)">No se encontraron usuarios.</p>'; return; }
+    res.innerHTML = d.usuarios.map(u=>`
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--crema);border-radius:8px;margin-bottom:6px;font-size:.83rem">
+        <div>
+          <strong>${u.nombre||'Sin nombre'}</strong>
+          <span style="color:var(--muted);margin-left:6px">${u.email||''}</span>
+          ${u.area?`<span style="color:var(--muted);margin-left:6px">Área ${u.area}</span>`:''}
+        </div>
+        <button class="btn-aprobar" style="font-size:.75rem;padding:5px 12px"
+          data-uid="${u.uid}" data-email="${u.email}" data-nombre="${u.nombre}"
+          id="sel-user-btn">Seleccionar</button>
+      </div>`).join('');
+    res.querySelectorAll('[id="sel-user-btn"]').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        adminMsgDestino = {uid:btn.dataset.uid, email:btn.dataset.email, nombre:btn.dataset.nombre};
+        document.getElementById('admin-dest-label').textContent=`Para: ${adminMsgDestino.nombre} <${adminMsgDestino.email}>`;
+        document.getElementById('admin-nuevo-thread-form').style.display='block';
+        document.getElementById('admin-nuevo-msg-texto').focus();
+      });
+    });
+  }catch(e){ res.innerHTML='<p style="font-size:.82rem;color:var(--rojo)">Error al buscar.</p>'; }
+}
+
+function abrirNuevoMsgAdmin(uid, email, nombre){
+  showPage('mensajes');
+  document.getElementById('nuevo-msg-admin-box').style.display='block';
+  adminMsgDestino = {uid, email, nombre};
+  document.getElementById('admin-dest-label').textContent=`Para: ${nombre||email} <${email}>`;
+  document.getElementById('admin-nuevo-thread-form').style.display='block';
+  document.getElementById('admin-buscar-usuario').value=nombre||email;
+  document.getElementById('admin-nuevo-msg-texto').focus();
+}
+
+document.getElementById('btn-admin-enviar-nuevo').addEventListener('click', async()=>{
+  if(!adminMsgDestino){ alert('Seleccioná un usuario primero.'); return; }
+  const texto = document.getElementById('admin-nuevo-msg-texto').value.trim();
+  const status = document.getElementById('admin-nuevo-msg-status');
+  if(!texto){ status.textContent='⚠️ Escribí un mensaje.'; status.style.color='var(--rojo)'; status.style.display='block'; return; }
+  const btn = document.getElementById('btn-admin-enviar-nuevo');
+  btn.disabled=true; btn.textContent='Enviando...';
+  try{
+    const threadId = 'thread_'+adminMsgDestino.uid+'_'+Date.now();
+    // Primero crear el thread con el primer mensaje del admin
+    const r = await apiGet({action:'saveMensaje', uid:adminMsgDestino.uid,
+      nombre:adminMsgDestino.nombre, email:adminMsgDestino.email,
+      telefono:'', barrio:'', area:'', lote:'',
+      mensaje:texto, threadId, autor:'admin'});
+    if(r.ok){
+      // Enviar email de notificación al vecino
+      await apiGet({action:'replyMensaje', threadId, mensaje:texto,
+        autor:'admin', emailVecino:adminMsgDestino.email, nombreVecino:adminMsgDestino.nombre}).catch(()=>{});
+      status.textContent='✅ Mensaje enviado.'; status.style.color='var(--verde-ok)'; status.style.display='block';
+      document.getElementById('admin-nuevo-msg-texto').value='';
+      adminMsgDestino=null;
+      setTimeout(()=>{
+        document.getElementById('nuevo-msg-admin-box').style.display='none';
+        document.getElementById('admin-nuevo-thread-form').style.display='none';
+        document.getElementById('admin-resultados-usuario').innerHTML='';
+        document.getElementById('admin-buscar-usuario').value='';
+        status.style.display='none';
+        cargarMensajes();
+      }, 1500);
+    } else throw new Error(r.error);
+  }catch(e){ status.textContent='❌ Error al enviar.'; status.style.color='var(--rojo)'; status.style.display='block'; }
+  btn.disabled=false; btn.textContent='Enviar';
+});
 document.getElementById('fab-contacto').addEventListener('click', ()=>showPage('consultas'));
 document.getElementById('modal-close-btn').addEventListener('click', ()=>document.getElementById('modal-contacto').classList.remove('open'));
 document.getElementById('modal-contacto').addEventListener('click', e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});
