@@ -1284,7 +1284,7 @@ function cardHTML(p,isDest){
       <div class="card-right"><div class="badge ${bc}">${el}</div><br>${st?`<div class="score-stars">${st}</div>`:''}<div class="reviews-count">${sc.total>0?sc.total+' reseña'+(sc.total!==1?'s':''):sc.total===0&&p.autoregistrado==='Si'?'Sin reseñas aún':''}</div></div>
     </div>
     <div class="card-contacto">
-      ${telOk?`<a class="contacto-item tel" href="tel:${p.telefono.replace(/\s/g,'')}">📞 ${p.telefono}</a>`:''}
+      ${telOk?`<a class="contacto-item tel" href="https://wa.me/${p.telefono.replace(/\D/g,'').replace(/^0/,'54').replace(/^(?!54)/,'54')}?text=${encodeURIComponent('Hola! Te contacto porque vi tu servicio de '+p.servicio+' en el directorio de proveedores de San Sebastián (sansebastian.vercel.app). ')}">💬 ${p.telefono}</a>`:''}
       ${empOk?`<span class="contacto-item">🏢 ${p.empresa}</span>`:''}
       ${p.barrio==='Si'?`<span class="contacto-item" style="color:var(--verde);border-color:rgba(74,124,47,.4);background:rgba(74,124,47,.06)">🏘️ Del barrio</span>`:p.barrio==='No'?`<span class="contacto-item">🔄 Externo</span>`:''}
     </div>
@@ -1525,31 +1525,37 @@ document.getElementById('btn-admin-enviar-nuevo').addEventListener('click', asyn
   const status = document.getElementById('admin-nuevo-msg-status');
   if(!texto){ status.textContent='⚠️ Escribí un mensaje.'; status.style.color='var(--rojo)'; status.style.display='block'; return; }
   const btn = document.getElementById('btn-admin-enviar-nuevo');
+  if(btn.disabled) return; // evitar doble click
   btn.disabled=true; btn.textContent='Enviando...';
+  const destino = {...adminMsgDestino}; // capturar antes de limpiar
+  adminMsgDestino=null; // limpiar inmediatamente para evitar reenvío
   try{
-    const threadId = 'thread_'+adminMsgDestino.uid+'_'+Date.now();
-    // Primero crear el thread con el primer mensaje del admin
-    const r = await apiGet({action:'saveMensaje', uid:adminMsgDestino.uid,
-      nombre:adminMsgDestino.nombre, email:adminMsgDestino.email,
+    const threadId = 'thread_'+destino.uid+'_'+Date.now();
+    const r = await apiGet({action:'saveMensaje', uid:destino.uid,
+      nombre:destino.nombre, email:destino.email,
       telefono:'', barrio:'', area:'', lote:'',
       mensaje:texto, threadId, autor:'admin'});
     if(r.ok){
-      // Solo notificar por email sin guardar otro mensaje
-      await apiGet({action:'notificarVecino', emailVecino:adminMsgDestino.email, nombreVecino:adminMsgDestino.nombre, threadId}).catch(()=>{});
+      await apiGet({action:'notificarVecino', emailVecino:destino.email, nombreVecino:destino.nombre, threadId}).catch(()=>{});
       status.textContent='✅ Mensaje enviado.'; status.style.color='var(--verde-ok)'; status.style.display='block';
       document.getElementById('admin-nuevo-msg-texto').value='';
-      adminMsgDestino=null;
       setTimeout(()=>{
         document.getElementById('nuevo-msg-admin-box').style.display='none';
         document.getElementById('admin-nuevo-thread-form').style.display='none';
         document.getElementById('admin-resultados-usuario').innerHTML='';
         document.getElementById('admin-buscar-usuario').value='';
         status.style.display='none';
+        btn.disabled=false; btn.textContent='Enviar';
         cargarMensajes();
       }, 1500);
-    } else throw new Error(r.error);
-  }catch(e){ status.textContent='❌ Error al enviar.'; status.style.color='var(--rojo)'; status.style.display='block'; }
-  btn.disabled=false; btn.textContent='Enviar';
+    } else {
+      adminMsgDestino=destino; // restaurar si falló
+      throw new Error(r.error);
+    }
+  }catch(e){
+    status.textContent='❌ Error al enviar.'; status.style.color='var(--rojo)'; status.style.display='block';
+    btn.disabled=false; btn.textContent='Enviar';
+  }
 });
 document.getElementById('fab-contacto').addEventListener('click', ()=>showPage('consultas'));
 document.getElementById('modal-close-btn').addEventListener('click', ()=>document.getElementById('modal-contacto').classList.remove('open'));
