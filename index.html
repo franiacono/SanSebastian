@@ -44,7 +44,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--crema);color:var(--text);
 .legal-footer a{color:var(--muted);text-decoration:underline;text-decoration-style:dotted}
 
 /* ── AUTH ── */
-.auth-screen{position:fixed;inset:0;z-index:600;display:flex;align-items:center;justify-content:center;background:var(--verde);background-image:radial-gradient(ellipse at 20% 50%,rgba(74,124,47,.4) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(45,80,22,.6) 0%,transparent 50%);overflow-y:auto}
+.auth-screen{position:fixed;inset:0;z-index:600;display:none;align-items:center;justify-content:center;background:var(--verde);background-image:radial-gradient(ellipse at 20% 50%,rgba(74,124,47,.4) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(45,80,22,.6) 0%,transparent 50%);overflow-y:auto}
+.auth-screen.visible{display:flex}
 .auth-card{background:var(--crema);border-radius:16px;padding:40px;width:100%;max-width:420px;box-shadow:0 24px 60px rgba(0,0,0,.3)}
 .auth-logo{width:60px;height:60px;background:var(--verde);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:26px}
 .auth-card h1{font-family:'Playfair Display',serif;font-size:1.7rem;color:var(--verde);text-align:center;margin-bottom:4px}
@@ -502,7 +503,7 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 </div>
 
 <!-- ── LOGIN ── -->
-<div id="screen-login" class="auth-screen">
+<div id="screen-login" class="auth-screen visible">
   <div class="auth-card">
     <div class="auth-logo">🏡</div>
     <h1>San Sebastián</h1>
@@ -522,7 +523,7 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 </div>
 
 <!-- ── REGISTRO ── -->
-<div id="screen-register" class="auth-screen" style="display:none">
+<div id="screen-register" class="auth-screen">
   <div class="auth-card">
     <div class="auth-logo">🏡</div>
     <h1>Crear cuenta</h1>
@@ -541,7 +542,7 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 </div>
 
 <!-- ── COMPLETAR PERFIL ── -->
-<div id="screen-perfil" class="auth-screen" style="display:none">
+<div id="screen-perfil" class="auth-screen">
   <div class="auth-card" style="max-width:460px">
     <div class="auth-logo">👤</div>
     <h1>Completá tu perfil</h1>
@@ -600,7 +601,7 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 </div>
 
 <!-- ── RESET CONTRASEÑA ── -->
-<div id="screen-reset" class="auth-screen" style="display:none">
+<div id="screen-reset" class="auth-screen">
   <div class="auth-card">
     <div class="auth-logo">🔑</div>
     <h1>Recuperar contraseña</h1>
@@ -887,14 +888,15 @@ const isAdmin = () => ADMIN_EMAILS.includes((currentUser?.email||'').toLowerCase
 const apiGet = p => { const pwd=isAdmin()?ADMIN_PWD:SCRIPT_PWD; return fetch(SCRIPT_URL+'?'+new URLSearchParams({...p,password:pwd})).then(r=>r.json()); };
 const errMsg = code => ({'auth/email-already-in-use':'Este email ya está registrado.','auth/invalid-email':'Email inválido.','auth/wrong-password':'Contraseña incorrecta.','auth/user-not-found':'No existe cuenta con ese email.','auth/weak-password':'Mínimo 6 caracteres.','auth/popup-closed-by-user':'Cerraste el popup.','auth/network-request-failed':'Error de red.','auth/invalid-credential':'Email o contraseña incorrectos.'})[code]||'Error al autenticar.';
 const showErr = (id,msg) => { const e=document.getElementById(id); e.textContent=msg; e.style.display='block'; };
-const hideScreens = () => ['screen-login','screen-register','screen-perfil','screen-reset'].forEach(id=>{ document.getElementById(id).style.display='none'; });
+const showScreen = id => { hideScreens(); document.getElementById(id).classList.add('visible'); };
+const hideScreens = () => ['screen-login','screen-register','screen-perfil','screen-reset'].forEach(id=>{ document.getElementById(id).classList.remove('visible'); });
 
 // ── AUTH STATE ─────────────────────────────────────────────────────────────
 onAuthStateChanged(auth, async user => {
   if (!user) {
     document.getElementById('app').style.display='none';
     hideScreens();
-    document.getElementById('screen-login').style.display='flex';
+    showScreen('screen-login');
     return;
   }
   currentUser = user;
@@ -909,7 +911,7 @@ onAuthStateChanged(auth, async user => {
       document.getElementById('app').style.display='none';
       document.getElementById('prf-email').value = user.email||'';
       if (user.displayName) document.getElementById('prf-nombre').value = user.displayName;
-      document.getElementById('screen-perfil').style.display='flex';
+      showScreen('screen-perfil');
     }
   } catch(e) { entrarALaApp(); }
 });
@@ -929,10 +931,10 @@ document.getElementById('btn-email-reg').addEventListener('click', async () => {
   if(pass.length<6){showErr('reg-error','Mínimo 6 caracteres');return;}
   try{await createUserWithEmailAndPassword(auth,email,pass);}catch(e){showErr('reg-error',errMsg(e.code));}
 });
-document.getElementById('ir-registro').addEventListener('click', ()=>{hideScreens();document.getElementById('screen-register').style.display='flex';});
-document.getElementById('ir-login').addEventListener('click',    ()=>{hideScreens();document.getElementById('screen-login').style.display='flex';});
-document.getElementById('ir-reset').addEventListener('click',    ()=>{hideScreens();document.getElementById('screen-reset').style.display='flex';});
-document.getElementById('volver-login').addEventListener('click',()=>{hideScreens();document.getElementById('screen-login').style.display='flex';});
+document.getElementById('ir-registro').addEventListener('click', ()=>showScreen('screen-register'));
+document.getElementById('ir-login').addEventListener('click',    ()=>showScreen('screen-login'));
+document.getElementById('ir-reset').addEventListener('click',    ()=>showScreen('screen-reset'));
+document.getElementById('volver-login').addEventListener('click',()=>showScreen('screen-login'));
 document.getElementById('btn-enviar-reset').addEventListener('click', async () => {
   const email=document.getElementById('reset-email').value.trim();
   const errEl=document.getElementById('reset-error'), okEl=document.getElementById('reset-ok-msg');
@@ -987,7 +989,7 @@ document.getElementById('btn-guardar-perfil').addEventListener('click', async ()
         autoregistrado:'Si'
       });
       perfilUsuario={nombre,barrio:'Proveedor',telefono:tel,area:'',lote:'',verificado:'No',tipoUsuario:'proveedor',email:currentUser.email};
-      document.getElementById('screen-perfil').style.display='none';
+      hideScreens();
       entrarALaApp(false);
     } catch(e){ showErr('prf-error','Error al guardar.'); btn.disabled=false; btn.textContent='Guardar y continuar'; }
 
@@ -1005,7 +1007,7 @@ document.getElementById('btn-guardar-perfil').addEventListener('click', async ()
       } catch(ve) { console.error('Error en verificacion:', ve); }
       await apiGet({action:'saveUsuario',uid:currentUser.uid,email:currentUser.email,nombre,barrio,telefono:tel,area,lote,verificado,tipoUsuario:'vecino'});
       perfilUsuario={nombre,barrio,telefono:tel,area,lote,verificado,tipoUsuario:'vecino',email:currentUser.email};
-      document.getElementById('screen-perfil').style.display='none';
+      hideScreens();
       entrarALaApp(false);
     } catch(e){ showErr('prf-error','Error al guardar.'); btn.disabled=false; btn.textContent='Guardar y continuar'; }
   }
