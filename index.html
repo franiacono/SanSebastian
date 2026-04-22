@@ -161,6 +161,8 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
 .card-footer-actions{padding:8px 16px 12px;border-top:1px solid var(--crema2)}
 .btn-recomendar-card{background:transparent;border:1.5px solid var(--verde2);color:var(--verde);border-radius:8px;padding:6px 14px;font-size:.78rem;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s}
 .btn-recomendar-card:hover{background:var(--verde);color:white}
+.btn-compartir-card{background:transparent;border:1.5px solid var(--border);color:var(--muted);border-radius:8px;padding:6px 14px;font-size:.78rem;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;margin-left:6px}
+.btn-compartir-card:hover{background:var(--crema2);color:var(--text)}
 
 /* ── LOADING/EMPTY ── */
 .empty-state{text-align:center;padding:50px 20px;color:var(--muted)}
@@ -1302,6 +1304,30 @@ function renderResults(){
   cont.querySelectorAll('.btn-recomendar-card').forEach(btn=>{
     btn.addEventListener('click', e=>{e.stopPropagation();recomendarDesdeCard(btn.dataset.p);});
   });
+  cont.querySelectorAll('.btn-compartir-card').forEach(btn=>{
+    btn.addEventListener('click', async e=>{
+      e.stopPropagation();
+      const nombre   = btn.dataset.nombre;
+      const servicio = btn.dataset.servicio;
+      const url      = 'https://sansebastian.vercel.app';
+      const texto    = `${nombre} — ${servicio}\nEncontralo en el directorio de proveedores de San Sebastián: ${url}`;
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: nombre, text: texto, url });
+        } catch(e) { /* usuario canceló */ }
+      } else {
+        // Fallback: copiar al portapapeles
+        try {
+          await navigator.clipboard.writeText(texto);
+          const orig = btn.textContent;
+          btn.textContent = '✅ Copiado!';
+          setTimeout(()=>btn.textContent=orig, 2000);
+        } catch(e) {
+          btn.textContent = url;
+        }
+      }
+    });
+  });
 }
 
 function cardHTML(p,isDest){
@@ -1329,7 +1355,10 @@ function cardHTML(p,isDest){
       ${p.barrio==='Si'?`<span class="contacto-item" style="color:var(--verde);border-color:rgba(74,124,47,.4);background:rgba(74,124,47,.06)">🏘️ Del barrio</span>`:p.barrio==='No'?`<span class="contacto-item">🔄 Externo</span>`:''}
     </div>
     ${toggle}
-    <div class="card-footer-actions"><button class="btn-recomendar-card" data-p='${pData.replace(/'/g,"&apos;")}'>✍️ Recomendar este proveedor</button></div>
+    <div class="card-footer-actions">
+      <button class="btn-recomendar-card" data-p='${pData.replace(/'/g,"&apos;")}'>✍️ Recomendar este proveedor</button>
+      <button class="btn-compartir-card" data-nombre="${p.nombre}" data-servicio="${p.servicio}">🔗 Compartir</button>
+    </div>
   </div>`;
 }
 
