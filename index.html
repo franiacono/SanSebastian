@@ -1319,7 +1319,7 @@ function renderResults(){
       const servicio = btn.dataset.servicio;
       const tel      = btn.dataset.tel;
       const url      = 'https://sansebastian.vercel.app/?tel=' + encodeURIComponent(tel);
-      const texto    = `${nombre} — ${servicio}\nDirectorio de proveedores San Sebastián`;
+      const texto    = `👀 Mirá lo que encontré en el directorio de proveedores de San Sebastián: ${nombre} (${servicio})`;
       if (navigator.share) {
         try {
           await navigator.share({ title: nombre, text: texto, url });
