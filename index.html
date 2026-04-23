@@ -1210,26 +1210,16 @@ let proveedores = [];
 async function cargarProveedores(){
   try{
     const data=await apiGet({action:'getProveedores'});
-    if(!data.error){procesarDatos(data.proveedores||[]);renderResults();navegarAHash();}
+    if(!data.error){procesarDatos(data.proveedores||[]);renderResults();navegarAParams();}
   }catch(e){console.error('Error cargando proveedores',e);}
 }
 
-function navegarAHash(){
-  const hash = window.location.hash.replace('#','').trim();
-  if(!hash) return;
-  // Buscar la card que coincida con el slug
-  setTimeout(()=>{
-    const cards = document.querySelectorAll('.proveedor-card');
-    for(const card of cards){
-      const nombre = card.querySelector('.card-nombre')?.textContent||'';
-      if(slugify(nombre) === hash){
-        card.scrollIntoView({behavior:'smooth', block:'center'});
-        card.style.boxShadow='0 0 0 3px var(--verde)';
-        setTimeout(()=>card.style.boxShadow='', 2500);
-        break;
-      }
-    }
-  }, 300);
+function navegarAParams(){
+  const params = new URLSearchParams(window.location.search);
+  const tel = params.get('tel');
+  if(!tel) return;
+  const input = document.getElementById('search-input');
+  if(input){ input.value = tel; renderResults(); }
 }
 
 function procesarDatos(filas){
@@ -1327,8 +1317,8 @@ function renderResults(){
       e.stopPropagation();
       const nombre   = btn.dataset.nombre;
       const servicio = btn.dataset.servicio;
-      const slug     = btn.dataset.slug;
-      const url      = 'https://sansebastian.vercel.app/#' + slug;
+      const tel      = btn.dataset.tel;
+      const url      = 'https://sansebastian.vercel.app/?tel=' + encodeURIComponent(tel);
       const texto    = `${nombre} — ${servicio}\nDirectorio de proveedores San Sebastián`;
       if (navigator.share) {
         try {
@@ -1364,7 +1354,7 @@ function cardHTML(p,isDest){
       <div class="card-avatar">${em}</div>
       <div class="card-info">${isDest?'<div class="destacado-badge">⭐ Destacado</div>':''}<div class="card-nombre">${p.nombre}</div><div class="card-sub">${empOk?p.empresa:p.servicio}</div><span class="card-servicio-tag">${p.servicio}</span>${autoregistradoBadge}</div>
       <div class="card-right">
-        <button class="btn-compartir-card" data-nombre="${p.nombre}" data-servicio="${p.servicio}" data-slug="${slugify(p.nombre)}" title="Compartir">🔗</button>
+        <button class="btn-compartir-card" data-nombre="${p.nombre}" data-servicio="${p.servicio}" data-tel="${p.telefono||''}" title="Compartir">🔗</button>
         <div class="badge ${bc}">${el}</div>
         ${st?`<div class="score-stars">${st}</div>`:''}
         <div class="reviews-count">${sc.total>0?sc.total+' reseña'+(sc.total!==1?'s':''):sc.total===0&&p.autoregistrado==='Si'?'Sin reseñas aún':''}</div>
