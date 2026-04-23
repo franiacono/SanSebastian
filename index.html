@@ -672,8 +672,8 @@ a.contacto-item.tel:hover{background:rgba(74,124,47,.14)}
         <span class="rubros-arrow">▾</span>
       </div>
       <select class="sort-select" id="sort-select">
-        <option value="destacados">⭐ Destacados primero</option>
-        <option value="puntuacion">★ Mayor puntuación</option>
+        <option value="recomendados">👍 Más recomendados</option>
+        <option value="nuevos">🆕 Más nuevos</option>
         <option value="alfabetico">🔤 Alfabético</option>
       </select>
     </div>
@@ -1224,10 +1224,10 @@ function navegarAParams(){
 
 function procesarDatos(filas){
   const mapa={};
-  filas.forEach(f=>{
+  filas.forEach((f, idx)=>{
     if(norm(f.recomendacion)==='utiles') return;
     const key=genKey(f);
-    if(!mapa[key]) mapa[key]={nombre:f.nombre,empresa:f.empresa,dni:f.dni,telefono:f.telefono,servicio:f.servicio,barrio:'',destacado:false,resenas:[]};
+    if(!mapa[key]) mapa[key]={nombre:f.nombre,empresa:f.empresa,dni:f.dni,telefono:f.telefono,servicio:f.servicio,barrio:'',destacado:false,resenas:[],idxOriginal:idx};
     if(!mapa[key].barrio && f.barrio && f.barrio.trim()!=='') mapa[key].barrio=normBarrio(f.barrio);
     if(norm(f.recomendacion)==='publicidad') mapa[key].destacado=true;
     else if(f.recomendacion) mapa[key].resenas.push({recomendacion:f.recomendacion,notas:f.notas});
@@ -1290,9 +1290,21 @@ function renderResults(){
     });
   }
   const ord={Destacado:5,'Muy Recomendable':4,Recomendable:3,'Malas Experiencias':2,'No Recomendable':1,'Sin datos':0};
-  if(srt==='alfabetico')fil.sort((a,b)=>a.destacado!==b.destacado?(a.destacado?-1:1):a.nombre.localeCompare(b.nombre,'es'));
-  else if(srt==='puntuacion')fil.sort((a,b)=>a.destacado!==b.destacado?(a.destacado?-1:1):b.score.estrellas-a.score.estrellas||a.nombre.localeCompare(b.nombre,'es'));
-  else fil.sort((a,b)=>a.destacado!==b.destacado?(a.destacado?-1:1):(ord[b.score.etiqueta]||0)-(ord[a.score.etiqueta]||0)||b.score.estrellas-a.score.estrellas);
+  // Destacados SIEMPRE primero, luego según criterio seleccionado
+  if(srt==='alfabetico')
+    fil.sort((a,b)=>a.destacado!==b.destacado?(a.destacado?-1:1):a.nombre.localeCompare(b.nombre,'es'));
+  else if(srt==='nuevos')
+    fil.sort((a,b)=>a.destacado!==b.destacado?(a.destacado?-1:1):b.idxOriginal-a.idxOriginal);
+  else
+    // Por defecto: más recomendados = mayor puntuación + mayor cantidad de reseñas positivas
+    fil.sort((a,b)=>{
+      if(a.destacado!==b.destacado) return a.destacado?-1:1;
+      const etDif=(ord[b.score.etiqueta]||0)-(ord[a.score.etiqueta]||0);
+      if(etDif!==0) return etDif;
+      const posDif=b.score.total-a.score.total;
+      if(posDif!==0) return posDif;
+      return a.nombre.localeCompare(b.nombre,'es');
+    });
   document.getElementById('stats-bar').textContent=`${fil.length} proveedor${fil.length!==1?'es':''} encontrado${fil.length!==1?'s':''}`;
   if(!fil.length){cont.innerHTML=`<div class="empty-state"><div class="icon">🔍</div><h3>Sin resultados</h3><p>Probá con otras palabras</p></div>`;return;}
   const dest=fil.filter(p=>p.destacado),reg=fil.filter(p=>!p.destacado);
