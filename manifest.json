@@ -1,29 +1,26 @@
 {
-  "name": "Proveedores San Sebastián",
-  "short_name": "SS Proveedores",
-  "description": "Directorio de proveedores del barrio cerrado San Sebastián, Pilar",
+  "name": "EntreVecinos",
+  "short_name": "EntreVecinos",
+  "description": "Proveedores de confianza recomendados por vecinos de barrios privados",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#2d5016",
-  "theme_color": "#2d5016",
+  "background_color": "#1a3a5c",
+  "theme_color": "#1a3a5c",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='38' fill='%231a3a5c'/%3E%3Ctext x='96' y='130' font-family='Georgia,serif' font-size='96' font-weight='700' fill='%23e8f0fe' text-anchor='middle'%3EEV%3C/text%3E%3C/svg%3E",
       "sizes": "192x192",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-512.png",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%231a3a5c'/%3E%3Ctext x='256' y='350' font-family='Georgia,serif' font-size='260' font-weight='700' fill='%23e8f0fe' text-anchor='middle'%3EEV%3C/text%3E%3C/svg%3E",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
-    },
-    {
-      "src": "/apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png"
     }
-  ]
+  ],
+  "categories": ["utilities", "lifestyle"],
+  "lang": "es-AR"
 }

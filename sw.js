@@ -2,24 +2,23 @@ importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js
 importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js');
 
 firebase.initializeApp({
-  apiKey:            "AIzaSyD6mlr7bcFRIR8QMg875jFVgAvaNhIipYA",
-  authDomain:        "sansebastian-proveedores.firebaseapp.com",
-  projectId:         "sansebastian-proveedores",
-  storageBucket:     "sansebastian-proveedores.firebasestorage.app",
-  messagingSenderId: "502507789799",
-  appId:             "1:502507789799:web:18c23d38e2d6f657f6f142",
+  apiKey:            "AIzaSyAG4Od0phx8CHOIrdt2PgFeWJ5khq1G8SU",
+  authDomain:        "entrevecinos-app.firebaseapp.com",
+  projectId:         "entrevecinos-app",
+  storageBucket:     "entrevecinos-app.firebasestorage.app",
+  messagingSenderId: "925885581421",
+  appId:             "1:925885581421:web:d7c7af6f8a5dbf92bf9764",
 });
 
 const messaging = firebase.messaging();
 
-// Manejar notificaciones cuando la app está en background
+// Notificaciones cuando la app está en background
 messaging.onBackgroundMessage(function(payload) {
-  const title = payload.notification?.title || 'San Sebastián Proveedores';
+  const title = payload.notification?.title || 'EntreVecinos';
   const body  = payload.notification?.body  || 'Tenés una notificación nueva.';
-  const icon  = '/icon-192.png';
   self.registration.showNotification(title, {
     body,
-    icon,
+    icon: '/icon-192.png',
     badge: '/icon-192.png',
     data: payload.data || {},
   });
@@ -30,10 +29,8 @@ self.addEventListener('notificationclick', function(event) {
   event.notification.close();
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
-      if (clientList.length > 0) {
-        return clientList[0].focus();
-      }
-      return clients.openWindow('https://sansebastian.vercel.app');
+      if (clientList.length > 0) return clientList[0].focus();
+      return clients.openWindow('https://entrevecinos.vercel.app');
     })
   );
 });
