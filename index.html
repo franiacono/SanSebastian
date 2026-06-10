@@ -845,7 +845,6 @@ function poblarSelectSectores(selectId, barrioNombre, incluirVacio=true) {
 // Poblar selects iniciales
 poblarSelectBarrios('prf-barrio');
 poblarSelectBarrios('cfg-barrio');
-poblarSelectBarrios('sv-barrio');
 poblarSelectBarrios('barrio-filter-select', false);
 document.getElementById('barrio-filter-select').insertAdjacentHTML('afterbegin','<option value="">Todos los barrios</option>');
 
@@ -880,7 +879,6 @@ poblarCheckboxBarrios('f-barrios-servicio');
 // Eventos cambio barrio en perfil
 document.getElementById('prf-barrio').addEventListener('change', e => poblarSelectSectores('prf-area', e.target.value));
 document.getElementById('cfg-barrio').addEventListener('change', e => poblarSelectSectores('cfg-area', e.target.value));
-document.getElementById('sv-barrio').addEventListener('change', e => poblarSelectSectores('sv-area', e.target.value));
 
 // ── TIPO USUARIO EN PERFIL ────────────────────────────────────────────────────
 document.querySelectorAll('.tipo-btn').forEach(btn => {
@@ -1761,7 +1759,6 @@ function abrirModalPerfil(panelId){
   if(perfilUsuario?.nombre){ document.getElementById('sv-nombre').value=document.getElementById('sv-nombre').value||perfilUsuario.nombre; }
   if(perfilUsuario?.telefono){ document.getElementById('sv-telefono').value=document.getElementById('sv-telefono').value||perfilUsuario.telefono; }
   poblarCheckboxBarrios('sv-barrios-servicio');
-  poblarSelectBarrios('sv-barrio');
   ['cfg-error','cfg-ok','pass-error','pass-ok','sv-error','sv-ok'].forEach(id=>{const e=document.getElementById(id);if(e){e.style.display='none';e.textContent='';}});
   const banner=document.getElementById('cfg-aviso-banner');
   if(banner) banner.style.display=perfilUsuario?.avisoAdmin==='Si'?'block':'none';
