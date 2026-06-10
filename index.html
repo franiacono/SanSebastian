@@ -116,6 +116,12 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
 .card-sub{font-size:.78rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card-servicio-tag{display:inline-block;background:var(--azul-claro);color:var(--azul2);border-radius:6px;padding:3px 8px;font-size:.72rem;font-weight:600;margin-top:4px}
 .badge-autoregistrado{display:inline-flex;align-items:center;gap:4px;background:#fef3c7;color:#92400e;border:1px solid #fde68a;border-radius:20px;padding:2px 8px;font-size:.68rem;font-weight:600;margin-top:3px;margin-left:4px}
+.barrio-check-item{display:flex;align-items:center;gap:6px;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:.8rem;transition:all .2s;background:white}
+.barrio-check-item:hover{border-color:var(--azul2);background:var(--azul-claro)}
+.barrio-check-item input{accent-color:var(--azul);cursor:pointer}
+.barrio-check-item.checked{border-color:var(--azul);background:var(--azul-claro);color:var(--azul);font-weight:500}
+.barrios-servicio-badges{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.barrio-srv-badge{background:var(--azul-claro);color:var(--azul2);border:1px solid var(--azul-mid);border-radius:12px;padding:2px 8px;font-size:.7rem;font-weight:500}
 .card-right{text-align:right;flex-shrink:0}
 .badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:600;white-space:nowrap}
 .badge.muy-recomendable{background:#d1fae5;color:#065f46}
@@ -363,8 +369,9 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
       <div class="auth-row"><label>Empresa / emprendimiento *</label><input class="auth-input" type="text" id="prf-empresa" placeholder="Nombre comercial"></div>
       <div class="auth-row"><label>Tipo de servicio *</label><input class="auth-input" type="text" id="prf-servicio" placeholder="Ej: Plomería, Electricidad..."></div>
       <div class="auth-row"><label>Descripción *</label><textarea class="auth-input" id="prf-descripcion" placeholder="Contá qué ofrecés..." style="height:70px;resize:vertical"></textarea></div>
-      <div class="auth-row"><label>¿Vivís en alguno de estos barrios?</label>
-        <select class="auth-select" id="prf-barrio-prov"><option value="No">No, soy externo</option></select>
+      <div class="auth-row">
+        <label>¿A qué barrios llegás? *</label>
+        <div id="prf-barrios-servicio" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px"></div>
       </div>
       <div style="background:var(--azul-claro);border-radius:10px;padding:12px 14px;font-size:.8rem;color:var(--azul);margin-bottom:14px">
         📋 Tu servicio será revisado por el administrador antes de publicarse.
@@ -496,12 +503,9 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
             </div>
             <div class="form-row"><label>Comentario *</label><textarea class="form-textarea" id="f-recomen" placeholder="Contá tu experiencia..."></textarea></div>
             <div class="form-row"><label>Notas adicionales</label><textarea class="form-textarea" id="f-notas" placeholder="Horarios, especialidades, zona... (opcional)" style="min-height:60px"></textarea></div>
-            <div class="form-row"><label>¿El proveedor es de algún barrio?</label>
-              <select class="form-select" id="f-barrio-prov">
-                <option value="No sé">No sé</option>
-                <option value="Sí">Sí, es del barrio</option>
-                <option value="No">No, es externo</option>
-              </select>
+            <div class="form-row">
+              <label>¿A qué barrios llega el proveedor?</label>
+              <div id="f-barrios-servicio" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px"></div>
             </div>
             <p class="form-msg" id="form-msg"></p>
             <button class="btn-submit" id="btn-form-submit">Enviar recomendación</button>
@@ -681,16 +685,9 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
       <div class="auth-row"><label>Teléfono de contacto *</label><input class="auth-input" type="tel" id="sv-telefono" placeholder="11 2345-6789"></div>
       <div class="auth-row"><label>Tipo de servicio *</label><input class="auth-input" type="text" id="sv-servicio" placeholder="Ej: Plomería, Limpieza..."></div>
       <div class="auth-row"><label>Descripción *</label><textarea class="auth-input" id="sv-descripcion" placeholder="Contá qué ofrecés..." style="height:80px;resize:vertical"></textarea></div>
-      <div class="auth-row"><label>¿Vivís en alguno de estos barrios?</label>
-        <div style="display:flex;gap:16px;margin-top:6px">
-          <label style="font-size:.88rem;cursor:pointer"><input type="radio" name="sv-del-barrio" value="Sí"> Sí, soy del barrio</label>
-          <label style="font-size:.88rem;cursor:pointer"><input type="radio" name="sv-del-barrio" value="No" checked> No, soy externo</label>
-        </div>
-      </div>
-      <div id="sv-campos-barrio" style="display:none">
-        <div class="auth-row"><label>Barrio</label><select class="auth-select" id="sv-barrio"><option value="">— Seleccioná —</option></select></div>
-        <div class="auth-row"><label>Sector</label><select class="auth-select" id="sv-area"><option value="">— Seleccioná —</option></select></div>
-        <div class="auth-row"><label>Lote</label><input class="auth-input" type="text" id="sv-lote" placeholder="Ej: 42"></div>
+      <div class="auth-row">
+        <label>¿A qué barrios llegás? *</label>
+        <div id="sv-barrios-servicio" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px"></div>
       </div>
       <button class="btn-primary" id="btn-registrar-servicio" style="margin-top:8px">Enviar para revisión</button>
       <p class="auth-error" id="sv-error"></p>
@@ -847,11 +844,38 @@ function poblarSelectSectores(selectId, barrioNombre, incluirVacio=true) {
 
 // Poblar selects iniciales
 poblarSelectBarrios('prf-barrio');
-poblarSelectBarrios('prf-barrio-prov', false);
 poblarSelectBarrios('cfg-barrio');
 poblarSelectBarrios('sv-barrio');
 poblarSelectBarrios('barrio-filter-select', false);
 document.getElementById('barrio-filter-select').insertAdjacentHTML('afterbegin','<option value="">Todos los barrios</option>');
+
+// Poblar checkboxes de barrios servicio
+function poblarCheckboxBarrios(containerId, seleccionados=[]) {
+  const c = document.getElementById(containerId);
+  if(!c) return;
+  const opciones = [
+    ...BARRIOS_CONFIG.map(b=>b.nombre),
+    'Toda la zona',
+    'Consultar'
+  ];
+  c.innerHTML = opciones.map(b=>`
+    <label class="barrio-check-item ${seleccionados.includes(b)?'checked':''}">
+      <input type="checkbox" value="${b}" ${seleccionados.includes(b)?'checked':''}> ${b}
+    </label>`).join('');
+  c.querySelectorAll('label').forEach(lbl=>{
+    lbl.querySelector('input').addEventListener('change', e=>{
+      lbl.classList.toggle('checked', e.target.checked);
+    });
+  });
+}
+function getCheckboxBarrios(containerId){
+  const c=document.getElementById(containerId);
+  if(!c) return [];
+  return [...c.querySelectorAll('input:checked')].map(i=>i.value);
+}
+
+poblarCheckboxBarrios('prf-barrios-servicio');
+poblarCheckboxBarrios('f-barrios-servicio');
 
 // Eventos cambio barrio en perfil
 document.getElementById('prf-barrio').addEventListener('change', e => poblarSelectSectores('prf-area', e.target.value));
@@ -958,23 +982,24 @@ document.getElementById('btn-guardar-perfil').addEventListener('click', async ()
     const empresa     = document.getElementById('prf-empresa').value.trim();
     const servicio    = document.getElementById('prf-servicio').value.trim();
     const descripcion = document.getElementById('prf-descripcion').value.trim();
-    const barrioSel   = document.getElementById('prf-barrio-prov').value;
+    const barriosServ = getCheckboxBarrios('prf-barrios-servicio');
     if(!nombre||!tel||!empresa||!servicio||!descripcion){ showErr('prf-error','Completá todos los campos'); return; }
+    if(!barriosServ.length){ showErr('prf-error','Seleccioná al menos un barrio donde prestás servicios'); return; }
     btn.disabled=true; btn.textContent='Guardando...';
     try {
       await setDoc(doc(db, 'usuarios', currentUser.uid), {
         uid:currentUser.uid, email:currentUser.email, nombre, telefono:tel,
-        barrio:barrioSel||'Externo', area:'', lote:'', verificado:'No',
+        barrio:'Externo', area:'', lote:'', verificado:'No',
         tipoUsuario:'proveedor', avisoAdmin:'', fcmToken:'', ultimoAcceso:serverTimestamp(), fechaRegistro:serverTimestamp()
       });
       await addDoc(collection(db,'pendientes'), {
         nombre, empresa, telefono:tel, servicio,
         recomendacion:'Recomendable', notas:descripcion,
-        barrio:barrioSel||'No',
+        barrio:'No', barriosServicio:barriosServ,
         quienInforma:nombre+' (auto-registro) | uid:'+currentUser.uid+' | '+currentUser.email,
         estado:'Pendiente', autoregistrado:true, fecha:serverTimestamp()
       });
-      perfilUsuario={uid:currentUser.uid,email:currentUser.email,nombre,telefono:tel,barrio:barrioSel||'Externo',area:'',lote:'',verificado:'No',tipoUsuario:'proveedor',avisoAdmin:''};
+      perfilUsuario={uid:currentUser.uid,email:currentUser.email,nombre,telefono:tel,barrio:'Externo',area:'',lote:'',verificado:'No',tipoUsuario:'proveedor',avisoAdmin:''};
       hideScreens();
       entrarALaApp();
     } catch(e){ showErr('prf-error','Error al guardar.'); btn.disabled=false; btn.textContent='Guardar y continuar'; }
@@ -1091,9 +1116,10 @@ function procesarDatos(filas){
   filas.forEach((f,idx)=>{
     if(norm(f.recomendacion)==='utiles') return;
     const key=genKey(f);
-    if(!mapa[key]) mapa[key]={nombre:f.nombre,empresa:f.empresa||'',dni:f.dni||'',telefono:f.telefono,servicio:f.servicio,barrio:'',destacado:false,resenas:[],idxOriginal:idx,autoregistrado:f.autoregistrado||false};
+    if(!mapa[key]) mapa[key]={nombre:f.nombre,empresa:f.empresa||"",dni:f.dni||"",telefono:f.telefono,servicio:f.servicio,barrio:"",destacado:false,resenas:[],idxOriginal:idx,autoregistrado:f.autoregistrado===true,barriosServicio:[]};
     if(!mapa[key].barrio && f.barrio && f.barrio.trim()!=='') mapa[key].barrio=normBarrio(f.barrio);
     if(!mapa[key].barrioOrigen && f.barrioOrigen) mapa[key].barrioOrigen=f.barrioOrigen;
+    if(f.barriosServicio&&f.barriosServicio.length) mapa[key].barriosServicio=[...new Set([...mapa[key].barriosServicio,...f.barriosServicio])];
     if(norm(f.recomendacion)==='publicidad') mapa[key].destacado=true;
     else if(f.recomendacion) mapa[key].resenas.push({recomendacion:f.recomendacion,notas:f.notas||'',barrioVecino:f.barrioVecino||''});
   });
@@ -1249,7 +1275,7 @@ function cardHTML(p,isDest){
         <div class="card-nombre">${p.nombre}</div>
         <div class="card-sub">${empOk?p.empresa:p.servicio}</div>
         <span class="card-servicio-tag">${p.servicio}</span>
-        ${p.autoregistrado?'<span class="badge-autoregistrado">🏪 Registrado por el proveedor</span>':''}
+        ${p.autoregistrado===true?'<span class="badge-autoregistrado">🏪 Registrado por el proveedor</span>':''}
       </div>
       <div class="card-right">
         <div class="badge ${bc}">${el}</div><br>
@@ -1260,7 +1286,8 @@ function cardHTML(p,isDest){
     <div class="card-contacto">
       ${telOk?`<button class="contacto-item tel btn-wa" data-num="${numWA}" data-srv="${p.servicio.replace(/"/g,'&quot;')}"><svg viewBox="0 0 24 24" width="13" height="13" fill="#25D366" style="vertical-align:middle;margin-right:2px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> ${p.telefono}</button>`:''}
       ${empOk?`<span class="contacto-item">🏢 ${p.empresa}</span>`:''}
-      ${p.barrio==='Sí'||p.barrio==='Si'?`<span class="contacto-item" style="color:var(--azul2);border-color:var(--azul-mid);background:var(--azul-claro)">🏘️ Del barrio</span>`:p.barrio==='No'?`<span class="contacto-item">🔄 Externo</span>`:''}
+      ${p.barrioOrigen?`<span class="contacto-item" style="color:var(--azul2);border-color:var(--azul-mid);background:var(--azul-claro)">🏘️ ${p.barrioOrigen}</span>`:''}
+      ${p.barriosServicio&&p.barriosServicio.length?`<div class="barrios-servicio-badges">${p.barriosServicio.map(b=>`<span class="barrio-srv-badge">📍 ${b}</span>`).join('')}</div>`:''}
     </div>
     ${toggle}
     <div class="card-footer-actions">
@@ -1301,7 +1328,7 @@ document.getElementById('btn-form-submit').addEventListener('click', async ()=>{
   const recomen   = document.getElementById('f-recomendacion').value;
   const vecino    = document.getElementById('f-recomen').value.trim();
   const notas     = document.getElementById('f-notas').value.trim();
-  const barrioProv = document.getElementById('f-barrio-prov').value;
+  const barrioProv = getCheckboxBarrios('f-barrios-servicio');
   const msg=document.getElementById('form-msg');
   msg.style.display='none';
   if(!nombre||!telefono||!servicio||!recomen||!vecino){msg.textContent='⚠️ Completá todos los campos obligatorios (*)';msg.style.color='var(--rojo)';msg.style.display='block';return;}
@@ -1318,7 +1345,8 @@ document.getElementById('btn-form-submit').addEventListener('click', async ()=>{
       recomendacion:recomen,notas,
       quienInforma:(perfilUsuario?.nombre||'')+(perfilUsuario?.nombre?' | ':'')+'uid:'+currentUser.uid+' | '+currentUser.email,
       barrioVecino: perfilUsuario?.barrio||'',
-      barrio:barrioProv,
+      barrio: barrioProv.includes('Toda la zona') ? 'Toda la zona' : barrioProv.length ? barrioProv[0] : 'No sé',
+      barriosServicio: barrioProv,
       estado:'Pendiente', autoregistrado:false, fecha:serverTimestamp()
     });
     gaEvent('recomendacion_enviada',{servicio,recomendacion:recomen});
@@ -1732,6 +1760,7 @@ function abrirModalPerfil(panelId){
   }
   if(perfilUsuario?.nombre){ document.getElementById('sv-nombre').value=document.getElementById('sv-nombre').value||perfilUsuario.nombre; }
   if(perfilUsuario?.telefono){ document.getElementById('sv-telefono').value=document.getElementById('sv-telefono').value||perfilUsuario.telefono; }
+  poblarCheckboxBarrios('sv-barrios-servicio');
   poblarSelectBarrios('sv-barrio');
   ['cfg-error','cfg-ok','pass-error','pass-ok','sv-error','sv-ok'].forEach(id=>{const e=document.getElementById(id);if(e){e.style.display='none';e.textContent='';}});
   const banner=document.getElementById('cfg-aviso-banner');
@@ -1821,38 +1850,29 @@ async function cargarMisRecomendaciones(){
 }
 
 // Registrar servicio desde configuración
-document.querySelectorAll('input[name="sv-del-barrio"]').forEach(r=>r.addEventListener('change',()=>{
-  document.getElementById('sv-campos-barrio').style.display=r.value==='Sí'?'block':'none';
-}));
 document.getElementById('btn-registrar-servicio').addEventListener('click', async()=>{
   const nombre=document.getElementById('sv-nombre').value.trim();
   const empresa=document.getElementById('sv-empresa').value.trim();
   const telefono=document.getElementById('sv-telefono').value.trim();
   const servicio=document.getElementById('sv-servicio').value.trim();
   const descripcion=document.getElementById('sv-descripcion').value.trim();
-  const delBarrio=document.querySelector('input[name="sv-del-barrio"]:checked')?.value||'No';
+  const barriosServ=getCheckboxBarrios('sv-barrios-servicio');
   const errEl=document.getElementById('sv-error');const okEl=document.getElementById('sv-ok');
   errEl.style.display='none';okEl.style.display='none';
   if(!nombre||!telefono||!servicio||!descripcion){errEl.textContent='Completá los campos obligatorios';errEl.style.display='block';return;}
+  if(!barriosServ.length){errEl.textContent='Seleccioná al menos un barrio';errEl.style.display='block';return;}
   const btn=document.getElementById('btn-registrar-servicio');btn.disabled=true;btn.textContent='Enviando...';
   try{
-    let barrioProv='No';
-    if(delBarrio==='Sí'){
-      barrioProv=document.getElementById('sv-barrio').value||'No verificado';
-      const area=document.getElementById('sv-area').value;
-      const lote=document.getElementById('sv-lote').value.trim();
-      try{const verif=await apiGet({action:'verificarVecino',nombre:perfilUsuario?.nombre||nombre,telefono:perfilUsuario?.telefono||telefono,area,lote});barrioProv=verif.verificado===true?'Sí':'No verificado';}catch(ve){}
-    }
     await addDoc(collection(db,'pendientes'),{
       nombre,empresa,telefono,servicio,
-      recomendacion:'Recomendable',notas:descripcion,barrio:barrioProv,
+      recomendacion:'Recomendable',notas:descripcion,barrio:'No',
+      barriosServicio:barriosServ,
       quienInforma:nombre+' (auto-registro) | uid:'+currentUser.uid+' | '+currentUser.email,
       estado:'Pendiente',autoregistrado:true,fecha:serverTimestamp()
     });
     okEl.style.display='block';
-    ['sv-nombre','sv-empresa','sv-telefono','sv-servicio','sv-descripcion','sv-lote'].forEach(id=>document.getElementById(id).value='');
-    document.querySelector('input[name="sv-del-barrio"][value="No"]').checked=true;
-    document.getElementById('sv-campos-barrio').style.display='none';
+    ['sv-nombre','sv-empresa','sv-telefono','sv-servicio','sv-descripcion'].forEach(id=>document.getElementById(id).value='');
+    poblarCheckboxBarrios('sv-barrios-servicio');
   }catch(e){errEl.textContent='Error al enviar.';errEl.style.display='block';}
   btn.disabled=false;btn.textContent='Enviar para revisión';
 });
