@@ -579,10 +579,18 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
         <div class="admin-tabs">
           <button class="admin-tab active" data-atab="pendientes">Pendientes</button>
           <button class="admin-tab" data-atab="recientes">Recientes</button>
+          <button class="admin-tab" data-atab="proveedores">Proveedores</button>
           <button class="admin-tab" data-atab="usuarios">Usuarios</button>
         </div>
         <div id="admin-tab-pendientes"><div id="pendientes-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div></div>
         <div id="admin-tab-recientes" style="display:none"><div id="aprobados-container"></div></div>
+        <div id="admin-tab-proveedores" style="display:none">
+          <div style="display:flex;gap:8px;margin-bottom:12px">
+            <input type="text" id="admin-buscar-proveedor" class="form-input" placeholder="Buscar por nombre o teléfono..." style="flex:1">
+            <button class="btn-submit" id="btn-admin-buscar-prov" style="padding:10px 18px">Buscar</button>
+          </div>
+          <div id="admin-resultados-proveedor"></div>
+        </div>
         <div id="admin-tab-usuarios" style="display:none">
           <div style="display:flex;gap:8px;margin-bottom:12px">
             <input type="text" id="admin-buscar-usuario" class="form-input" placeholder="Buscar por nombre o email..." style="flex:1">
@@ -701,7 +709,37 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
   </div>
 </div>
 
-<div class="aviso-datos-overlay" id="modal-aviso-datos">
+<div class="modal-overlay" id="modal-editar-proveedor">
+  <div class="modal-box" style="max-width:520px">
+    <button class="modal-close" id="editar-prov-close">✕</button>
+    <h3 style="font-family:'Fraunces',serif;color:var(--azul);margin-bottom:16px">✏️ Editar proveedor</h3>
+    <input type="hidden" id="edit-prov-id">
+    <div class="auth-row"><label>Nombre *</label><input class="auth-input" id="edit-prov-nombre"></div>
+    <div class="auth-row"><label>Empresa</label><input class="auth-input" id="edit-prov-empresa"></div>
+    <div class="auth-row"><label>DNI</label><input class="auth-input" id="edit-prov-dni"></div>
+    <div class="auth-row"><label>Teléfono *</label><input class="auth-input" id="edit-prov-telefono"></div>
+    <div class="auth-row"><label>Servicio *</label><input class="auth-input" id="edit-prov-servicio"></div>
+    <div class="auth-row"><label>Recomendación</label>
+      <select class="auth-select" id="edit-prov-recomendacion">
+        <option value="Muy Recomendable">⭐ Muy Recomendable</option>
+        <option value="Recomendable">👍 Recomendable</option>
+        <option value="Malas Experiencias">⚠️ Malas Experiencias</option>
+        <option value="No Recomendable">🚫 No Recomendable</option>
+        <option value="Publicidad">⭐ Destacado (Publicidad)</option>
+      </select>
+    </div>
+    <div class="auth-row"><label>Notas</label><textarea class="auth-input" id="edit-prov-notas" style="height:70px;resize:vertical"></textarea></div>
+    <div class="auth-row">
+      <label>Barrios donde presta servicios</label>
+      <div id="edit-prov-barrios" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px"></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+      <button class="btn-primary" id="btn-guardar-prov" style="flex:1">💾 Guardar cambios</button>
+      <button class="btn-rechazar" id="btn-eliminar-prov" style="padding:12px 18px;border-radius:10px;font-family:'Inter',sans-serif;font-size:.9rem;cursor:pointer;border:none">🗑️ Eliminar</button>
+    </div>
+    <p id="edit-prov-msg" style="font-size:.82rem;margin-top:8px;display:none;text-align:center"></p>
+  </div>
+</div>
   <div class="aviso-datos-box">
     <div style="font-size:2.8rem;margin-bottom:12px">⚠️</div>
     <h3 style="font-family:'Fraunces',serif;color:var(--rojo);font-size:1.2rem;margin-bottom:10px">Revisá tus datos</h3>
@@ -1128,7 +1166,7 @@ function procesarDatos(filas){
   filas.forEach((f,idx)=>{
     if(norm(f.recomendacion)==='utiles') return;
     const key=genKey(f);
-    if(!mapa[key]) mapa[key]={nombre:f.nombre,empresa:f.empresa||"",dni:f.dni||"",telefono:f.telefono,servicio:f.servicio,barrio:"",destacado:false,resenas:[],idxOriginal:idx,autoregistrado:f.autoregistrado===true,barriosServicio:[]};
+    if(!mapa[key]) mapa[key]={nombre:f.nombre,empresa:f.empresa||"",dni:f.dni||"",telefono:f.telefono,servicio:f.servicio,barrio:"",destacado:false,resenas:[],idxOriginal:idx,autoregistrado:f.autoregistrado===true,barriosServicio:[],firestoreId:f.id||""};
     if(!mapa[key].barrio && f.barrio && f.barrio.trim()!=='') mapa[key].barrio=normBarrio(f.barrio);
     if(!mapa[key].barrioOrigen && f.barrioOrigen) mapa[key].barrioOrigen=f.barrioOrigen;
     if(f.barriosServicio&&f.barriosServicio.length) mapa[key].barriosServicio=[...new Set([...mapa[key].barriosServicio,...f.barriosServicio])];
@@ -1315,6 +1353,7 @@ function cardHTML(p,isDest){
     <div class="card-footer-actions">
       <button class="btn-recomendar-card" data-p='${pData.replace(/'/g,"&apos;")}'>✍️ Recomendar</button>
       <button class="btn-compartir-card" data-nombre="${p.nombre}" data-srv="${p.servicio}" data-tel="${p.telefono||''}">🔗</button>
+      ${isAdmin()?`<button class="btn-editar-card" data-id="${p.firestoreId||''}" style="background:transparent;border:1.5px solid var(--naranja);color:var(--naranja);border-radius:8px;padding:6px 12px;font-size:.75rem;font-family:'Inter',sans-serif;cursor:pointer">✏️</button>`:''}
     </div>
   </div>`;
 }
@@ -1400,9 +1439,11 @@ document.querySelectorAll('.admin-tab').forEach(tab=>{
     tab.classList.add('active');
     document.getElementById('admin-tab-pendientes').style.display=tab.dataset.atab==='pendientes'?'block':'none';
     document.getElementById('admin-tab-recientes').style.display=tab.dataset.atab==='recientes'?'block':'none';
+    document.getElementById('admin-tab-proveedores').style.display=tab.dataset.atab==='proveedores'?'block':'none';
     document.getElementById('admin-tab-usuarios').style.display=tab.dataset.atab==='usuarios'?'block':'none';
     if(tab.dataset.atab==='pendientes'||tab.dataset.atab==='recientes') cargarPendientes();
     if(tab.dataset.atab==='usuarios') buscarUsuariosAdmin();
+    if(tab.dataset.atab==='proveedores') buscarProveedoresAdmin();
   });
 });
 
@@ -1964,7 +2005,106 @@ async function pedirPermisoNotificaciones(uid){
   }catch(e){console.log('FCM error:',e);}
 }
 
-// ── ADMIN BUSCAR USUARIO ──────────────────────────────────────────────────────
+// ── ADMIN BUSCAR Y EDITAR PROVEEDORES ─────────────────────────────────────────
+document.getElementById('btn-admin-buscar-prov').addEventListener('click', ()=>buscarProveedoresAdmin());
+document.getElementById('admin-buscar-proveedor').addEventListener('keydown', e=>{if(e.key==='Enter') buscarProveedoresAdmin();});
+
+async function buscarProveedoresAdmin(){
+  const q2=norm(document.getElementById('admin-buscar-proveedor').value.trim());
+  const res=document.getElementById('admin-resultados-proveedor');
+  res.innerHTML='<div class="loading"><div class="spinner"></div>Cargando...</div>';
+  try{
+    const snap=await getDocs(collection(db,'proveedores'));
+    const found=[];
+    snap.forEach(d=>{
+      const p=d.data();
+      if(!q2||norm(p.nombre||'').includes(q2)||norm(p.telefono||'').includes(q2)||norm(p.servicio||'').includes(q2))
+        found.push({id:d.id,...p});
+    });
+    found.sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||'','es'));
+    if(!found.length){res.innerHTML='<p style="color:var(--muted);font-size:.82rem">No encontrado.</p>';return;}
+    res.innerHTML=`<p style="font-size:.78rem;color:var(--muted);margin-bottom:8px">${found.length} proveedor${found.length!==1?'es':''}</p>
+    <div style="overflow-x:auto"><table style="width:100%;font-size:.77rem;border-collapse:collapse">
+      <thead><tr style="background:var(--crema2)">${['Nombre','Servicio','Teléfono','Recomendación',''].map(h=>`<th style="padding:7px 8px;text-align:left;border-bottom:1px solid var(--border);font-weight:600">${h}</th>`).join('')}</tr></thead>
+      <tbody>${found.map(p=>`<tr style="border-bottom:1px solid var(--crema2)">
+        <td style="padding:7px 8px;font-weight:500">${p.nombre||'—'}</td>
+        <td style="padding:7px 8px;color:var(--muted)">${p.servicio||'—'}</td>
+        <td style="padding:7px 8px">${p.telefono||'—'}</td>
+        <td style="padding:7px 8px"><span class="badge ${badgeCls(p.recomendacion)}" style="font-size:.68rem">${p.recomendacion||'—'}</span></td>
+        <td style="padding:7px 8px"><button class="btn-marcar-datos" style="font-size:.72rem;color:var(--azul);border-color:var(--azul)" data-edit-id="${p.id}">✏️ Editar</button></td>
+      </tr>`).join('')}</tbody></table></div>`;
+    res.querySelectorAll('[data-edit-id]').forEach(btn=>btn.addEventListener('click',()=>abrirEditarProveedor(btn.dataset.editId, found.find(p=>p.id===btn.dataset.editId))));
+  }catch(e){res.innerHTML='<p style="color:var(--rojo);font-size:.82rem">Error al cargar.</p>';}
+}
+
+function abrirEditarProveedor(id, p){
+  document.getElementById('edit-prov-id').value=id;
+  document.getElementById('edit-prov-nombre').value=p.nombre||'';
+  document.getElementById('edit-prov-empresa').value=p.empresa||'';
+  document.getElementById('edit-prov-dni').value=p.dni||'';
+  document.getElementById('edit-prov-telefono').value=p.telefono||'';
+  document.getElementById('edit-prov-servicio').value=p.servicio||'';
+  document.getElementById('edit-prov-recomendacion').value=p.recomendacion||'Recomendable';
+  document.getElementById('edit-prov-notas').value=p.notas||'';
+  poblarCheckboxBarrios('edit-prov-barrios', p.barriosServicio||[]);
+  document.getElementById('edit-prov-msg').style.display='none';
+  document.getElementById('modal-editar-proveedor').classList.add('open');
+}
+
+document.getElementById('editar-prov-close').addEventListener('click',()=>document.getElementById('modal-editar-proveedor').classList.remove('open'));
+document.getElementById('modal-editar-proveedor').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});
+
+document.getElementById('btn-guardar-prov').addEventListener('click', async()=>{
+  const id=document.getElementById('edit-prov-id').value;
+  if(!id) return;
+  const msg=document.getElementById('edit-prov-msg');
+  const btn=document.getElementById('btn-guardar-prov');
+  btn.disabled=true; btn.textContent='Guardando...';
+  try{
+    const datos={
+      nombre:document.getElementById('edit-prov-nombre').value.trim(),
+      empresa:document.getElementById('edit-prov-empresa').value.trim(),
+      dni:document.getElementById('edit-prov-dni').value.trim(),
+      telefono:document.getElementById('edit-prov-telefono').value.trim(),
+      servicio:document.getElementById('edit-prov-servicio').value.trim(),
+      recomendacion:document.getElementById('edit-prov-recomendacion').value,
+      notas:document.getElementById('edit-prov-notas').value.trim(),
+      barriosServicio:getCheckboxBarrios('edit-prov-barrios'),
+    };
+    await updateDoc(doc(db,'proveedores',id), datos);
+    msg.textContent='✅ Guardado correctamente'; msg.style.color='var(--verde-ok)'; msg.style.display='block';
+    await cargarProveedores();
+    setTimeout(()=>document.getElementById('modal-editar-proveedor').classList.remove('open'),1200);
+  }catch(e){msg.textContent='❌ Error al guardar: '+e.message; msg.style.color='var(--rojo)'; msg.style.display='block';}
+  btn.disabled=false; btn.textContent='💾 Guardar cambios';
+});
+
+document.getElementById('btn-eliminar-prov').addEventListener('click', async()=>{
+  const id=document.getElementById('edit-prov-id').value;
+  const nombre=document.getElementById('edit-prov-nombre').value;
+  if(!id) return;
+  if(!confirm(`¿Eliminar a "${nombre}" del directorio? Esta acción no se puede deshacer.`)) return;
+  const btn=document.getElementById('btn-eliminar-prov');
+  btn.disabled=true;
+  try{
+    await deleteDoc(doc(db,'proveedores',id));
+    document.getElementById('modal-editar-proveedor').classList.remove('open');
+    await cargarProveedores();
+    buscarProveedoresAdmin();
+  }catch(e){alert('Error al eliminar: '+e.message);}
+  btn.disabled=false;
+});
+
+// Event delegation para botón editar en cards del directorio
+document.getElementById('results-container').addEventListener('click', e=>{
+  const btn=e.target.closest('.btn-editar-card');
+  if(btn&&btn.dataset.id){
+    e.stopPropagation();
+    // Buscar el proveedor en el array
+    const p=proveedores.find(p=>p.firestoreId===btn.dataset.id);
+    if(p) abrirEditarProveedor(btn.dataset.id,{...p,recomendacion:p.score?.etiqueta||'Recomendable'});
+  }
+});
 async function buscarUsuariosAdmin(){
   const q2=document.getElementById('admin-buscar-usuario').value.trim().toLowerCase();
   const res=document.getElementById('admin-resultados-usuario');
