@@ -83,7 +83,7 @@ header{background:var(--azul);color:white;padding:0 16px;position:sticky;top:0;z
 .nav-btn:hover{background:rgba(255,255,255,.2)}
 .nav-btn.active{background:rgba(255,255,255,.25);border-color:rgba(255,255,255,.5);font-weight:600}
 .label{display:inline}
-@media(max-width:480px){.label{display:none}}
+@media(max-width:600px){.label{display:none}}
 .user-avatar{width:36px;height:36px;border-radius:50%;background:var(--azul2);border:2px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:600;cursor:pointer;overflow:hidden;color:white;flex-shrink:0}
 .user-avatar img{width:100%;height:100%;object-fit:cover}
 .avatar-wrap{position:relative}
@@ -1405,9 +1405,10 @@ async function cargarPendientes(){
   pc.innerHTML='<div class="loading"><div class="spinner"></div>Cargando...</div>';
   try{
     const snapPend=await getDocs(query(collection(db,'pendientes'),where('estado','==','Pendiente'),orderBy('fecha','desc')));
-    const snapProc=await getDocs(query(collection(db,'pendientes'),where('estado','in',['Aprobado','Rechazado']),orderBy('fecha','desc'),limit(10)));
+    const snapProc=await getDocs(query(collection(db,'pendientes'),where('estado','in',['Aprobado','Rechazado'])));
     const pendientes=[]; snapPend.forEach(d=>pendientes.push({id:d.id,...d.data()}));
     const procesados=[]; snapProc.forEach(d=>procesados.push({id:d.id,...d.data()}));
+    procesados.sort((a,b)=>{const fa=a.fecha?.toDate?.()?.getTime?.()||0;const fb=b.fecha?.toDate?.()?.getTime?.()||0;return fb-fa;});
     pc.innerHTML=pendientes.length?pendientes.map(r=>adminCardHTML(r)).join(''):'<div class="admin-empty"><div class="icon">✅</div><p>Sin pendientes</p></div>';
     ac.innerHTML=procesados.length?procesados.map(r=>adminCardHTML(r)).join(''):'<div class="admin-empty"><div class="icon">📋</div><p>Sin procesados</p></div>';
     [pc,ac].forEach(c=>{
