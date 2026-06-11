@@ -83,7 +83,7 @@ header{background:var(--azul);color:white;padding:0 16px;position:sticky;top:0;z
 .nav-btn:hover{background:rgba(255,255,255,.2)}
 .nav-btn.active{background:rgba(255,255,255,.25);border-color:rgba(255,255,255,.5);font-weight:600}
 .label{display:inline}
-@media(max-width:600px){.label{display:none}}
+@media(max-width:700px){.label{display:none}.nav-btn{padding:5px 8px;font-size:.8rem}.header-title span{display:none}}
 .user-avatar{width:36px;height:36px;border-radius:50%;background:var(--azul2);border:2px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:600;cursor:pointer;overflow:hidden;color:white;flex-shrink:0}
 .user-avatar img{width:100%;height:100%;object-fit:cover}
 .avatar-wrap{position:relative}
@@ -1665,7 +1665,11 @@ async function cargarMisConsultas(){
         threadMap[tid].mensajes.push({...m,fecha:m.fecha?.toDate?.()?.toISOString()||''});
     });
     const threads=Object.values(threadMap);
-    threads.forEach(t=>t.mensajes.sort((a,b)=>a.fecha>b.fecha?1:-1));
+    threads.forEach(t=>t.mensajes.sort((a,b)=>{
+      const fa=new Date(a.fecha||0).getTime();
+      const fb=new Date(b.fecha||0).getTime();
+      return fa-fb; // siempre ascendente: más viejo arriba, más nuevo abajo
+    }));
     threads.sort((a,b)=>{const fa=a.mensajes[a.mensajes.length-1]?.fecha||'';const fb=b.mensajes[b.mensajes.length-1]?.fecha||'';return fb>fa?1:-1;});
     if(!threads.length){c.innerHTML='<p style="color:var(--muted);font-size:.83rem;text-align:center;padding:20px 0">Todavía no enviaste ninguna consulta.</p>';actualizarBadgeConsultas(0);return;}
     let sinLeerTotal=0;
@@ -1846,10 +1850,17 @@ async function cargarMisRecomendaciones(){
   const c=document.getElementById('misrecs-container');
   c.innerHTML='<div class="loading"><div class="spinner"></div>Cargando...</div>';
   try{
-    const snap=await getDocs(query(collection(db,'pendientes'),where('uid','==',currentUser.uid)));
-    // También buscar por email en quienInforma
+    // Buscar en pendientes donde quienInforma contiene el uid del usuario
+    const snap=await getDocs(collection(db,'pendientes'));
     const items=[];
-    snap.forEach(d=>items.push({id:d.id,...d.data()}));
+    snap.forEach(d=>{
+      const data={id:d.id,...d.data()};
+      const quien=data.quienInforma||'';
+      // Coincide si contiene el uid o el email del usuario actual
+      if(quien.includes(currentUser.uid)||quien.includes(currentUser.email||'')){
+        items.push(data);
+      }
+    });
     if(!items.length){c.innerHTML='<p style="color:var(--muted);font-size:.83rem;text-align:center;padding:20px 0">Todavía no hiciste ninguna recomendación.</p>';return;}
     const ord={'Pendiente':0,'Aprobado':1,'Rechazado':2};
     items.sort((a,b)=>(ord[a.estado]||0)-(ord[b.estado]||0));
@@ -1928,12 +1939,16 @@ async function pedirPermisoNotificaciones(uid){
   if(!messaging||!uid) return;
   try{
     const permiso=await Notification.requestPermission();
-    if(permiso!=='granted') return;
+    if(permiso!=='granted'){ console.log('FCM: permiso denegado'); return; }
     const swReg=await navigator.serviceWorker.ready;
     const token=await getToken(messaging,{vapidKey:VAPID_KEY,serviceWorkerRegistration:swReg});
     if(token){
+      console.log('FCM token obtenido, guardando...');
       await updateDoc(doc(db,'usuarios',uid),{fcmToken:token});
+      console.log('FCM token guardado en Firestore');
       await apiGet({action:'saveFcmToken',uid,token}).catch(()=>{});
+    } else {
+      console.log('FCM: no se obtuvo token');
     }
   }catch(e){console.log('FCM error:',e);}
 }
