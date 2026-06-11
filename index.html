@@ -106,6 +106,8 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
 
 /* ── CARDS PROVEEDORES ── */
 .results-grid{display:flex;flex-direction:column;gap:10px}
+.destacados-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:4px}
+@media(max-width:600px){.destacados-grid{grid-template-columns:1fr}}
 .proveedor-card{background:white;border:1.5px solid var(--border);border-radius:14px;overflow:hidden;transition:box-shadow .2s,border-color .2s}
 .proveedor-card:hover{box-shadow:0 4px 20px rgba(26,58,92,.1);border-color:var(--azul-mid)}
 .proveedor-card.destacado{border-color:var(--dorado);border-width:2px}
@@ -740,7 +742,7 @@ const FB_CONFIG = {
 const ADMIN_EMAILS = ['francisco.iacono@gmail.com','adminproveedoressansebastian@gmail.com'];
 const VAPID_KEY    = 'BGjJSrPaiqpz3GMqJto5_U9HqBxeZ8RXKvsgj3cE8YX5uPMbafNK6gL1l7wDTTV_Xvid578kRXiR5QG9t4l8Jnc';
 // Apps Script solo para emails y push (sigue igual)
-const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbwhtOjdFRVev3nkHe8LDf4HCw3y2J30u20BKP7VGfAtAmCMNhktJrMlg9xtFDBckk2x/exec';
+const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbxWHyoQ7CYEERMMtSrK5TmpeLdf67Sw1z0mRBPMOuD9cvGCrxy8UshNWevBk7g9JJdV1g/exec';
 const SCRIPT_PWD   = 'sansebastian2025';
 const ADMIN_PWD    = 'admin2025';
 
@@ -1142,14 +1144,18 @@ function calcScore(r){
   const prom=vals.reduce((a,b)=>a+b,0)/vals.length;
   const contar = lbl => r.filter(x=>x.recomendacion===lbl).length;
   const mr=contar('Muy Recomendable'),rec=contar('Recomendable'),mal=contar('Malas Experiencias'),noRec=contar('No Recomendable');
+  const total=r.length;
   let etq='Sin datos';
-  if(mr>0&&mr>=r.length*.6) etq='Muy Recomendable';
-  else if((mr+rec)>=r.length*.6) etq='Recomendable';
-  else if((mal+noRec)>r.length*.5) etq='No Recomendable';
+  // Muy Recomendable: mayoría MR, sin negativas
+  if(mr>=1 && mr/total>=0.6 && (mal+noRec)===0) etq='Muy Recomendable';
+  // Recomendable: mayoría positivas
+  else if((mr+rec)/total>=0.6 && (mal+noRec)<=total*0.2) etq='Recomendable';
+  // No Recomendable: mayoría negativas
+  else if((mal+noRec)/total>0.5) etq='No Recomendable';
   else if((mal+noRec)>0) etq='Malas Experiencias';
-  else if(rec>0) etq='Recomendable';
+  else if(rec>0||mr>0) etq='Recomendable';
   const st=prom>=4.5?'★★★★★':prom>=3.5?'★★★★☆':prom>=2.5?'★★★☆☆':prom>=1.5?'★★☆☆☆':'★☆☆☆☆';
-  return {promedio:prom,total:r.length,etiqueta:etq,estrellas:prom,stars:st};
+  return {promedio:prom,total,etiqueta:etq,estrellas:prom,stars:st};
 }
 
 function poblarRubros(){
@@ -1228,7 +1234,10 @@ function renderResults(){
   const dest = fil.filter(p=>p.destacado);
   const rest = fil.filter(p=>!p.destacado);
   let html='';
-  if(dest.length){ html+=`<div class="section-label">⭐ DESTACADOS</div>`+dest.map((p,i)=>cardHTML(p,true)).join('');}
+  if(dest.length){
+    html+=`<div class="section-label">⭐ DESTACADOS</div>`;
+    html+=`<div class="destacados-grid">${dest.map(p=>cardHTML(p,true)).join('')}</div>`;
+  }
   if(rest.length){ if(dest.length) html+=`<div class="section-label">TODOS LOS PROVEEDORES</div>`; html+=rest.map(p=>cardHTML(p,false)).join(''); }
   cont.innerHTML=html;
 
@@ -1286,7 +1295,7 @@ function cardHTML(p,isDest){
       <div class="card-right">
         <div class="badge ${bc}">${el}</div><br>
         ${st?`<div class="score-stars">${st}</div>`:''}
-        <div class="reviews-count">${sc.total>0?sc.total+' reseña'+(sc.total!==1?'s':''):p.autoregistrado?'Sin reseñas aún':''}</div>
+        <div class="reviews-count">${p.resenas.length>0?p.resenas.length+' reseña'+(p.resenas.length!==1?'s':''):'Sin reseñas aún'}</div>
       </div>
     </div>
     <div class="card-contacto">
@@ -1388,6 +1397,7 @@ document.querySelectorAll('.admin-tab').forEach(tab=>{
     document.getElementById('admin-tab-recientes').style.display=tab.dataset.atab==='recientes'?'block':'none';
     document.getElementById('admin-tab-usuarios').style.display=tab.dataset.atab==='usuarios'?'block':'none';
     if(tab.dataset.atab==='pendientes'||tab.dataset.atab==='recientes') cargarPendientes();
+    if(tab.dataset.atab==='usuarios') buscarUsuariosAdmin();
   });
 });
 
@@ -1930,29 +1940,33 @@ async function pedirPermisoNotificaciones(uid){
 }
 
 // ── ADMIN BUSCAR USUARIO ──────────────────────────────────────────────────────
-document.getElementById('btn-admin-buscar').addEventListener('click', async()=>{
+async function buscarUsuariosAdmin(){
   const q2=document.getElementById('admin-buscar-usuario').value.trim().toLowerCase();
   const res=document.getElementById('admin-resultados-usuario');
-  if(!q2){res.innerHTML='<p style="color:var(--muted);font-size:.82rem">Ingresá un nombre o email.</p>';return;}
+  res.innerHTML='<div class="loading"><div class="spinner"></div>Cargando...</div>';
   try{
     const snap=await getDocs(collection(db,'usuarios'));
     const found=[];
-    snap.forEach(d=>{const u=d.data();if(norm(u.nombre||'').includes(q2)||norm(u.email||'').includes(q2))found.push({...u,id:d.id});});
-    if(!found.length){res.innerHTML='<p style="color:var(--muted);font-size:.82rem">No encontrado.</p>';return;}
-    res.innerHTML=`<table style="width:100%;font-size:.8rem;border-collapse:collapse">
-      <thead><tr style="background:var(--crema2)">${['Nombre','Email','Barrio','Sector','Verificado','Último acceso','Acciones'].map(h=>`<th style="padding:8px;text-align:left;border-bottom:1px solid var(--border)">${h}</th>`).join('')}</tr></thead>
+    snap.forEach(d=>{const u=d.data();if(!q2||norm(u.nombre||'').includes(q2)||norm(u.email||'').includes(q2))found.push({...u,id:d.id});});
+    found.sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||'','es'));
+    if(!found.length){res.innerHTML='<p style="color:var(--muted);font-size:.82rem">No se encontraron usuarios.</p>';return;}
+    res.innerHTML=`<p style="font-size:.78rem;color:var(--muted);margin-bottom:8px">${found.length} usuario${found.length!==1?'s':''}</p>
+    <div style="overflow-x:auto"><table style="width:100%;font-size:.77rem;border-collapse:collapse">
+      <thead><tr style="background:var(--crema2)">${['Nombre','Email','Barrio','Sector','Verificado','Último acceso',''].map(h=>`<th style="padding:7px 8px;text-align:left;border-bottom:1px solid var(--border);font-weight:600">${h}</th>`).join('')}</tr></thead>
       <tbody>${found.map(u=>`<tr style="border-bottom:1px solid var(--crema2)">
-        <td style="padding:8px">${u.nombre||'—'}</td>
-        <td style="padding:8px;color:var(--muted)">${u.email||'—'}</td>
-        <td style="padding:8px">${u.barrio||'—'}</td>
-        <td style="padding:8px">${u.area||'—'}</td>
-        <td style="padding:8px"><span class="admin-badge ${u.verificado==='Si'?'verificado':'no-verificado'}">${u.verificado==='Si'?'✅':'⚠️'} ${u.verificado||'No'}</span></td>
-        <td style="padding:8px;color:var(--muted)">${u.ultimoAcceso?.toDate?fmtFecha(u.ultimoAcceso.toDate().toISOString()):'—'}</td>
-        <td style="padding:8px"><button class="btn-marcar-datos" style="font-size:.72rem" data-marcar-uid="${u.uid||u.id}" data-marcar-email="${u.email||''}">🚩 Marcar</button></td>
-      </tr>`).join('')}</tbody></table>`;
+        <td style="padding:7px 8px">${u.nombre||'—'}</td>
+        <td style="padding:7px 8px;color:var(--muted)">${u.email||'—'}</td>
+        <td style="padding:7px 8px">${u.barrio||'—'}</td>
+        <td style="padding:7px 8px">${u.area||'—'}</td>
+        <td style="padding:7px 8px"><span class="admin-badge ${u.verificado==='Si'?'verificado':'no-verificado'}">${u.verificado==='Si'?'✅':'⚠️'} ${u.verificado||'No'}</span></td>
+        <td style="padding:7px 8px;color:var(--muted)">${u.ultimoAcceso?.toDate?fmtFecha(u.ultimoAcceso.toDate().toISOString()):'—'}</td>
+        <td style="padding:7px 8px"><button class="btn-marcar-datos" style="font-size:.72rem" data-marcar-uid="${u.uid||u.id}" data-marcar-email="${u.email||''}">🚩</button></td>
+      </tr>`).join('')}</tbody></table></div>`;
     res.querySelectorAll('[data-marcar-uid]').forEach(btn=>btn.addEventListener('click',()=>marcarDatosIncorrectos(btn)));
-  }catch(e){res.innerHTML='<p style="color:var(--rojo);font-size:.82rem">Error al buscar.</p>';}
-});
+  }catch(e){res.innerHTML='<p style="color:var(--rojo);font-size:.82rem">Error al cargar.</p>';}
+}
+document.getElementById('btn-admin-buscar').addEventListener('click', ()=>buscarUsuariosAdmin());
+document.getElementById('admin-buscar-usuario').addEventListener('keydown', e=>{ if(e.key==='Enter') buscarUsuariosAdmin(); });
 
 </script>
 </body>
