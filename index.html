@@ -846,8 +846,11 @@ function poblarSelectSectores(selectId, barrioNombre, incluirVacio=true) {
 // Poblar selects iniciales
 poblarSelectBarrios('prf-barrio');
 poblarSelectBarrios('cfg-barrio');
-poblarSelectBarrios('barrio-filter-select', false);
-document.getElementById('barrio-filter-select').insertAdjacentHTML('afterbegin','<option value="">Todos los barrios</option>');
+// Poblar filtro de barrios (sin vacío, lo agregamos al principio)
+const barrioFilterSel = document.getElementById('barrio-filter-select');
+barrioFilterSel.innerHTML = '<option value="">Todos los barrios</option>' +
+  BARRIOS_CONFIG.map(b=>`<option value="${b.nombre}">${b.nombre}</option>`).join('');
+barrioFilterSel.value = ''; // asegurar que quede en "Todos"
 
 // Poblar checkboxes de barrios servicio
 function poblarCheckboxBarrios(containerId, seleccionados=[]) {
@@ -1288,9 +1291,14 @@ function cardHTML(p,isDest){
       ${p.barrioOrigen?`<span class="contacto-item" style="color:var(--azul2);border-color:var(--azul-mid);background:var(--azul-claro)">🏘️ ${p.barrioOrigen}</span>`:''}
     </div>
     ${p.barriosServicio&&p.barriosServicio.length?`
-      <div class="barrio-srv-label">📍 Barrios donde presta servicios</div>
-      <div class="barrios-servicio-badges">${p.barriosServicio.map(b=>`<span class="barrio-srv-badge">${b==='Consultar'?'🔍 Consultar por otros barrios':b==='Toda la zona'?'🌐 Toda la zona':b}</span>`).join('')}</div>`:''}
-    ${toggle}
+      <div class="card-detail" style="display:none">
+        <div class="barrio-srv-label" style="padding:0;margin-bottom:6px">📍 Barrios donde presta servicios</div>
+        <div class="barrios-servicio-badges" style="padding:0;margin-top:0">${p.barriosServicio.map(b=>`<span class="barrio-srv-badge">${b==='Consultar'?'🔍 Consultar por otros barrios':b==='Toda la zona'?'🌐 Toda la zona':b}</span>`).join('')}</div>
+        ${resHtml?`<div class="resenas-title" style="margin-top:12px">Reseñas</div>${resHtml}`:''}
+      </div>
+      ${p.resenas.length?`<div class="card-resenas-toggle"><span class="toggle-label">Ver reseñas (${p.resenas.length}) y barrios ▾</span></div>`:'<div class="card-resenas-toggle"><span class="toggle-label">Ver barrios de servicio ▾</span></div>'}`
+      :`${toggle}`}
+    
     <div class="card-footer-actions">
       <button class="btn-recomendar-card" data-p='${pData.replace(/'/g,"&apos;")}'>✍️ Recomendar</button>
       <button class="btn-compartir-card" data-nombre="${p.nombre}" data-srv="${p.servicio}" data-tel="${p.telefono||''}">🔗</button>
