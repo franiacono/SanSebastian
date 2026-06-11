@@ -1348,9 +1348,8 @@ document.getElementById('btn-form-submit').addEventListener('click', async ()=>{
       estado:'Pendiente', autoregistrado:false, fecha:serverTimestamp()
     });
     gaEvent('recomendacion_enviada',{servicio,recomendacion:recomen});
-    // Notificar admin via Apps Script
-    apiGet({action:'saveMensaje',uid:currentUser.uid,nombre:perfilUsuario?.nombre||'',email:currentUser.email||'',telefono:'',barrio:'',mensaje:`Nueva recomendación pendiente: ${nombre} (${servicio})`,threadId:'admin_notif_'+Date.now(),autor:'sistema'}).catch(()=>{});
-    document.getElementById('form-body').style.display='none';
+    // Notificar admin por email
+    apiGet({action:'notificarAdminRecomendacion', nombre, servicio, vecino:perfilUsuario?.nombre||''}).catch(()=>{});document.getElementById('form-body').style.display='none';
     document.getElementById('form-success').style.display='block';
   }catch(e){msg.textContent='❌ Error al enviar. Intentá de nuevo.';msg.style.color='var(--rojo)';msg.style.display='block';btn.disabled=false;btn.textContent='Enviar recomendación';}
 });
