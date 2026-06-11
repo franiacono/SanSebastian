@@ -72,13 +72,14 @@ body{font-family:'Inter',sans-serif;background:var(--crema);color:var(--text);mi
 /* ── APP ── */
 #app{display:none}
 header{background:var(--azul);color:white;padding:0 16px;position:sticky;top:0;z-index:200;box-shadow:0 2px 16px rgba(0,0,0,.25)}
-.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:8px;height:60px}
-.header-brand{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:6px;height:56px;padding:0 12px}
+.header-brand{display:flex;align-items:center;gap:8px;flex:0 0 auto}
 .header-logo{width:34px;height:34px;background:rgba(255,255,255,.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:14px;font-weight:700;color:white;letter-spacing:-0.5px;flex-shrink:0}
-.header-title{font-family:'Fraunces',serif;font-size:1.05rem;font-weight:700}
-.header-title span{font-size:.7rem;font-weight:400;opacity:.7;display:block;font-family:'Inter',sans-serif}
-.header-nav{display:flex;gap:4px;align-items:center;flex-shrink:0}
+.header-title{font-family:'Fraunces',serif;font-size:.95rem;font-weight:700}
+.header-title span{font-size:.62rem;font-weight:400;opacity:.7;display:block;font-family:'Inter',sans-serif}
+.header-nav{display:flex;gap:3px;align-items:center;flex:1;justify-content:flex-end}
 .nav-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:white;padding:6px 10px;border-radius:18px;font-size:.75rem;cursor:pointer;font-family:'Inter',sans-serif;transition:background .2s;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+@media(max-width:420px){.header-title span{display:none}.header-logo{width:28px;height:28px;font-size:12px}.nav-btn{padding:5px 8px;font-size:.7rem}}
 .nav-btn:hover{background:rgba(255,255,255,.2)}
 .nav-btn.active{background:rgba(255,255,255,.25);border-color:rgba(255,255,255,.5);font-weight:600}
 .label{display:inline}
@@ -1166,7 +1167,7 @@ function poblarRubros(){
 const CHIPS=[
   {id:'todos',label:'Todos',fn:()=>true},
   {id:'destacados',label:'⭐ Destacados',fn:p=>p.destacado},
-  {id:'muy-recomendables',label:'💚 Muy recomendables',fn:p=>p.score.etiqueta==='Muy Recomendable'},
+  {id:'muy-recomendables',label:'💚 Muy recomendables',fn:p=>p.destacado||p.score.etiqueta==='Muy Recomendable'},
   {id:'recomendables',label:'👍 Recomendables',fn:p=>p.score.etiqueta==='Recomendable'},
   {id:'malas',label:'⚠️ Malas experiencias',fn:p=>p.score.etiqueta==='Malas Experiencias'},
   {id:'no-rec',label:'🚫 No recomendables',fn:p=>p.score.etiqueta==='No Recomendable'},
