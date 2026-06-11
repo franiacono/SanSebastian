@@ -1099,8 +1099,9 @@ function entrarALaApp() {
   }
   cargarProveedores();
   cargarTelefonos();
-  // Aviso datos incorrectos
-  if(perfilUsuario?.avisoAdmin === 'Si'){
+  // Aviso datos incorrectos - solo mostrar una vez por sesión
+  if(perfilUsuario?.avisoAdmin === 'Si' && !sessionStorage.getItem('avisoMostrado')){
+    sessionStorage.setItem('avisoMostrado','1');
     document.getElementById('modal-aviso-datos').classList.add('open');
     document.getElementById('cfg-aviso-banner').style.display='block';
   }
@@ -1872,7 +1873,9 @@ document.getElementById('btn-guardar-cfg').addEventListener('click', async()=>{
       await updateDoc(doc(db,'usuarios',currentUser.uid),{avisoAdmin:''});
       await apiGet({action:'setAvisoAdmin',uid:currentUser.uid,email:currentUser.email,avisoAdmin:''}).catch(()=>{});
       perfilUsuario.avisoAdmin='';
+      sessionStorage.removeItem('avisoMostrado');
       document.getElementById('cfg-aviso-banner').style.display='none';
+      document.getElementById('modal-aviso-datos').classList.remove('open');
     }
     document.getElementById('dd-nombre').textContent=nombre;
     document.getElementById('dd-barrio').textContent=barrio?`📍 ${barrio}${area?' · Sector '+area:''}`:'' ;
