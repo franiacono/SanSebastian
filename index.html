@@ -1143,17 +1143,14 @@ function calcScore(r){
   if(!vals.length) return {promedio:0,total:0,etiqueta:'Sin datos',estrellas:0};
   const prom=vals.reduce((a,b)=>a+b,0)/vals.length;
   const contar = lbl => r.filter(x=>x.recomendacion===lbl).length;
-  const mr=contar('Muy Recomendable'),rec=contar('Recomendable'),mal=contar('Malas Experiencias'),noRec=contar('No Recomendable');
-  const total=r.length;
+  const mr=contar('Muy Recomendable'), rec=contar('Recomendable');
+  const mal=contar('Malas Experiencias'), noRec=contar('No Recomendable');
+  const positivas=mr+rec, negativas=mal+noRec, total=r.length;
   let etq='Sin datos';
-  // Muy Recomendable: mayoría MR, sin negativas
-  if(mr>=1 && mr/total>=0.6 && (mal+noRec)===0) etq='Muy Recomendable';
-  // Recomendable: mayoría positivas
-  else if((mr+rec)/total>=0.6 && (mal+noRec)<=total*0.2) etq='Recomendable';
-  // No Recomendable: mayoría negativas
-  else if((mal+noRec)/total>0.5) etq='No Recomendable';
-  else if((mal+noRec)>0) etq='Malas Experiencias';
-  else if(rec>0||mr>0) etq='Recomendable';
+  if(positivas>=5 && negativas===0) etq='Muy Recomendable';
+  else if(negativas/total>0.5) etq='No Recomendable';
+  else if(negativas/total>0.3) etq='Malas Experiencias';
+  else if(positivas>=1) etq='Recomendable';
   const st=prom>=4.5?'★★★★★':prom>=3.5?'★★★★☆':prom>=2.5?'★★★☆☆':prom>=1.5?'★★☆☆☆':'★☆☆☆☆';
   return {promedio:prom,total,etiqueta:etq,estrellas:prom,stars:st};
 }
