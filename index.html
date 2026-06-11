@@ -83,7 +83,7 @@ header{background:var(--azul);color:white;padding:0 16px;position:sticky;top:0;z
 .nav-btn:hover{background:rgba(255,255,255,.2)}
 .nav-btn.active{background:rgba(255,255,255,.25);border-color:rgba(255,255,255,.5);font-weight:600}
 .label{display:inline}
-@media(max-width:700px){.label{display:none}.nav-btn{padding:5px 8px;font-size:.8rem}.header-title span{display:none}}
+@media(max-width:768px){.label{display:none}.nav-btn{padding:6px 8px;font-size:.82rem}.header-title span{display:none}}
 .user-avatar{width:36px;height:36px;border-radius:50%;background:var(--azul2);border:2px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:600;cursor:pointer;overflow:hidden;color:white;flex-shrink:0}
 .user-avatar img{width:100%;height:100%;object-fit:cover}
 .avatar-wrap{position:relative}
@@ -1647,13 +1647,14 @@ async function cargarMisConsultas(){
   if(!c) return;
   c.innerHTML='<div class="loading"><div class="spinner"></div>Cargando...</div>';
   try{
-    const snap=await getDocs(query(collection(db,'mensajes'),where('uid','==',currentUser.uid),orderBy('fecha','desc')));
+    const snap=await getDocs(query(collection(db,'mensajes'),where('uid','==',currentUser.uid)));
     const threadMap={};
     snap.forEach(d=>{
       const m={id:d.id,...d.data()};
       const tid=m.threadId||d.id;
       if(!threadMap[tid]) threadMap[tid]={threadId:tid,mensajes:[]};
-      threadMap[tid].mensajes.push({...m,fecha:m.fecha?.toDate?.()?.toISOString()||''});
+      const fechaMs=m.fecha?.toMillis?.()||m.fecha?.seconds*1000||0;
+      threadMap[tid].mensajes.push({...m,fecha:m.fecha?.toDate?.()?.toISOString()||'',fechaMs});
     });
     // También buscar threads iniciados por el admin con el uid del vecino
     const snap2=await getDocs(query(collection(db,'mensajes'),where('threadId','>=','thread_'+currentUser.uid),where('threadId','<','thread_'+currentUser.uid+'~')));
@@ -1661,15 +1662,13 @@ async function cargarMisConsultas(){
       const m={id:d.id,...d.data()};
       const tid=m.threadId;
       if(!threadMap[tid]) threadMap[tid]={threadId:tid,mensajes:[]};
-      if(!threadMap[tid].mensajes.find(x=>x.id===d.id))
-        threadMap[tid].mensajes.push({...m,fecha:m.fecha?.toDate?.()?.toISOString()||''});
+      if(!threadMap[tid].mensajes.find(x=>x.id===d.id)){
+        const fechaMs=m.fecha?.toMillis?.()||m.fecha?.seconds*1000||0;
+        threadMap[tid].mensajes.push({...m,fecha:m.fecha?.toDate?.()?.toISOString()||'',fechaMs});
+      }
     });
     const threads=Object.values(threadMap);
-    threads.forEach(t=>t.mensajes.sort((a,b)=>{
-      const fa=new Date(a.fecha||0).getTime();
-      const fb=new Date(b.fecha||0).getTime();
-      return fa-fb; // siempre ascendente: más viejo arriba, más nuevo abajo
-    }));
+    threads.forEach(t=>t.mensajes.sort((a,b)=>(a.fechaMs||0)-(b.fechaMs||0)));
     threads.sort((a,b)=>{const fa=a.mensajes[a.mensajes.length-1]?.fecha||'';const fb=b.mensajes[b.mensajes.length-1]?.fecha||'';return fb>fa?1:-1;});
     if(!threads.length){c.innerHTML='<p style="color:var(--muted);font-size:.83rem;text-align:center;padding:20px 0">Todavía no enviaste ninguna consulta.</p>';actualizarBadgeConsultas(0);return;}
     let sinLeerTotal=0;
@@ -1722,7 +1721,12 @@ async function enviarRespuestaVecino(threadId,btnEl){
       nombre:perfilUsuario?.nombre||'',email:currentUser.email||'',uid:currentUser.uid,
       mensaje:texto,threadId,autor:'vecino',leido:'No',fecha:serverTimestamp()
     });
-    await apiGet({action:'replyMensaje',threadId,mensaje:texto,autor:'vecino',uid:currentUser.uid}).catch(()=>{});
+    await apiGet({
+      action:'replyMensaje',threadId,mensaje:texto,autor:'vecino',
+      uid:currentUser.uid,
+      nombreVecino:perfilUsuario?.nombre||'',
+      emailVecino:currentUser.email||''
+    }).catch(()=>{});
     input.value=''; cargarMisConsultas();
   }catch(e){alert('Error de conexión');if(btnEl){btnEl.disabled=false;btnEl.textContent='Responder';}}
 }
