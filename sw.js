@@ -12,7 +12,6 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// Notificaciones cuando la app está en background
 messaging.onBackgroundMessage(function(payload) {
   const title = payload.notification?.title || 'EntreVecinos';
   const body  = payload.notification?.body  || 'Tenés una notificación nueva.';
@@ -24,7 +23,6 @@ messaging.onBackgroundMessage(function(payload) {
   });
 });
 
-// Click en la notificación abre la app
 self.addEventListener('notificationclick', function(event) {
   event.notification.close();
   event.waitUntil(
