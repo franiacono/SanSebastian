@@ -413,6 +413,8 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
     <div class="auth-switch" style="margin-top:12px"><a id="volver-login-verify">← Volver al inicio de sesión</a></div>
   </div>
 </div>
+
+<div id="screen-reset" class="auth-screen">
   <div class="auth-card">
     <div class="auth-logo">🔑</div>
     <h1>Recuperar contraseña</h1>
@@ -955,8 +957,9 @@ document.querySelectorAll('.tipo-btn').forEach(btn => {
 });
 
 // ── AUTH SCREENS ──────────────────────────────────────────────────────────────
-const showScreen  = id => { hideScreens(); document.getElementById(id).classList.add('visible'); };
-const hideScreens = () => ['screen-login','screen-register','screen-perfil','screen-reset','screen-verify-email'].forEach(id=>document.getElementById(id).classList.remove('visible'));
+const doSignOut = async () => { await signOut(auth); location.reload(); };
+const hideScreens = () => ['screen-login','screen-register','screen-perfil','screen-reset','screen-verify-email'].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('visible');});
+const showScreen  = id => { hideScreens(); document.getElementById(id)?.classList.add('visible'); };
 
 document.getElementById('ir-registro').addEventListener('click',  ()=>showScreen('screen-register'));
 document.getElementById('ir-login').addEventListener('click',     ()=>showScreen('screen-login'));
