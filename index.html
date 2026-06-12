@@ -1747,7 +1747,17 @@ async function cargarMensajes(){
     const nuevo=c.cloneNode(false); nuevo.innerHTML=c.innerHTML; c.parentNode.replaceChild(nuevo,c);
     nuevo.addEventListener('click',e=>{
       const hdr=e.target.closest('[data-toggle="admin"]');
-      if(hdr){const b=document.getElementById('cbody-'+hdr.dataset.tid);b.style.display=b.style.display==='none'||!b.style.display?'block':'none';apiGet({action:'marcarLeidoAdmin',threadId:hdr.dataset.tid}).catch(()=>{});return;}
+      if(hdr){
+        const b=document.getElementById('cbody-'+hdr.dataset.tid);
+        b.style.display=b.style.display==='none'||!b.style.display?'block':'none';
+        // Marcar como leído en Firestore
+        const tid=hdr.dataset.tid;
+        getDocs(query(collection(db,'mensajes'),where('threadId','==',tid),where('autor','==','vecino'),where('leido','==','No')))
+          .then(snap=>{ snap.forEach(d=>updateDoc(doc(db,'mensajes',d.id),{leido:'Si'})); cargarEstadisticasAdmin(); })
+          .catch(()=>{});
+        apiGet({action:'marcarLeidoAdmin',threadId:tid}).catch(()=>{});
+        return;
+      }
       const btn2=e.target.closest('[data-send-admin]');if(btn2&&!btn2.disabled)enviarRespuestaAdmin(btn2.dataset.sendAdmin,btn2);
     });
   }catch(e){c.innerHTML='<div class="admin-empty"><div class="icon">❌</div><p>Error al cargar.</p></div>';}
