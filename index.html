@@ -217,6 +217,9 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
 .btn-marcar-datos:hover{background:var(--rojo);color:white}
 .btn-marcar-datos.marcado{background:#fee2e2;color:var(--rojo)}
 .admin-empty{text-align:center;padding:48px 20px;color:var(--muted)}
+.admin-stat-card{background:white;border:1.5px solid var(--border);border-radius:12px;padding:16px;text-align:center}
+.stat-num{font-size:1.8rem;font-weight:700;color:var(--azul);font-family:'Fraunces',serif}
+.stat-label{font-size:.75rem;color:var(--muted);margin-top:4px;font-weight:500}
 .admin-empty .icon{font-size:2.5rem;margin-bottom:12px}
 .admin-tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--crema2);border-radius:10px;padding:4px}
 .admin-tab{flex:1;padding:8px;border:none;background:transparent;border-radius:8px;font-size:.82rem;font-family:'Inter',sans-serif;cursor:pointer;color:var(--muted);font-weight:500;transition:all .2s}
@@ -594,6 +597,14 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
           <h2 class="admin-title">🛠️ Panel de administración</h2>
           <button class="btn-submit" id="btn-actualizar-admin" style="padding:9px 18px">↺ Actualizar</button>
         </div>
+        <!-- Estadísticas -->
+        <div id="admin-stats" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:20px">
+          <div class="admin-stat-card" id="stat-pendientes"><div class="stat-num">—</div><div class="stat-label">⏳ Pendientes</div></div>
+          <div class="admin-stat-card" id="stat-usuarios"><div class="stat-num">—</div><div class="stat-label">👥 Usuarios totales</div></div>
+          <div class="admin-stat-card" id="stat-nuevos"><div class="stat-num">—</div><div class="stat-label">🆕 Nuevos esta semana</div></div>
+          <div class="admin-stat-card" id="stat-proveedores"><div class="stat-num">—</div><div class="stat-label">📋 Proveedores</div></div>
+          <div class="admin-stat-card" id="stat-mensajes"><div class="stat-num">—</div><div class="stat-label">💬 Consultas sin leer</div></div>
+        </div>
         <div class="admin-tabs">
           <button class="admin-tab active" data-atab="pendientes">Pendientes</button>
           <button class="admin-tab" data-atab="recientes">Recientes</button>
@@ -801,7 +812,7 @@ const FB_CONFIG = {
 const ADMIN_EMAILS = ['francisco.iacono@gmail.com','adminproveedoressansebastian@gmail.com'];
 const VAPID_KEY    = 'BBNWLH5KZLq7Zdj7ARf3hE1zRQxR1Sbk1k7Xk2-5Hf9t9L5rKaYcNSFu5WrGWJmyh-QKrok5jNZBTgpUXxjLS30';
 // Apps Script solo para emails y push (sigue igual)
-const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbxWHyoQ7CYEERMMtSrK5TmpeLdf67Sw1z0mRBPMOuD9cvGCrxy8UshNWevBk7g9JJdV1g/exec';
+const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbyiVJz1u-LTeuf-VpWJbZJWfTt2_s9tezT6G4RyRiDKAVBXB7GLFSUAfG1uYrdneAWm-w/exec';
 const SCRIPT_PWD   = 'sansebastian2025';
 const ADMIN_PWD    = 'admin2025';
 
@@ -1116,6 +1127,8 @@ document.getElementById('btn-guardar-perfil').addEventListener('click', async ()
         estado:'Pendiente', autoregistrado:true, fecha:serverTimestamp()
       });
       perfilUsuario={uid:currentUser.uid,email:currentUser.email,nombre,telefono:tel,barrio:'Externo',area:'',lote:'',verificado:'No',tipoUsuario:'proveedor',avisoAdmin:''};
+      // Email de confirmación al proveedor
+      apiGet({action:'notificarProveedorRegistro',emailProv:currentUser.email,nombreProv:nombre,servicio}).catch(()=>{});
       hideScreens();
       entrarALaApp();
     } catch(e){ showErr('prf-error','Error al guardar.'); btn.disabled=false; btn.textContent='Guardar y continuar'; }
@@ -1188,7 +1201,7 @@ function showPage(pageId){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+pageId).classList.add('active');
   document.getElementById('nav-'+pageId)?.classList.add('active');
-  if(pageId==='admin')     cargarPendientes();
+  if(pageId==='admin'){cargarPendientes();cargarEstadisticasAdmin();}
   if(pageId==='mensajes')  cargarMensajes();
   if(pageId==='consultas') cargarMisConsultas();
 }
@@ -1504,7 +1517,7 @@ async function cargarTelefonos(){
 }
 
 // ── ADMIN ─────────────────────────────────────────────────────────────────────
-document.getElementById('btn-actualizar-admin').addEventListener('click', cargarPendientes);
+document.getElementById('btn-actualizar-admin').addEventListener('click', ()=>{ cargarPendientes(); cargarEstadisticasAdmin(); });
 document.querySelectorAll('.admin-tab').forEach(tab=>{
   tab.addEventListener('click',()=>{
     document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
@@ -2028,6 +2041,7 @@ document.getElementById('btn-registrar-servicio').addEventListener('click', asyn
       estado:'Pendiente',autoregistrado:true,fecha:serverTimestamp()
     });
     okEl.style.display='block';
+    apiGet({action:'notificarProveedorRegistro',emailProv:currentUser.email,nombreProv:nombre,servicio}).catch(()=>{});
     ['sv-nombre','sv-empresa','sv-telefono','sv-servicio','sv-descripcion'].forEach(id=>document.getElementById(id).value='');
     poblarCheckboxBarrios('sv-barrios-servicio');
   }catch(e){errEl.textContent='Error al enviar.';errEl.style.display='block';}
@@ -2083,7 +2097,37 @@ async function pedirPermisoNotificaciones(uid){
   }catch(e){console.log('FCM error:',e);}
 }
 
-// ── ADMIN BUSCAR Y EDITAR PROVEEDORES ─────────────────────────────────────────
+// ── ESTADÍSTICAS ADMIN ────────────────────────────────────────────────────────
+async function cargarEstadisticasAdmin(){
+  try{
+    const ahora = new Date();
+    const haceSemana = new Date(ahora.getTime() - 7*24*60*60*1000);
+
+    // Pendientes
+    const snapPend = await getDocs(query(collection(db,'pendientes'),where('estado','==','Pendiente')));
+    document.querySelector('#stat-pendientes .stat-num').textContent = snapPend.size;
+
+    // Usuarios totales y nuevos esta semana
+    const snapUsers = await getDocs(collection(db,'usuarios'));
+    let nuevos = 0;
+    snapUsers.forEach(d=>{
+      const f = d.data().fechaRegistro?.toDate?.();
+      if(f && f >= haceSemana) nuevos++;
+    });
+    document.querySelector('#stat-usuarios .stat-num').textContent = snapUsers.size;
+    document.querySelector('#stat-nuevos .stat-num').textContent = nuevos;
+
+    // Proveedores
+    const snapProv = await getDocs(collection(db,'proveedores'));
+    document.querySelector('#stat-proveedores .stat-num').textContent = snapProv.size;
+
+    // Mensajes sin leer del admin
+    const snapMsg = await getDocs(query(collection(db,'mensajes'),where('autor','==','vecino'),where('leido','==','No')));
+    document.querySelector('#stat-mensajes .stat-num').textContent = snapMsg.size;
+  }catch(e){ console.log('Stats error:',e); }
+}
+
+// ── EMAIL A PROVEEDOR AL AUTO-REGISTRARSE ─────────────────────────────────────
 document.getElementById('btn-admin-buscar-prov').addEventListener('click', ()=>buscarProveedoresAdmin());
 document.getElementById('admin-buscar-proveedor').addEventListener('keydown', e=>{if(e.key==='Enter') buscarProveedoresAdmin();});
 
