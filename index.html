@@ -402,7 +402,17 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
   </div>
 </div>
 
-<div id="screen-reset" class="auth-screen">
+<div id="screen-verify-email" class="auth-screen">
+  <div class="auth-card" style="text-align:center">
+    <div style="font-size:3rem;margin-bottom:16px">📧</div>
+    <h1 style="font-family:'Fraunces',serif;color:var(--azul);margin-bottom:8px">Verificá tu email</h1>
+    <p style="color:var(--muted);font-size:.88rem;line-height:1.6;margin-bottom:24px">Te enviamos un link de verificación a <strong id="verify-email-addr"></strong>.<br>Revisá tu bandeja de entrada y hacé click en el link.</p>
+    <button class="btn-primary" id="btn-ya-verifique" style="margin-bottom:10px">✅ Ya verifiqué mi email</button>
+    <button class="btn-secondary" id="btn-reenviar-email" style="width:100%;margin-bottom:10px">📨 Reenviar email</button>
+    <p id="verify-msg" style="font-size:.82rem;color:var(--muted);display:none;margin-top:8px"></p>
+    <div class="auth-switch" style="margin-top:12px"><a id="volver-login-verify">← Volver al inicio de sesión</a></div>
+  </div>
+</div>
   <div class="auth-card">
     <div class="auth-logo">🔑</div>
     <h1>Recuperar contraseña</h1>
@@ -761,7 +771,7 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getAuth, GoogleAuthProvider, signInWithPopup,
          createUserWithEmailAndPassword, signInWithEmailAndPassword,
          onAuthStateChanged, signOut, updatePassword, sendPasswordResetEmail,
-         RecaptchaVerifier, signInWithPhoneNumber }
+         sendEmailVerification }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc,
          collection, query, where, orderBy, getDocs, onSnapshot, serverTimestamp, limit }
@@ -946,7 +956,7 @@ document.querySelectorAll('.tipo-btn').forEach(btn => {
 
 // ── AUTH SCREENS ──────────────────────────────────────────────────────────────
 const showScreen  = id => { hideScreens(); document.getElementById(id).classList.add('visible'); };
-const hideScreens = () => ['screen-login','screen-register','screen-perfil','screen-reset'].forEach(id=>document.getElementById(id).classList.remove('visible'));
+const hideScreens = () => ['screen-login','screen-register','screen-perfil','screen-reset','screen-verify-email'].forEach(id=>document.getElementById(id).classList.remove('visible'));
 
 document.getElementById('ir-registro').addEventListener('click',  ()=>showScreen('screen-register'));
 document.getElementById('ir-login').addEventListener('click',     ()=>showScreen('screen-login'));
@@ -978,7 +988,10 @@ document.getElementById('btn-register').addEventListener('click', async () => {
   if(!email||!pass){ showErr('register-error','Completá todos los campos'); return; }
   if(pass.length<6){ showErr('register-error','La contraseña debe tener al menos 6 caracteres'); return; }
   const btn = document.getElementById('btn-register'); btn.disabled=true; btn.textContent='Creando cuenta...';
-  try { await createUserWithEmailAndPassword(auth, email, pass); }
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await sendEmailVerification(cred.user);
+  }
   catch(e){ showErr('register-error', e.code==='auth/email-already-in-use'?'Ese email ya está registrado':'Error al crear la cuenta'); btn.disabled=false; btn.textContent='Crear cuenta'; }
 });
 
@@ -993,8 +1006,43 @@ document.getElementById('btn-reset').addEventListener('click', async () => {
   }catch(e){ showErr('reset-error','No se encontró ese email'); }
 });
 
-// Sign out
-const doSignOut = async () => { await signOut(auth); location.reload(); };
+document.getElementById('volver-login-verify').addEventListener('click', async()=>{ await signOut(auth); showScreen('screen-login'); });
+
+document.getElementById('btn-ya-verifique').addEventListener('click', async()=>{
+  const btn=document.getElementById('btn-ya-verifique');
+  const msg=document.getElementById('verify-msg');
+  btn.disabled=true; btn.textContent='Verificando...';
+  try{
+    await auth.currentUser.reload();
+    if(auth.currentUser.emailVerified){
+      hideScreens();
+      currentUser=auth.currentUser;
+      // Cargar perfil
+      const snap=await getDoc(doc(db,'usuarios',currentUser.uid));
+      if(snap.exists()&&snap.data().nombre){ perfilUsuario=snap.data(); entrarALaApp(); }
+      else { document.getElementById('prf-email').value=currentUser.email||''; showScreen('screen-perfil'); }
+    } else {
+      msg.textContent='⚠️ Todavía no verificaste el email. Revisá tu bandeja de entrada.';
+      msg.style.color='var(--rojo)'; msg.style.display='block';
+    }
+  }catch(e){ msg.textContent='Error al verificar.'; msg.style.color='var(--rojo)'; msg.style.display='block'; }
+  btn.disabled=false; btn.textContent='✅ Ya verifiqué mi email';
+});
+
+document.getElementById('btn-reenviar-email').addEventListener('click', async()=>{
+  const btn=document.getElementById('btn-reenviar-email');
+  const msg=document.getElementById('verify-msg');
+  btn.disabled=true;
+  try{
+    await sendEmailVerification(auth.currentUser);
+    msg.textContent='✅ Email reenviado. Revisá tu bandeja de entrada.';
+    msg.style.color='var(--verde-ok)'; msg.style.display='block';
+  }catch(e){
+    msg.textContent='Error al reenviar. Esperá un momento e intentá de nuevo.';
+    msg.style.color='var(--rojo)'; msg.style.display='block';
+  }
+  setTimeout(()=>btn.disabled=false, 30000); // esperar 30s antes de reenviar
+});
 document.getElementById('dd-salir').addEventListener('click', doSignOut);
 
 // ── AUTH STATE ────────────────────────────────────────────────────────────────
@@ -1003,6 +1051,14 @@ onAuthStateChanged(auth, async user => {
     document.getElementById('app').style.display='none';
     hideScreens();
     showScreen('screen-login');
+    return;
+  }
+  // Si se registró con email/contraseña y no verificó el email
+  if(!user.emailVerified && user.providerData[0]?.providerId === 'password'){
+    document.getElementById('app').style.display='none';
+    document.getElementById('verify-email-addr').textContent = user.email;
+    hideScreens();
+    showScreen('screen-verify-email');
     return;
   }
   currentUser = user;
@@ -1394,6 +1450,11 @@ document.getElementById('btn-form-submit').addEventListener('click', async ()=>{
   const barrioProv = getCheckboxBarrios('f-barrios-servicio');
   const msg=document.getElementById('form-msg');
   msg.style.display='none';
+  // Verificar email
+  if(!currentUser.emailVerified && currentUser.providerData[0]?.providerId==='password'){
+    msg.textContent='⚠️ Debés verificar tu email antes de enviar recomendaciones. Revisá tu bandeja de entrada.';
+    msg.style.color='var(--rojo)'; msg.style.display='block'; return;
+  }
   if(!nombre||!telefono||!servicio||!recomen||!vecino){msg.textContent='⚠️ Completá todos los campos obligatorios (*)';msg.style.color='var(--rojo)';msg.style.display='block';return;}
   const btn=document.getElementById('btn-form-submit');btn.disabled=true;btn.textContent='Enviando...';
   try{
@@ -1801,6 +1862,10 @@ document.getElementById('btn-cancelar-nueva-consulta').addEventListener('click',
 document.getElementById('btn-enviar-nueva-consulta').addEventListener('click', async()=>{
   const texto=document.getElementById('nueva-consulta-texto').value.trim();
   const msgEl=document.getElementById('nueva-consulta-msg');
+  if(!currentUser.emailVerified && currentUser.providerData[0]?.providerId==='password'){
+    msgEl.textContent='⚠️ Debés verificar tu email antes de enviar consultas.';
+    msgEl.style.color='var(--rojo)'; msgEl.style.display='block'; return;
+  }
   if(!texto){msgEl.textContent='⚠️ Escribí tu consulta';msgEl.style.color='var(--rojo)';msgEl.style.display='block';return;}
   const btn=document.getElementById('btn-enviar-nueva-consulta');btn.disabled=true;btn.textContent='Enviando...';
   try{
