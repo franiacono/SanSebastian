@@ -406,7 +406,13 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
   <div class="auth-card" style="text-align:center">
     <div style="font-size:3rem;margin-bottom:16px">📧</div>
     <h1 style="font-family:'Fraunces',serif;color:var(--azul);margin-bottom:8px">Verificá tu email</h1>
-    <p style="color:var(--muted);font-size:.88rem;line-height:1.6;margin-bottom:24px">Te enviamos un link de verificación a <strong id="verify-email-addr"></strong>.<br>Revisá tu bandeja de entrada y hacé click en el link.</p>
+    <p style="color:var(--muted);font-size:.88rem;line-height:1.6;margin-bottom:16px">Te enviamos un link de verificación a <strong id="verify-email-addr"></strong>.<br>Hacé click en el link para activar tu cuenta.</p>
+    <div style="background:#fef3c7;border:1px solid #fde68a;border-radius:10px;padding:12px 14px;font-size:.82rem;color:#92400e;margin-bottom:20px;text-align:left">
+      <strong>⚠️ ¿No llegó el email?</strong><br>
+      1. Revisá la carpeta de <strong>spam o correo no deseado</strong><br>
+      2. Buscá un email de <strong>noreply@entrevecinos-app.firebaseapp.com</strong><br>
+      3. Marcalo como "No es spam" para futuros emails
+    </div>
     <button class="btn-primary" id="btn-ya-verifique" style="margin-bottom:10px">✅ Ya verifiqué mi email</button>
     <button class="btn-secondary" id="btn-reenviar-email" style="width:100%;margin-bottom:10px">📨 Reenviar email</button>
     <p id="verify-msg" style="font-size:.82rem;color:var(--muted);display:none;margin-top:8px"></p>
