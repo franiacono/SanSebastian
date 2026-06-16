@@ -1604,6 +1604,7 @@ function adminCardHTML(r){
       <div>
         <div class="admin-nombre">${r.nombre||'Sin nombre'}</div>
         <div class="admin-meta"><span>⚙️ ${r.servicio||'—'}</span>${r.telefono?`<span>📞 ${r.telefono}</span>`:''}</div>
+        ${r.barriosServicio&&r.barriosServicio.length?`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">${r.barriosServicio.map(b=>`<span class="barrio-srv-badge" style="font-size:.68rem">${b==='Consultar'?'🔍 Consultar':b==='Toda la zona'?'🌐 Toda la zona':b}</span>`).join('')}</div>`:''}
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           <span class="badge ${r.recomendacion?r.recomendacion.toLowerCase().replace(/ /g,'-'):'sin-datos'}" style="font-size:.7rem">${r.recomendacion||'—'}</span>
           <span class="admin-badge ${bc}">${r.estado||'Pendiente'}</span>
@@ -1637,7 +1638,10 @@ async function accionPendiente(id, accion, btn){
       await addDoc(collection(db,'proveedores'),{
         nombre:r.nombre,empresa:r.empresa||'',dni:r.dni||'',telefono:r.telefono,
         servicio:r.servicio,recomendacion:r.recomendacion,notas:r.notas||'',
-        barrio:r.barrio||'',barrioOrigen:r.barrioVecino||'',
+        barrio:r.barrio||'',
+        barrioOrigen:r.barrioOrigen||'',
+        barriosServicio:r.barriosServicio||[],
+        barrioVecino:r.barrioVecino||'',
         autoregistrado:r.autoregistrado||false, fechaAprobacion:serverTimestamp()
       });
       // Notificar vecino push via Apps Script
