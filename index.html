@@ -1504,6 +1504,7 @@ document.getElementById('btn-form-submit').addEventListener('click', async ()=>{
   const barrioProv = barrioPrvOpt==='Si' ? barrioPrvCual : barrioPrvOpt;
   const barrioOrigen = barrioPrvOpt==='Si' ? barrioPrvCual : '';
   const barriosServicio = getCheckboxBarrios('f-barrios-servicio');
+  console.log('Barrios seleccionados:', barriosServicio, document.getElementById('f-barrios-servicio')?.innerHTML?.length);
   const msg=document.getElementById('form-msg');
   msg.style.display='none';
   // Verificar email
