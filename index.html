@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EntreVecinos · Proveedores de confianza</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' rx='40' fill='%231a3a5c'/%3E%3Ctext x='100' y='130' font-family='Georgia,serif' font-size='90' font-weight='700' fill='%23e8f0fe' text-anchor='middle'%3EEV%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' rx='40' fill='%231a3a5c'/%3E%3Ctext x='100' y='135' font-family='Georgia,serif' font-size='96' font-weight='700' fill='%23e8f0fe' text-anchor='middle'%3EEV%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%231a3a5c'/%3E%3Ctext x='256' y='340' font-family='Georgia,serif' font-size='240' font-weight='700' fill='%23e8f0fe' text-anchor='middle'%3EEV%3C/text%3E%3C/svg%3E">
 <link rel="manifest" href="/manifest.json">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -917,10 +918,13 @@ let confirmResult  = null;
 let adminMsgDestino = null;
 
 // Fix labels en mobile Safari/PWA
-if(window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)){
-  document.querySelectorAll('.label').forEach(el=>el.style.display='none');
-  document.querySelectorAll('.nav-btn').forEach(el=>{el.style.padding='6px 8px';el.style.fontSize='.8rem';});
+function fixMobileLabels(){
+  if(window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)){
+    document.querySelectorAll('.label').forEach(el=>el.style.display='none');
+    document.querySelectorAll('.nav-btn').forEach(el=>{el.style.padding='6px 8px';el.style.fontSize='.8rem';});
+  }
 }
+fixMobileLabels();
 
 const isAdmin = () => ADMIN_EMAILS.includes((currentUser?.email||'').toLowerCase());
 const apiGet  = p => { const pwd=isAdmin()?ADMIN_PWD:SCRIPT_PWD; return fetch(SCRIPT_URL+'?'+new URLSearchParams({...p,password:pwd})).then(r=>r.json()); };
@@ -1204,6 +1208,7 @@ function entrarALaApp() {
   }
   cargarProveedores();
   cargarTelefonos();
+  setTimeout(fixMobileLabels, 100);
   // Aviso datos incorrectos - solo mostrar una vez por sesión
   if(perfilUsuario?.avisoAdmin === 'Si' && !sessionStorage.getItem('avisoMostrado')){
     sessionStorage.setItem('avisoMostrado','1');
