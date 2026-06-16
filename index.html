@@ -1233,7 +1233,11 @@ function showPage(pageId){
 }
 document.getElementById('nav-buscar').addEventListener('click',    ()=>showPage('buscar'));
 document.getElementById('nav-telefonos').addEventListener('click', ()=>showPage('telefonos'));
-document.getElementById('nav-recomendar').addEventListener('click',()=>showPage('recomendar'));
+document.getElementById('nav-recomendar').addEventListener('click',()=>{
+  showPage('recomendar');
+  poblarCheckboxBarrios('f-barrios-servicio');
+  poblarSelectBarrios('f-barrio-cual');
+});
 document.getElementById('nav-consultas').addEventListener('click', ()=>showPage('consultas'));
 document.getElementById('nav-admin').addEventListener('click',     ()=>showPage('admin'));
 document.getElementById('nav-mensajes').addEventListener('click',  ()=>showPage('mensajes'));
