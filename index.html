@@ -549,6 +549,10 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
                 </select>
               </div>
             </div>
+            <div class="form-row">
+              <label>¿A qué barrios llega para trabajar?</label>
+              <div id="f-barrios-servicio" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px"></div>
+            </div>
             <p class="form-msg" id="form-msg"></p>
             <button class="btn-submit" id="btn-form-submit">Enviar recomendación</button>
           </div>
@@ -973,6 +977,7 @@ function getCheckboxBarrios(containerId){
 
 // Selector barrio proveedor en form recomendar
 poblarSelectBarrios('f-barrio-cual');
+poblarCheckboxBarrios('f-barrios-servicio');
 document.querySelectorAll('input[name="f-barrio-prov-opt"]').forEach(r=>{
   r.addEventListener('change',()=>{
     document.getElementById('f-barrio-cual-box').style.display=r.value==='Si'?'block':'none';
@@ -1491,10 +1496,10 @@ document.getElementById('btn-form-submit').addEventListener('click', async ()=>{
   const vecino    = document.getElementById('f-recomen').value.trim();
   const notas     = document.getElementById('f-notas').value.trim();
   const barrioPrvOpt = document.querySelector('input[name="f-barrio-prov-opt"]:checked')?.value||'No sé';
-  const barrioPrvCual = barrioPrvOpt==='Si' ? (document.getElementById('f-barrio-cual').value||'No sé') : '';
+  const barrioPrvCual = barrioPrvOpt==='Si' ? (document.getElementById('f-barrio-cual').value||'') : '';
   const barrioProv = barrioPrvOpt==='Si' ? barrioPrvCual : barrioPrvOpt;
   const barrioOrigen = barrioPrvOpt==='Si' ? barrioPrvCual : '';
-  const barriosServicio = barrioPrvOpt==='Si' ? [barrioPrvCual,'Consultar'] : ['Consultar'];
+  const barriosServicio = getCheckboxBarrios('f-barrios-servicio');
   const msg=document.getElementById('form-msg');
   msg.style.display='none';
   // Verificar email
