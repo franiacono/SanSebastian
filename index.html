@@ -1591,10 +1591,11 @@ document.getElementById('btn-form-submit').addEventListener('click', async ()=>{
 // ── TELEFONOS UTILES ──────────────────────────────────────────────────────────
 async function cargarTelefonos(){
   const c=document.getElementById('telefonos-container');
+  const barrioUsuario = perfilUsuario?.barrio||'';
+  console.log('cargarTelefonos - barrio usuario:', barrioUsuario, '| perfil:', perfilUsuario?.nombre);
   try{
     const snap=await getDocs(query(collection(db,'proveedores'),where('tipo','==','util')));
     if(snap.empty){c.innerHTML='<div class="empty-state"><div class="icon">📞</div><p>Sin teléfonos cargados</p></div>';return;}
-    const barrioUsuario = perfilUsuario?.barrio||'';
     const items=[];
     snap.forEach(d=>{
       const t={id:d.id,...d.data()};
