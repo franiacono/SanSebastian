@@ -1600,6 +1600,7 @@ async function cargarTelefonos(){
     snap.forEach(d=>{
       const t={id:d.id,...d.data()};
       const bs=t.barriosServicio||[];
+      console.log('Util:', t.nombre, '| bs:', JSON.stringify(bs), '| incluye barrio:', bs.includes(barrioUsuario));
       if(!barrioUsuario){ items.push(t); return; } // sin barrio ve todo
       if(bs.length===0){ items.push(t); return; } // sin barrios definidos visible para todos
       if(bs.includes('Toda la zona')){ items.push(t); return; }
