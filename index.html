@@ -1488,8 +1488,8 @@ function cardHTML(p,isDest){
       <div class="card-avatar">${em}</div>
       <div class="card-info">
         ${isDest?'<div class="destacado-badge">⭐ Destacado</div>':''}
-        <div class="card-nombre">${p.nombre}</div>
-        <div class="card-sub">${empOk?p.empresa:p.servicio}</div>
+        <div class="card-nombre">${empOk?p.empresa:p.nombre}</div>
+        <div class="card-sub">${empOk?p.nombre:p.servicio}</div>
         <span class="card-servicio-tag">${p.servicio}</span>
         ${p.autoregistrado===true?'<span class="badge-autoregistrado">🏪 Registrado por el proveedor</span>':''}
       </div>
