@@ -505,7 +505,7 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
       <div class="chip-row" id="chip-row"></div>
       <div class="results-header">
         <span class="results-count" id="results-count"></span>
-        <button id="btn-limpiar-filtros" style="display:none;padding:5px 12px;background:transparent;border:1.5px solid var(--rojo);color:var(--rojo);border-radius:8px;font-size:.75rem;font-family:'Inter',sans-serif;cursor:pointer" onclick="limpiarFiltros()">✕ Limpiar filtros</button>
+        <button id="btn-limpiar-filtros" style="display:none;padding:5px 12px;background:transparent;border:1.5px solid var(--rojo);color:var(--rojo);border-radius:8px;font-size:.75rem;font-family:'Inter',sans-serif;cursor:pointer">✕ Limpiar filtros</button>
       </div>
       <div id="results-container"><div class="loading"><div class="spinner"></div>Cargando proveedores...</div></div>
     </div>
@@ -1392,6 +1392,7 @@ chipRow.querySelectorAll('.chip').forEach(btn=>{
   });
 });
 
+document.getElementById('btn-limpiar-filtros').addEventListener('click', limpiarFiltros);
 document.getElementById('search-input').addEventListener('input', ()=>renderResults());
 document.getElementById('cat-select').addEventListener('change',  ()=>renderResults());
 document.getElementById('barrio-filter-select').addEventListener('change', ()=>renderResults());
