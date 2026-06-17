@@ -1352,10 +1352,12 @@ function calcScore(r){
 }
 
 function poblarRubros(){
-  const cats=new Set(proveedores.map(p=>p.categoria));
   const sel=document.getElementById('cat-select');
+  const valorActual=sel.value; // guardar selección actual
+  const cats=new Set(proveedores.map(p=>p.categoria));
   sel.innerHTML='<option value="">Todos los rubros ('+proveedores.length+')</option>'+
     [...cats].sort().map(c=>`<option value="${c}">${c}</option>`).join('');
+  if(valorActual) sel.value=valorActual; // restaurar selección
 }
 
 // ── RENDER RESULTS ────────────────────────────────────────────────────────────
@@ -1395,9 +1397,13 @@ function renderResults(){
     if(!chip.fn(p)) return false;
     if(cat && p.categoria!==cat) return false;
     if(barF){
-      const pb=norm(p.barrioOrigen||'');
       const bf=norm(barF);
-      if(!pb.includes(bf)) return false;
+      const bs=p.barriosServicio||[];
+      // Buscar si algún barrio de servicio coincide con el filtro
+      const coincide=bs.some(b=>norm(b).includes(bf));
+      // También incluir si tiene Consultar o Toda la zona
+      const esGeneral=bs.includes('Consultar')||bs.includes('Toda la zona')||bs.length===0;
+      if(!coincide && !esGeneral) return false;
     }
     if(q){
       const hay=norm(p.nombre).includes(q)||norm(p.servicio).includes(q)||norm(p.empresa).includes(q)||norm(p.telefono).includes(q)||norm(p.dni).includes(q);
