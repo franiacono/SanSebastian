@@ -791,7 +791,33 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
     <p id="edit-prov-msg" style="font-size:.82rem;margin-top:8px;display:none;text-align:center"></p>
   </div>
 </div>
-  <div class="aviso-datos-overlay" id="modal-aviso-datos">
+  <div class="modal-overlay" id="modal-editar-usuario">
+  <div class="modal-box" style="max-width:480px">
+    <button class="modal-close" id="editar-usr-close">✕</button>
+    <h3 style="font-family:'Fraunces',serif;color:var(--azul);margin-bottom:16px">✏️ Editar usuario</h3>
+    <input type="hidden" id="edit-usr-id">
+    <div class="auth-row"><label>Email</label><input class="auth-input" id="edit-usr-email" readonly style="opacity:.6"></div>
+    <div class="auth-row"><label>Nombre *</label><input class="auth-input" id="edit-usr-nombre"></div>
+    <div class="auth-row"><label>Teléfono</label><input class="auth-input" id="edit-usr-telefono"></div>
+    <div class="auth-row"><label>Barrio</label><select class="auth-select" id="edit-usr-barrio"><option value="">— Seleccioná —</option></select></div>
+    <div class="auth-row"><label>Sector / Área</label><select class="auth-select" id="edit-usr-area"><option value="">— Seleccioná —</option></select></div>
+    <div class="auth-row"><label>Lote</label><input class="auth-input" id="edit-usr-lote" placeholder="Ej: 42"></div>
+    <div class="auth-row"><label>Verificado</label>
+      <select class="auth-select" id="edit-usr-verificado">
+        <option value="No">No verificado</option>
+        <option value="Si">✅ Verificado</option>
+      </select>
+    </div>
+    <div class="auth-row"><label>Aviso datos incorrectos</label>
+      <select class="auth-select" id="edit-usr-aviso">
+        <option value="">Sin aviso</option>
+        <option value="Si">⚠️ Marcar datos incorrectos</option>
+      </select>
+    </div>
+    <button class="btn-primary" id="btn-guardar-usr" style="margin-top:8px">💾 Guardar cambios</button>
+    <p id="edit-usr-msg" style="font-size:.82rem;margin-top:8px;display:none;text-align:center"></p>
+  </div>
+</div>
   <div class="aviso-datos-box">
     <div style="font-size:2.8rem;margin-bottom:12px">⚠️</div>
     <h3 style="font-family:'Fraunces',serif;color:var(--rojo);font-size:1.2rem;margin-bottom:10px">Revisá tus datos</h3>
@@ -2317,6 +2343,58 @@ document.getElementById('results-container').addEventListener('click', e=>{
     if(p) abrirEditarProveedor(btn.dataset.id,{...p,recomendacion:p.score?.etiqueta||'Recomendable'});
   }
 });
+
+// ── ADMIN EDITAR USUARIO ──────────────────────────────────────────────────────
+document.getElementById('editar-usr-close').addEventListener('click',()=>document.getElementById('modal-editar-usuario').classList.remove('open'));
+document.getElementById('modal-editar-usuario').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});
+document.getElementById('edit-usr-barrio').addEventListener('change',e=>poblarSelectSectores('edit-usr-area',e.target.value));
+
+function abrirEditarUsuario(u){
+  document.getElementById('edit-usr-id').value=u.uid||u.id;
+  document.getElementById('edit-usr-email').value=u.email||'';
+  document.getElementById('edit-usr-nombre').value=u.nombre||'';
+  document.getElementById('edit-usr-telefono').value=u.telefono||'';
+  document.getElementById('edit-usr-lote').value=u.lote||'';
+  document.getElementById('edit-usr-verificado').value=u.verificado||'No';
+  document.getElementById('edit-usr-aviso').value=u.avisoAdmin||'';
+  poblarSelectBarrios('edit-usr-barrio');
+  if(u.barrio){
+    document.getElementById('edit-usr-barrio').value=u.barrio;
+    poblarSelectSectores('edit-usr-area',u.barrio);
+    if(u.area) document.getElementById('edit-usr-area').value=u.area;
+  }
+  document.getElementById('edit-usr-msg').style.display='none';
+  document.getElementById('modal-editar-usuario').classList.add('open');
+}
+
+document.getElementById('btn-guardar-usr').addEventListener('click', async()=>{
+  const id=document.getElementById('edit-usr-id').value;
+  if(!id) return;
+  const msg=document.getElementById('edit-usr-msg');
+  const btn=document.getElementById('btn-guardar-usr');
+  btn.disabled=true; btn.textContent='Guardando...';
+  try{
+    const datos={
+      nombre:document.getElementById('edit-usr-nombre').value.trim(),
+      telefono:document.getElementById('edit-usr-telefono').value.trim(),
+      barrio:document.getElementById('edit-usr-barrio').value,
+      area:document.getElementById('edit-usr-area').value,
+      lote:document.getElementById('edit-usr-lote').value.trim(),
+      verificado:document.getElementById('edit-usr-verificado').value,
+      avisoAdmin:document.getElementById('edit-usr-aviso').value,
+    };
+    await updateDoc(doc(db,'usuarios',id), datos);
+    if(datos.avisoAdmin==='Si'){
+      const email=document.getElementById('edit-usr-email').value;
+      apiGet({action:'setAvisoAdmin',uid:id,email,avisoAdmin:'Si'}).catch(()=>{});
+    }
+    msg.textContent='✅ Guardado'; msg.style.color='var(--verde-ok)'; msg.style.display='block';
+    buscarUsuariosAdmin();
+    setTimeout(()=>document.getElementById('modal-editar-usuario').classList.remove('open'),1200);
+  }catch(e){msg.textContent='❌ Error: '+e.message; msg.style.color='var(--rojo)'; msg.style.display='block';}
+  btn.disabled=false; btn.textContent='💾 Guardar cambios';
+});
+
 async function buscarUsuariosAdmin(){
   const q2=document.getElementById('admin-buscar-usuario').value.trim().toLowerCase();
   const res=document.getElementById('admin-resultados-usuario');
@@ -2337,9 +2415,14 @@ async function buscarUsuariosAdmin(){
         <td style="padding:7px 8px">${u.area||'—'}</td>
         <td style="padding:7px 8px"><span class="admin-badge ${u.verificado==='Si'?'verificado':'no-verificado'}">${u.verificado==='Si'?'✅':'⚠️'} ${u.verificado||'No'}</span></td>
         <td style="padding:7px 8px;color:var(--muted)">${u.ultimoAcceso?.toDate?fmtFecha(u.ultimoAcceso.toDate().toISOString()):'—'}</td>
-        <td style="padding:7px 8px"><button class="btn-marcar-datos" style="font-size:.72rem" data-marcar-uid="${u.uid||u.id}" data-marcar-email="${u.email||''}">🚩</button></td>
+        <td style="padding:7px 8px"><button class="btn-marcar-datos" style="font-size:.72rem" data-marcar-uid="${u.uid||u.id}" data-marcar-email="${u.email||''}">🚩</button>
+        <button class="btn-marcar-datos" style="font-size:.72rem;color:var(--azul);border-color:var(--azul);margin-left:4px" data-edit-usr-id="${u.uid||u.id}">✏️</button></td>
       </tr>`).join('')}</tbody></table></div>`;
     res.querySelectorAll('[data-marcar-uid]').forEach(btn=>btn.addEventListener('click',()=>marcarDatosIncorrectos(btn)));
+    res.querySelectorAll('[data-edit-usr-id]').forEach(btn=>btn.addEventListener('click',()=>{
+      const u=found.find(u=>(u.uid||u.id)===btn.dataset.editUsrId);
+      if(u) abrirEditarUsuario(u);
+    }));
   }catch(e){res.innerHTML='<p style="color:var(--rojo);font-size:.82rem">Error al cargar.</p>';}
 }
 document.getElementById('btn-admin-buscar').addEventListener('click', ()=>buscarUsuariosAdmin());
