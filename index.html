@@ -1406,13 +1406,11 @@ function renderResults(){
     // Filtro por barrio del usuario
     const bs = p.barriosServicio||[];
     const barrioUsuario = perfilUsuario?.barrio||'';
-    if(!barrioUsuario) return true; // usuario sin barrio ve todo
+    if(!barrioUsuario) return true; // sin barrio ve todo
     if(bs.length===0) return true; // sin barrios definidos, visible para todos
     if(bs.includes('Toda la zona')) return true; // cubre toda la zona
+    if(bs.includes('Consultar')) return true; // puede ir a otros barrios bajo consulta → visible para todos
     if(bs.includes(barrioUsuario)) return true; // cubre el barrio del usuario
-    // Tiene solo "Consultar" sin barrios específicos → visible para todos
-    const bariosReales = bs.filter(b=>b!=='Consultar');
-    if(bariosReales.length===0) return true;
     return false;
   });
 
@@ -1615,9 +1613,9 @@ async function cargarTelefonos(){
       if(!barrioUsuario) return true;
       if(bs.length===0) return true;
       if(bs.includes('Toda la zona')) return true;
+      if(bs.includes('Consultar')) return true;
       if(bs.includes(barrioUsuario)) return true;
-      const bariosReales=bs.filter(b=>b!=='Consultar');
-      return bariosReales.length===0;
+      return false;
     });
 
     if(!items.length){c.innerHTML='<div class="empty-state"><div class="icon">📞</div><p>Sin teléfonos para tu barrio</p></div>';return;}
