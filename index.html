@@ -13,6 +13,16 @@
 <meta name="apple-mobile-web-app-title" content="EntreVecinos">
 <meta name="theme-color" content="#1a3a5c">
 <meta name="description" content="Directorio de proveedores recomendados por vecinos de barrios privados">
+<meta property="og:title" content="EntreVecinos · Proveedores de confianza">
+<meta property="og:description" content="Encontrá proveedores recomendados por tus vecinos. Plomeros, electricistas, limpieza y más, calificados por la comunidad.">
+<meta property="og:image" content="https://entrevecinos.vercel.app/icon-512.png">
+<meta property="og:url" content="https://entrevecinos.vercel.app">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_AR">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="EntreVecinos · Proveedores de confianza">
+<meta name="twitter:description" content="Encontrá proveedores recomendados por tus vecinos de barrios privados.">
+<meta name="twitter:image" content="https://entrevecinos.vercel.app/icon-512.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -495,6 +505,7 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
       <div class="chip-row" id="chip-row"></div>
       <div class="results-header">
         <span class="results-count" id="results-count"></span>
+        <button id="btn-limpiar-filtros" style="display:none;padding:5px 12px;background:transparent;border:1.5px solid var(--rojo);color:var(--rojo);border-radius:8px;font-size:.75rem;font-family:'Inter',sans-serif;cursor:pointer" onclick="limpiarFiltros()">✕ Limpiar filtros</button>
       </div>
       <div id="results-container"><div class="loading"><div class="spinner"></div>Cargando proveedores...</div></div>
     </div>
@@ -1386,6 +1397,17 @@ document.getElementById('cat-select').addEventListener('change',  ()=>renderResu
 document.getElementById('barrio-filter-select').addEventListener('change', ()=>renderResults());
 document.getElementById('sort-select').addEventListener('change',  ()=>renderResults());
 
+function limpiarFiltros(){
+  document.getElementById('search-input').value='';
+  document.getElementById('cat-select').value='';
+  document.getElementById('barrio-filter-select').value='';
+  document.getElementById('sort-select').value='recomendados';
+  chipActivo='todos';
+  chipRow.querySelectorAll('.chip').forEach(b=>b.classList.remove('active'));
+  chipRow.querySelector('[data-chip="todos"]')?.classList.add('active');
+  renderResults();
+}
+
 function renderResults(){
   const q    = norm(document.getElementById('search-input').value);
   const cat  = document.getElementById('cat-select').value;
@@ -1435,6 +1457,9 @@ function renderResults(){
 
   const cont = document.getElementById('results-container');
   document.getElementById('results-count').textContent = fil.length+' proveedor'+(fil.length!==1?'es':'');
+  // Mostrar botón limpiar si hay filtros activos
+  const hayFiltros = q!==''||cat!==''||barF!==''||chipActivo!=='todos';
+  document.getElementById('btn-limpiar-filtros').style.display=hayFiltros?'inline-block':'none';
 
   if(!fil.length){ cont.innerHTML='<div class="empty-state"><div class="icon">🔍</div><p>No encontramos resultados</p></div>'; return; }
 
