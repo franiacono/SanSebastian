@@ -2392,7 +2392,7 @@ async function buscarProveedoresAdmin(){
   }catch(e){res.innerHTML='<p style="color:var(--rojo);font-size:.82rem">Error al cargar.</p>';}
 }
 
-function abrirEditarProveedor(id, p){
+async function abrirEditarProveedor(id, p){
   document.getElementById('edit-prov-id').value=id;
   document.getElementById('edit-prov-nombre').value=p.nombre||'';
   document.getElementById('edit-prov-empresa').value=p.empresa||'';
@@ -2401,15 +2401,20 @@ function abrirEditarProveedor(id, p){
   document.getElementById('edit-prov-servicio').value=p.servicio||'';
   document.getElementById('edit-prov-recomendacion').value=p.recomendacion||'Recomendable';
   document.getElementById('edit-prov-notas').value=p.notas||'';
-  // Poblar checkboxes de categorías
-  const catsDiv=document.getElementById('edit-prov-cats');
-  const catsActuales=p.categorias||[];
-  catsDiv.innerHTML=CATS.filter(c=>c.label!=='Varios').map(c=>`
-    <label style="display:flex;align-items:center;gap:5px;font-size:.8rem;cursor:pointer">
-      <input type="checkbox" value="${c.label}" ${catsActuales.includes(c.label)?'checked':''}>
-      ${c.emoji} ${c.label}
-    </label>`).join('');
-  poblarCheckboxBarrios('edit-prov-barrios', p.barriosServicio||[]);
+  // Leer datos frescos de Firestore
+  try{
+    const snap=await getDoc(doc(db,'proveedores',id));
+    const fresh=snap.exists()?snap.data():p;
+    const catsActuales=fresh.categorias||p.categorias||[];
+    document.getElementById('edit-prov-cats').innerHTML=CATS.filter(c=>c.label!=='Varios').map(c=>`
+      <label style="display:flex;align-items:center;gap:5px;font-size:.8rem;cursor:pointer">
+        <input type="checkbox" value="${c.label}" ${catsActuales.includes(c.label)?'checked':''}>
+        ${c.emoji} ${c.label}
+      </label>`).join('');
+    poblarCheckboxBarrios('edit-prov-barrios', fresh.barriosServicio||p.barriosServicio||[]);
+  }catch(e){
+    poblarCheckboxBarrios('edit-prov-barrios', p.barriosServicio||[]);
+  }
   document.getElementById('edit-prov-msg').style.display='none';
   document.getElementById('modal-editar-proveedor').classList.add('open');
 }
