@@ -2399,12 +2399,14 @@ async function abrirEditarProveedor(id, p){
   document.getElementById('edit-prov-dni').value=p.dni||'';
   document.getElementById('edit-prov-telefono').value=p.telefono||'';
   document.getElementById('edit-prov-servicio').value=p.servicio||'';
-  document.getElementById('edit-prov-recomendacion').value=p.recomendacion||'Recomendable';
   document.getElementById('edit-prov-notas').value=p.notas||'';
   // Leer datos frescos de Firestore
   try{
     const snap=await getDoc(doc(db,'proveedores',id));
     const fresh=snap.exists()?snap.data():p;
+    // Determinar valor del select según tipo y recomendacion
+    const tipoVal = fresh.tipo==='util' ? 'Utiles' : fresh.tipo==='publicidad' ? 'Publicidad' : (fresh.recomendacion||'Recomendable');
+    document.getElementById('edit-prov-recomendacion').value=tipoVal;
     const catsActuales=fresh.categorias||p.categorias||[];
     document.getElementById('edit-prov-cats').innerHTML=CATS.filter(c=>c.label!=='Varios').map(c=>`
       <label style="display:flex;align-items:center;gap:5px;font-size:.8rem;cursor:pointer">
@@ -2443,6 +2445,23 @@ document.getElementById('btn-guardar-prov').addEventListener('click', async()=>{
       tipo: rec==='Utiles' ? 'util' : rec==='Publicidad' ? 'publicidad' : 'proveedor',
     };
     await updateDoc(doc(db,'proveedores',id), datos);
+    // Actualizar barriosServicio y categorias en TODOS los docs del mismo proveedor
+    const tel=datos.telefono.replace(/\D/g,'').slice(-8);
+    const snapAll=await getDocs(collection(db,'proveedores'));
+    const batch=[];
+    snapAll.forEach(d=>{
+      if(d.id!==id){
+        const t=d.data().telefono||'';
+        if(t.replace(/\D/g,'').slice(-8)===tel){
+          batch.push(updateDoc(doc(db,'proveedores',d.id),{
+            barriosServicio:datos.barriosServicio,
+            categorias:datos.categorias,
+            barrioOrigen:datos.barrioOrigen||d.data().barrioOrigen||'',
+          }));
+        }
+      }
+    });
+    await Promise.all(batch);
     msg.textContent='✅ Guardado correctamente'; msg.style.color='var(--verde-ok)'; msg.style.display='block';
     await cargarProveedores();
     setTimeout(()=>document.getElementById('modal-editar-proveedor').classList.remove('open'),1200);
