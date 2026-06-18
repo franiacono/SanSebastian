@@ -15,14 +15,14 @@
 <meta name="description" content="Directorio de proveedores recomendados por vecinos de barrios privados">
 <meta property="og:title" content="EntreVecinos · Proveedores de confianza">
 <meta property="og:description" content="Encontrá proveedores recomendados por tus vecinos. Plomeros, electricistas, limpieza y más, calificados por la comunidad.">
-<meta property="og:image" content="https://entrevecinos.vercel.app/icon-512.png">
-<meta property="og:url" content="https://entrevecinos.vercel.app">
+<meta property="og:image" content="https://entrevecinos.ar/icon-512.png">
+<meta property="og:url" content="https://entrevecinos.ar">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_AR">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="EntreVecinos · Proveedores de confianza">
 <meta name="twitter:description" content="Encontrá proveedores recomendados por tus vecinos de barrios privados.">
-<meta name="twitter:image" content="https://entrevecinos.vercel.app/icon-512.png">
+<meta name="twitter:image" content="https://entrevecinos.ar/icon-512.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -873,7 +873,7 @@ const FB_CONFIG = {
 const ADMIN_EMAILS = ['francisco.iacono@gmail.com','adminproveedoressansebastian@gmail.com'];
 const VAPID_KEY    = 'BBNWLH5KZLq7Zdj7ARf3hE1zRQxR1Sbk1k7Xk2-5Hf9t9L5rKaYcNSFu5WrGWJmyh-QKrok5jNZBTgpUXxjLS30';
 // Apps Script solo para emails y push (sigue igual)
-const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbyiVJz1u-LTeuf-VpWJbZJWfTt2_s9tezT6G4RyRiDKAVBXB7GLFSUAfG1uYrdneAWm-w/exec';
+const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbwCAJK40eyfiXjtj-hRhfhE0-PbzZeCJcCAUcav29hwCLPVym_oGhtAw8lqnOAHXtcTfw/exec';
 const SCRIPT_PWD   = 'sansebastian2025';
 const ADMIN_PWD    = 'admin2025';
 
@@ -1493,7 +1493,7 @@ function renderResults(){
   cont.querySelectorAll('.btn-compartir-card').forEach(btn=>{
     btn.addEventListener('click', async e=>{
       e.stopPropagation();
-      const url='https://entrevecinos.vercel.app/?tel='+encodeURIComponent(btn.dataset.tel);
+      const url='https://entrevecinos.ar/?tel='+encodeURIComponent(btn.dataset.tel);
       const texto=`👀 Mirá lo que encontré en EntreVecinos: ${btn.dataset.nombre} (${btn.dataset.srv})`;
       if(navigator.share){ try{ await navigator.share({title:btn.dataset.nombre,text:texto,url}); }catch(ex){} }
       else{ try{ await navigator.clipboard.writeText(url); const o=btn.textContent; btn.textContent='✅'; setTimeout(()=>btn.textContent=o,2000); }catch(ex){} }
@@ -1549,7 +1549,7 @@ function cardHTML(p,isDest){
 }
 
 function abrirWA(num,servicio){
-  const msg='Hola! Te contacto porque vi tu servicio de '+servicio+' en EntreVecinos (entrevecinos.vercel.app). ';
+  const msg='Hola! Te contacto porque vi tu servicio de '+servicio+' en EntreVecinos (entrevecinos.ar). ';
   const url='whatsapp://send?phone='+num+'&text='+encodeURIComponent(msg);
   const a=document.createElement('a'); a.href=url; document.body.appendChild(a); a.click(); setTimeout(()=>document.body.removeChild(a),200);
 }
