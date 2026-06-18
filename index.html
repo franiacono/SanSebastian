@@ -791,6 +791,10 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
         <option value="Utiles">📞 Teléfono útil</option>
       </select>
     </div>
+    <div class="auth-row">
+      <label>Rubros / Categorías</label>
+      <div id="edit-prov-cats" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:6px;max-height:180px;overflow-y:auto"></div>
+    </div>
     <div class="auth-row"><label>Notas</label><textarea class="auth-input" id="edit-prov-notas" style="height:70px;resize:vertical"></textarea></div>
     <div class="auth-row">
       <label>Barrios donde presta servicios</label>
@@ -1330,7 +1334,7 @@ function procesarDatos(filas){
   filas.forEach((f,idx)=>{
     if(norm(f.recomendacion)==='utiles') return;
     const key=genKey(f);
-    if(!mapa[key]) mapa[key]={nombre:f.nombre,empresa:f.empresa||"",dni:f.dni||"",telefono:f.telefono,servicio:f.servicio,barrio:"",destacado:false,resenas:[],idxOriginal:idx,autoregistrado:f.autoregistrado===true,barriosServicio:[],firestoreId:f.id||""};
+    if(!mapa[key]) mapa[key]={nombre:f.nombre,empresa:f.empresa||"",dni:f.dni||"",telefono:f.telefono,servicio:f.servicio,barrio:"",destacado:false,resenas:[],idxOriginal:idx,autoregistrado:f.autoregistrado===true,barriosServicio:[],firestoreId:f.id||"",categorias:f.categorias||[]};
     if(!mapa[key].barrio && f.barrio && f.barrio.trim()!=='') mapa[key].barrio=normBarrio(f.barrio);
     if(!mapa[key].barrioOrigen && f.barrioOrigen) mapa[key].barrioOrigen=f.barrioOrigen;
     if(f.barriosServicio&&f.barriosServicio.length) mapa[key].barriosServicio=[...new Set([...mapa[key].barriosServicio,...f.barriosServicio])];
@@ -1339,7 +1343,7 @@ function procesarDatos(filas){
   });
   proveedores=Object.values(mapa).map(p=>({
     ...p, score:p.destacado?{promedio:5,total:0,etiqueta:'Destacado',estrellas:5}:calcScore(p.resenas),
-    categoria:catDe(p.servicio),
+    categorias: p.categorias?.length ? p.categorias : [catDe(p.servicio)],
   }));
   poblarRubros();
 }
@@ -1367,11 +1371,11 @@ function calcScore(r){
 
 function poblarRubros(){
   const sel=document.getElementById('cat-select');
-  const valorActual=sel.value; // guardar selección actual
-  const cats=new Set(proveedores.map(p=>p.categoria));
+  const valorActual=sel.value;
+  const cats=new Set(proveedores.flatMap(p=>p.categorias||[]));
   sel.innerHTML='<option value="">Todos los rubros ('+proveedores.length+')</option>'+
     [...cats].sort().map(c=>`<option value="${c}">${c}</option>`).join('');
-  if(valorActual) sel.value=valorActual; // restaurar selección
+  if(valorActual) sel.value=valorActual;
 }
 
 // ── RENDER RESULTS ────────────────────────────────────────────────────────────
@@ -1421,7 +1425,7 @@ function renderResults(){
 
   let fil = proveedores.filter(p=>{
     if(!chip.fn(p)) return false;
-    if(cat && p.categoria!==cat) return false;
+    if(cat && !(p.categorias||[]).includes(cat)) return false;
     if(barF){
       const bf=norm(barF);
       const bs=p.barriosServicio||[];
@@ -1511,7 +1515,7 @@ function cardHTML(p,isDest){
   const bc=badgeCls(isDest?'Destacado':sc.etiqueta);
   const el=isDest?'⭐ Destacado':sc.etiqueta;
   const st=sc.stars||'';
-  const em=CATS.find(c=>c.label===p.categoria)?.emoji||'🔧';
+  const em=CATS.find(c=>(p.categorias||[]).includes(c.label))?.emoji||'🔧';
   const telOk=p.telefono&&!['n/a',''].includes(norm(p.telefono));
   const empOk=p.empresa&&!['n/a',''].includes(norm(p.empresa));
   const numWA=(t=>{t=t.replace(/\D/g,'');return t.startsWith('54')?t:t.startsWith('0')?'54'+t.slice(1):'54'+t;})(p.telefono||'');
@@ -1749,6 +1753,7 @@ async function accionPendiente(id, accion, btn){
         barrioOrigen:r.barrioOrigen||'',
         barriosServicio:r.barriosServicio||[],
         barrioVecino:r.barrioVecino||'',
+        categorias:r.categorias||[catDe(r.servicio)],
         autoregistrado:r.autoregistrado||false, fechaAprobacion:serverTimestamp()
       });
       // Notificar vecino push via Apps Script
@@ -2335,6 +2340,14 @@ function abrirEditarProveedor(id, p){
   document.getElementById('edit-prov-servicio').value=p.servicio||'';
   document.getElementById('edit-prov-recomendacion').value=p.recomendacion||'Recomendable';
   document.getElementById('edit-prov-notas').value=p.notas||'';
+  // Poblar checkboxes de categorías
+  const catsDiv=document.getElementById('edit-prov-cats');
+  const catsActuales=p.categorias||[];
+  catsDiv.innerHTML=CATS.filter(c=>c.label!=='Varios').map(c=>`
+    <label style="display:flex;align-items:center;gap:5px;font-size:.8rem;cursor:pointer">
+      <input type="checkbox" value="${c.label}" ${catsActuales.includes(c.label)?'checked':''}>
+      ${c.emoji} ${c.label}
+    </label>`).join('');
   poblarCheckboxBarrios('edit-prov-barrios', p.barriosServicio||[]);
   document.getElementById('edit-prov-msg').style.display='none';
   document.getElementById('modal-editar-proveedor').classList.add('open');
@@ -2360,6 +2373,7 @@ document.getElementById('btn-guardar-prov').addEventListener('click', async()=>{
       recomendacion:rec,
       notas:document.getElementById('edit-prov-notas').value.trim(),
       barriosServicio:getCheckboxBarrios('edit-prov-barrios'),
+      categorias:[...document.querySelectorAll('#edit-prov-cats input:checked')].map(i=>i.value),
       tipo: rec==='Utiles' ? 'util' : rec==='Publicidad' ? 'publicidad' : 'proveedor',
     };
     await updateDoc(doc(db,'proveedores',id), datos);
