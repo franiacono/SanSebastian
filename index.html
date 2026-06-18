@@ -834,7 +834,18 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
     <p id="edit-usr-msg" style="font-size:.82rem;margin-top:8px;display:none;text-align:center"></p>
   </div>
 </div>
-  <div class="aviso-datos-overlay" id="modal-aviso-datos">
+  <div class="modal-overlay" id="modal-aprobar-prov">
+  <div class="modal-box" style="max-width:420px">
+    <button class="modal-close" id="aprobar-prov-close">✕</button>
+    <h3 style="font-family:'Fraunces',serif;color:var(--azul);margin-bottom:8px">✅ Aprobar proveedor</h3>
+    <p id="aprobar-prov-nombre" style="font-weight:600;margin-bottom:16px"></p>
+    <input type="hidden" id="aprobar-prov-id">
+    <label style="font-size:.82rem;font-weight:600;color:var(--text);display:block;margin-bottom:8px">Seleccioná los rubros:</label>
+    <div id="aprobar-prov-cats" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:20px;max-height:220px;overflow-y:auto"></div>
+    <button class="btn-primary" id="btn-confirmar-aprobar">✅ Confirmar aprobación</button>
+    <p id="aprobar-prov-msg" style="font-size:.82rem;margin-top:8px;display:none;text-align:center"></p>
+  </div>
+</div>
   <div class="aviso-datos-box">
     <div style="font-size:2.8rem;margin-bottom:12px">⚠️</div>
     <h3 style="font-family:'Fraunces',serif;color:var(--rojo);font-size:1.2rem;margin-bottom:10px">Revisá tus datos</h3>
@@ -1679,6 +1690,8 @@ document.querySelectorAll('.admin-tab').forEach(tab=>{
   });
 });
 
+let pendientesData=[];
+
 async function cargarPendientes(){
   const pc=document.getElementById('pendientes-container');
   const ac=document.getElementById('aprobados-container');
@@ -1686,7 +1699,7 @@ async function cargarPendientes(){
   try{
     const snapPend=await getDocs(query(collection(db,'pendientes'),where('estado','==','Pendiente'),orderBy('fecha','desc')));
     const snapProc=await getDocs(query(collection(db,'pendientes'),where('estado','in',['Aprobado','Rechazado'])));
-    const pendientes=[]; snapPend.forEach(d=>pendientes.push({id:d.id,...d.data()}));
+    const pendientes=[]; snapPend.forEach(d=>pendientes.push({id:d.id,...d.data()})); pendientesData=pendientes;
     const procesados=[]; snapProc.forEach(d=>procesados.push({id:d.id,...d.data()}));
     procesados.sort((a,b)=>{const fa=a.fecha?.toDate?.()?.getTime?.()||0;const fb=b.fecha?.toDate?.()?.getTime?.()||0;return fb-fa;});
     pc.innerHTML=pendientes.length?pendientes.map(r=>adminCardHTML(r)).join(''):'<div class="admin-empty"><div class="icon">✅</div><p>Sin pendientes</p></div>';
@@ -1695,7 +1708,26 @@ async function cargarPendientes(){
       const nv=c.cloneNode(false); nv.innerHTML=c.innerHTML; c.parentNode.replaceChild(nv,c);
       nv.addEventListener('click',async e=>{
         const ba=e.target.closest('[data-send-admin]'); if(ba&&!ba.disabled){enviarRespuestaAdmin(ba.dataset.sendAdmin,ba);return;}
-        const bap=e.target.closest('[data-aprobar]'); if(bap) await accionPendiente(bap.dataset.aprobar,'Aprobado',bap);
+        const bap=e.target.closest('[data-aprobar]');
+        if(bap){
+          const id=bap.dataset.aprobar;
+          const r=pendientesData?.find(p=>p.id===id);
+          if(r){
+            document.getElementById('aprobar-prov-id').value=id;
+            document.getElementById('aprobar-prov-nombre').textContent=r.nombre+(r.servicio?' — '+r.servicio:'');
+            const catsSug=[catDe(r.servicio)];
+            document.getElementById('aprobar-prov-cats').innerHTML=CATS.filter(c=>c.label!=='Varios').map(c=>`
+              <label style="display:flex;align-items:center;gap:5px;font-size:.8rem;cursor:pointer;padding:4px;border:1px solid var(--border);border-radius:6px">
+                <input type="checkbox" value="${c.label}" ${catsSug.includes(c.label)?'checked':''}>
+                ${c.emoji} ${c.label}
+              </label>`).join('');
+            document.getElementById('aprobar-prov-msg').style.display='none';
+            document.getElementById('modal-aprobar-prov').classList.add('open');
+          } else {
+            await accionPendiente(id,'Aprobado',bap);
+          }
+          return;
+        }
         const brec=e.target.closest('[data-rechazar]'); if(brec) await accionPendiente(brec.dataset.rechazar,'Rechazado',brec);
         const bmd=e.target.closest('[data-marcar-uid]'); if(bmd) await marcarDatosIncorrectos(bmd);
         const bms=e.target.closest('[data-msg-uid]'); if(bms) abrirNuevoMsgAdmin(bms.dataset.msgUid,bms.dataset.msgEmail,bms.dataset.msgNombre);
@@ -2269,7 +2301,35 @@ async function pedirPermisoNotificaciones(uid){
   }catch(e){console.log('FCM error:',e);}
 }
 
-// ── ESTADÍSTICAS ADMIN ────────────────────────────────────────────────────────
+document.getElementById('aprobar-prov-close').addEventListener('click',()=>document.getElementById('modal-aprobar-prov').classList.remove('open'));
+document.getElementById('modal-aprobar-prov').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});
+
+document.getElementById('btn-confirmar-aprobar').addEventListener('click', async()=>{
+  const id=document.getElementById('aprobar-prov-id').value;
+  if(!id) return;
+  const cats=[...document.querySelectorAll('#aprobar-prov-cats input:checked')].map(i=>i.value);
+  const btn=document.getElementById('btn-confirmar-aprobar');
+  const msg=document.getElementById('aprobar-prov-msg');
+  btn.disabled=true; btn.textContent='Aprobando...';
+  try{
+    const r=pendientesData.find(p=>p.id===id);
+    if(r){
+      await addDoc(collection(db,'proveedores'),{
+        nombre:r.nombre,empresa:r.empresa||'',dni:r.dni||'',telefono:r.telefono,
+        servicio:r.servicio,recomendacion:r.recomendacion,notas:r.notas||'',
+        barrio:r.barrio||'',barrioOrigen:r.barrioOrigen||'',
+        barriosServicio:r.barriosServicio||[],barrioVecino:r.barrioVecino||'',
+        categorias:cats.length?cats:[catDe(r.servicio)],
+        autoregistrado:r.autoregistrado||false,fechaAprobacion:serverTimestamp()
+      });
+      await updateDoc(doc(db,'pendientes',id),{estado:'Aprobado',fecha:serverTimestamp()});
+      await apiGet({action:'procesarPendiente',id,accion:'Aprobado',uid:r.uid||r.quienInforma||''}).catch(()=>{});
+    }
+    document.getElementById('modal-aprobar-prov').classList.remove('open');
+    cargarPendientes(); cargarProveedores(); cargarEstadisticasAdmin();
+  }catch(e){msg.textContent='❌ Error: '+e.message; msg.style.color='var(--rojo)'; msg.style.display='block';}
+  btn.disabled=false; btn.textContent='✅ Confirmar aprobación';
+});
 async function cargarEstadisticasAdmin(){
   try{
     const ahora = new Date();
