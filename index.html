@@ -846,6 +846,7 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
     <p id="aprobar-prov-msg" style="font-size:.82rem;margin-top:8px;display:none;text-align:center"></p>
   </div>
 </div>
+  <div class="aviso-datos-overlay" id="modal-aviso-datos">
   <div class="aviso-datos-box">
     <div style="font-size:2.8rem;margin-bottom:12px">⚠️</div>
     <h3 style="font-family:'Fraunces',serif;color:var(--rojo);font-size:1.2rem;margin-bottom:10px">Revisá tus datos</h3>
@@ -1384,7 +1385,7 @@ function poblarRubros(){
   const sel=document.getElementById('cat-select');
   const valorActual=sel.value;
   const cats=new Set(proveedores.flatMap(p=>p.categorias||[]));
-  sel.innerHTML='<option value="">Todos los rubros ('+proveedores.length+')</option>'+
+  sel.innerHTML='<option value="">Todos los rubros</option>'+
     [...cats].sort().map(c=>`<option value="${c}">${c}</option>`).join('');
   if(valorActual) sel.value=valorActual;
 }
