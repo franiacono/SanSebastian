@@ -571,7 +571,8 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
           <div id="form-success" style="display:none" class="form-success">
             <div style="font-size:2rem;margin-bottom:10px">✅</div>
             <h3 style="font-family:'Fraunces',serif;color:var(--azul);margin-bottom:6px">¡Gracias por tu recomendación!</h3>
-            <p style="font-size:.85rem;color:var(--muted)">Será revisada antes de publicarse.</p>
+            <p style="font-size:.85rem;color:var(--muted);margin-bottom:14px">Será revisada antes de publicarse.</p>
+            <button id="btn-recomendar-otro" class="btn-secondary" style="font-size:.85rem;padding:10px 20px">✍️ Recomendar otro proveedor</button>
           </div>
         </div>
       </div>
@@ -1304,10 +1305,30 @@ function showPage(pageId){
 }
 document.getElementById('nav-buscar').addEventListener('click',    ()=>showPage('buscar'));
 document.getElementById('nav-telefonos').addEventListener('click', ()=>showPage('telefonos'));
+function resetFormRecomendar(){
+  document.getElementById('form-success').style.display='none';
+  document.getElementById('rec-form').style.display='block';
+  // Resetear campos
+  ['f-nombre','f-empresa','f-telefono','f-servicio','f-notas'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('f-recomen').value='';
+  document.getElementById('f-barrio-cual').value='';
+  document.getElementById('f-barrio-cual-box').style.display='none';
+  document.querySelector('input[name="f-barrio-prov-opt"][value="No sé"]').checked=true;
+  poblarCheckboxBarrios('f-barrios-servicio');
+  document.getElementById('form-msg').style.display='none';
+  document.getElementById('f-vecino').checked=false;
+}
+
+document.getElementById('btn-recomendar-otro').addEventListener('click', resetFormRecomendar);
+
+// Resetear formulario al volver a la pantalla de recomendar
 document.getElementById('nav-recomendar').addEventListener('click',()=>{
   showPage('recomendar');
   poblarCheckboxBarrios('f-barrios-servicio');
   poblarSelectBarrios('f-barrio-cual');
+  if(document.getElementById('form-success').style.display==='block') resetFormRecomendar();
 });
 document.getElementById('nav-consultas').addEventListener('click', ()=>showPage('consultas'));
 document.getElementById('nav-admin').addEventListener('click',     ()=>showPage('admin'));
