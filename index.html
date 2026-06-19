@@ -755,19 +755,37 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
       <div id="misrecs-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
     </div>
     <div class="perfil-panel" id="panel-miservicio">
-      <p style="font-size:.83rem;color:var(--muted);margin-bottom:16px">Registrá tu servicio para que los vecinos puedan encontrarte.</p>
-      <div class="auth-row"><label>Nombre / razón social *</label><input class="auth-input" type="text" id="sv-nombre" placeholder="Tu nombre o empresa"></div>
-      <div class="auth-row"><label>Empresa / emprendimiento</label><input class="auth-input" type="text" id="sv-empresa" placeholder="Nombre comercial (opcional)"></div>
-      <div class="auth-row"><label>Teléfono de contacto *</label><input class="auth-input" type="tel" id="sv-telefono" placeholder="11 2345-6789"></div>
-      <div class="auth-row"><label>Tipo de servicio *</label><input class="auth-input" type="text" id="sv-servicio" placeholder="Ej: Plomería, Limpieza..."></div>
-      <div class="auth-row"><label>Descripción *</label><textarea class="auth-input" id="sv-descripcion" placeholder="Contá qué ofrecés..." style="height:80px;resize:vertical"></textarea></div>
-      <div class="auth-row">
-        <label>¿A qué barrios llegás? *</label>
-        <div id="sv-barrios-servicio" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px"></div>
+      <!-- Vista para proveedor nuevo (sin servicio aún) -->
+      <div id="sv-form-nuevo">
+        <p style="font-size:.83rem;color:var(--muted);margin-bottom:16px">Registrá tu servicio para que los vecinos puedan encontrarte.</p>
+        <div class="auth-row"><label>Nombre / razón social *</label><input class="auth-input" type="text" id="sv-nombre" placeholder="Tu nombre o empresa"></div>
+        <div class="auth-row"><label>Empresa / emprendimiento</label><input class="auth-input" type="text" id="sv-empresa" placeholder="Nombre comercial (opcional)"></div>
+        <div class="auth-row"><label>Teléfono de contacto *</label><input class="auth-input" type="tel" id="sv-telefono" placeholder="11 2345-6789"></div>
+        <div class="auth-row"><label>Tipo de servicio *</label><input class="auth-input" type="text" id="sv-servicio" placeholder="Ej: Plomería, Limpieza..."></div>
+        <div class="auth-row"><label>Descripción *</label><textarea class="auth-input" id="sv-descripcion" placeholder="Contá qué ofrecés..." style="height:80px;resize:vertical"></textarea></div>
+        <div class="auth-row">
+          <label>¿A qué barrios llegás? *</label>
+          <div id="sv-barrios-servicio" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px"></div>
+        </div>
+        <button class="btn-primary" id="btn-registrar-servicio" style="margin-top:8px">Enviar para revisión</button>
+        <p class="auth-error" id="sv-error"></p>
+        <p id="sv-ok" style="color:var(--verde-ok);font-size:.83rem;display:none;margin-top:8px">✅ Enviado. El administrador lo revisará pronto.</p>
       </div>
-      <button class="btn-primary" id="btn-registrar-servicio" style="margin-top:8px">Enviar para revisión</button>
-      <p class="auth-error" id="sv-error"></p>
-      <p id="sv-ok" style="color:var(--verde-ok);font-size:.83rem;display:none;margin-top:8px">✅ Enviado. El administrador lo revisará pronto.</p>
+      <!-- Vista para proveedor existente (servicio ya registrado) -->
+      <div id="sv-form-existente" style="display:none">
+        <p style="font-size:.83rem;color:var(--muted);margin-bottom:14px">Tu servicio está registrado. Solo podés modificar los barrios donde trabajás.</p>
+        <div class="auth-row"><label>Nombre</label><input class="auth-input" id="sv-ex-nombre" disabled style="opacity:.6"></div>
+        <div class="auth-row"><label>Empresa</label><input class="auth-input" id="sv-ex-empresa" disabled style="opacity:.6"></div>
+        <div class="auth-row"><label>Teléfono</label><input class="auth-input" id="sv-ex-telefono" disabled style="opacity:.6"></div>
+        <div class="auth-row"><label>Servicio</label><input class="auth-input" id="sv-ex-servicio" disabled style="opacity:.6"></div>
+        <p style="font-size:.76rem;color:var(--muted);margin-bottom:14px">¿Necesitás modificar otros datos? <a id="sv-link-consulta" style="color:var(--azul2);cursor:pointer;font-weight:500">Enviá un mensaje al admin</a>.</p>
+        <div class="auth-row">
+          <label>¿A qué barrios llegás?</label>
+          <div id="sv-barrios-existente" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px"></div>
+        </div>
+        <button class="btn-primary" id="btn-actualizar-barrios" style="margin-top:8px">💾 Actualizar barrios</button>
+        <p id="sv-ex-ok" style="color:var(--verde-ok);font-size:.83rem;display:none;margin-top:8px">✅ Barrios actualizados.</p>
+      </div>
     </div>
   </div>
 </div>
@@ -2162,7 +2180,34 @@ function activarPanelPerfil(panelId){
   document.querySelectorAll('.perfil-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('panel-'+panelId)?.classList.add('active');
   document.querySelector(`.perfil-tab[data-panel="${panelId}"]`)?.classList.add('active');
-  if(panelId==='servicio') poblarCheckboxBarrios('sv-barrios-servicio');
+  if(panelId==='miservicio'){
+    poblarCheckboxBarrios('sv-barrios-servicio');
+    // Verificar si ya tiene servicio registrado
+    if(perfilUsuario?.telefono){
+      const tel=perfilUsuario.telefono.replace(/\D/g,'').slice(-8);
+      getDocs(query(collection(db,'proveedores'),where('autoregistrado','==',true))).then(snap=>{
+        let found=null;
+        snap.forEach(d=>{
+          const dt=d.data();
+          if((dt.telefono||'').replace(/\D/g,'').slice(-8)===tel) found={id:d.id,...dt};
+        });
+        if(found){
+          document.getElementById('sv-form-nuevo').style.display='none';
+          document.getElementById('sv-form-existente').style.display='block';
+          document.getElementById('sv-ex-nombre').value=found.nombre||'';
+          document.getElementById('sv-ex-empresa').value=found.empresa||'';
+          document.getElementById('sv-ex-telefono').value=found.telefono||'';
+          document.getElementById('sv-ex-servicio').value=found.servicio||'';
+          poblarCheckboxBarrios('sv-barrios-existente', found.barriosServicio||[]);
+          document.getElementById('sv-form-existente').dataset.provId=found.id;
+          document.getElementById('sv-form-existente').dataset.provTel=tel;
+        } else {
+          document.getElementById('sv-form-nuevo').style.display='block';
+          document.getElementById('sv-form-existente').style.display='none';
+        }
+      });
+    }
+  }
 }
 document.querySelectorAll('.perfil-tab').forEach(tab=>{
   tab.addEventListener('click',()=>{activarPanelPerfil(tab.dataset.panel);if(tab.dataset.panel==='misrecs')cargarMisRecomendaciones();});
@@ -2214,6 +2259,40 @@ document.getElementById('link-msg-admin').addEventListener('click',()=>{
     document.getElementById('nueva-consulta-texto').focus();
   },300);
 });
+document.getElementById('sv-link-consulta').addEventListener('click',()=>{
+  document.getElementById('modal-perfil').classList.remove('open');
+  showPage('consultas');
+  setTimeout(()=>{
+    document.getElementById('nueva-consulta-box').style.display='block';
+    document.getElementById('btn-nueva-consulta').style.display='none';
+    document.getElementById('nueva-consulta-texto').value='Hola, quisiera modificar los datos de mi servicio. ';
+    document.getElementById('nueva-consulta-texto').focus();
+  },300);
+});
+
+document.getElementById('btn-actualizar-barrios').addEventListener('click', async()=>{
+  const btn=document.getElementById('btn-actualizar-barrios');
+  const ok=document.getElementById('sv-ex-ok');
+  const tel=document.getElementById('sv-form-existente').dataset.provTel;
+  const nuevosBarrios=getCheckboxBarrios('sv-barrios-existente');
+  if(!nuevosBarrios.length){ok.textContent='⚠️ Seleccioná al menos un barrio.';ok.style.color='var(--rojo)';ok.style.display='block';return;}
+  btn.disabled=true; btn.textContent='Guardando...';
+  try{
+    const snap=await getDocs(collection(db,'proveedores'));
+    const batch=[];
+    snap.forEach(d=>{
+      if((d.data().telefono||'').replace(/\D/g,'').slice(-8)===tel){
+        batch.push(updateDoc(doc(db,'proveedores',d.id),{barriosServicio:nuevosBarrios}));
+      }
+    });
+    await Promise.all(batch);
+    await cargarProveedores();
+    ok.textContent='✅ Barrios actualizados.'; ok.style.color='var(--verde-ok)'; ok.style.display='block';
+    setTimeout(()=>ok.style.display='none',3000);
+  }catch(e){ok.textContent='❌ Error: '+e.message; ok.style.color='var(--rojo)'; ok.style.display='block';}
+  btn.disabled=false; btn.textContent='💾 Actualizar barrios';
+});
+
 document.getElementById('btn-cambiar-pass').addEventListener('click', async()=>{
   const p1=document.getElementById('new-pass').value;
   const p2=document.getElementById('confirm-pass').value;
