@@ -2130,6 +2130,7 @@ function activarPanelPerfil(panelId){
   document.querySelectorAll('.perfil-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('panel-'+panelId)?.classList.add('active');
   document.querySelector(`.perfil-tab[data-panel="${panelId}"]`)?.classList.add('active');
+  if(panelId==='servicio') poblarCheckboxBarrios('sv-barrios-servicio');
 }
 document.querySelectorAll('.perfil-tab').forEach(tab=>{
   tab.addEventListener('click',()=>{activarPanelPerfil(tab.dataset.panel);if(tab.dataset.panel==='misrecs')cargarMisRecomendaciones();});
