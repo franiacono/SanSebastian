@@ -1307,7 +1307,7 @@ document.getElementById('nav-buscar').addEventListener('click',    ()=>showPage(
 document.getElementById('nav-telefonos').addEventListener('click', ()=>showPage('telefonos'));
 function resetFormRecomendar(){
   document.getElementById('form-success').style.display='none';
-  document.getElementById('rec-form').style.display='block';
+  document.getElementById('form-body').style.display='block';
   // Resetear campos
   ['f-nombre','f-empresa','f-telefono','f-servicio','f-notas'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
@@ -1601,7 +1601,7 @@ function recomendarDesdeCard(pDataStr){
     const p=JSON.parse(pDataStr.replace(/&apos;/g,"'"));
     // Primero resetear y mostrar el form
     document.getElementById('form-success').style.display='none';
-    document.getElementById('rec-form').style.display='block';
+    document.getElementById('form-body').style.display='block';
     document.getElementById('form-msg').style.display='none';
     // Cargar datos del proveedor
     document.getElementById('f-nombre').value   = p.nombre||'';
