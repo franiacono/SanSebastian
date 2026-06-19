@@ -1323,12 +1323,12 @@ function resetFormRecomendar(){
 
 document.getElementById('btn-recomendar-otro').addEventListener('click', resetFormRecomendar);
 
-// Resetear formulario al volver a la pantalla de recomendar
+// Resetear formulario al volver a la pantalla de recomendar desde nav
 document.getElementById('nav-recomendar').addEventListener('click',()=>{
   showPage('recomendar');
   poblarCheckboxBarrios('f-barrios-servicio');
   poblarSelectBarrios('f-barrio-cual');
-  if(document.getElementById('form-success').style.display==='block') resetFormRecomendar();
+  resetFormRecomendar();
 });
 document.getElementById('nav-consultas').addEventListener('click', ()=>showPage('consultas'));
 document.getElementById('nav-admin').addEventListener('click',     ()=>showPage('admin'));
@@ -1599,11 +1599,19 @@ function abrirWA(num,servicio){
 function recomendarDesdeCard(pDataStr){
   try{
     const p=JSON.parse(pDataStr.replace(/&apos;/g,"'"));
+    // Primero resetear y mostrar el form
+    document.getElementById('form-success').style.display='none';
+    document.getElementById('rec-form').style.display='block';
+    document.getElementById('form-msg').style.display='none';
+    // Cargar datos del proveedor
     document.getElementById('f-nombre').value   = p.nombre||'';
     document.getElementById('f-empresa').value  = p.empresa||'';
     document.getElementById('f-dni').value      = p.dni||'';
     document.getElementById('f-telefono').value = p.telefono||'';
     document.getElementById('f-servicio').value = p.servicio||'';
+    // Poblar checkboxes
+    poblarCheckboxBarrios('f-barrios-servicio');
+    poblarSelectBarrios('f-barrio-cual');
     showPage('recomendar');
     window.scrollTo(0,0);
   }catch(e){}
