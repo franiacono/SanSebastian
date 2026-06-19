@@ -1061,6 +1061,7 @@ document.querySelectorAll('.tipo-btn').forEach(btn => {
     const esProveedor = btn.dataset.tipo === 'proveedor';
     document.getElementById('prf-campos-vecino').style.display    = esProveedor ? 'none'  : 'block';
     document.getElementById('prf-campos-proveedor').style.display = esProveedor ? 'block' : 'none';
+    if(esProveedor) poblarCheckboxBarrios('prf-barrios-servicio');
   });
 });
 
