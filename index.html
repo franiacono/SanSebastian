@@ -1308,17 +1308,19 @@ document.getElementById('nav-telefonos').addEventListener('click', ()=>showPage(
 function resetFormRecomendar(){
   document.getElementById('form-success').style.display='none';
   document.getElementById('form-body').style.display='block';
-  // Resetear campos
-  ['f-nombre','f-empresa','f-telefono','f-servicio','f-notas'].forEach(id=>{
+  ['f-nombre','f-empresa','f-telefono','f-servicio','f-notas','f-dni'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
-  document.getElementById('f-recomen').value='';
-  document.getElementById('f-barrio-cual').value='';
-  document.getElementById('f-barrio-cual-box').style.display='none';
-  document.querySelector('input[name="f-barrio-prov-opt"][value="No sé"]').checked=true;
+  const fRecomen=document.getElementById('f-recomen'); if(fRecomen) fRecomen.value='';
+  const fCual=document.getElementById('f-barrio-cual'); if(fCual) fCual.value='';
+  const fCualBox=document.getElementById('f-barrio-cual-box'); if(fCualBox) fCualBox.style.display='none';
+  const radioNose=document.querySelector('input[name="f-barrio-prov-opt"][value="No sé"]');
+  if(radioNose) radioNose.checked=true;
   poblarCheckboxBarrios('f-barrios-servicio');
-  document.getElementById('form-msg').style.display='none';
-  document.getElementById('f-vecino').checked=false;
+  const fMsg=document.getElementById('form-msg'); if(fMsg) fMsg.style.display='none';
+  // Rehabilitar botón enviar
+  const btnSubmit=document.getElementById('btn-form-submit');
+  if(btnSubmit){ btnSubmit.disabled=false; btnSubmit.textContent='✍️ Enviar recomendación'; }
 }
 
 document.getElementById('btn-recomendar-otro').addEventListener('click', resetFormRecomendar);
