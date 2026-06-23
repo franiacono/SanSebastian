@@ -910,7 +910,7 @@ const FB_CONFIG = {
 const ADMIN_EMAILS = ['francisco.iacono@gmail.com','adminproveedoressansebastian@gmail.com','entrevecinos.ar@gmail.com'];
 const VAPID_KEY    = 'BBNWLH5KZLq7Zdj7ARf3hE1zRQxR1Sbk1k7Xk2-5Hf9t9L5rKaYcNSFu5WrGWJmyh-QKrok5jNZBTgpUXxjLS30';
 // Apps Script solo para emails y push (sigue igual)
-const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbwUHDXToFUQM4p4DQwM8hxUoBJMLwKMjVdFbXq48HhZXLIbg17z8WzcI18yOfB5-grrvg/exec';
+const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbxbCtPSWp81M_3jJ3VQRxZFML0yrFBX9n7spNyo4VGs2C_HADWerBwJX8H0EguYXlLs3A/exec';
 const SCRIPT_PWD   = 'EV_v3c!n0s#2025xK';
 const ADMIN_PWD    = 'EV_4dm!n#2025zR9';
 
@@ -1853,25 +1853,26 @@ async function accionPendiente(id, accion, btn){
     const snap=await getDoc(docRef);
     if(!snap.exists()) return;
     const r=snap.data();
-    await updateDoc(docRef,{estado:accion});
+    await updateDoc(docRef,{estado:accion,fecha:serverTimestamp()});
+    const uidMatch=(r.quienInforma||'').match(/uid:([^\s|]+)/);
+    const uid=uidMatch?uidMatch[1]:'';
     if(accion==='Aprobado'){
       await addDoc(collection(db,'proveedores'),{
         nombre:r.nombre,empresa:r.empresa||'',dni:r.dni||'',telefono:r.telefono,
         servicio:r.servicio,recomendacion:r.recomendacion,notas:r.notas||'',
-        barrio:r.barrio||'',
-        barrioOrigen:r.barrioOrigen||'',
-        barriosServicio:r.barriosServicio||[],
-        barrioVecino:r.barrioVecino||'',
+        barrio:r.barrio||'',barrioOrigen:r.barrioOrigen||'',
+        barriosServicio:r.barriosServicio||[],barrioVecino:r.barrioVecino||'',
         categorias:r.categorias||[catDe(r.servicio)],
-        autoregistrado:r.autoregistrado||false, fechaAprobacion:serverTimestamp()
+        autoregistrado:r.autoregistrado||false,fechaAprobacion:serverTimestamp()
       });
-      // Notificar vecino push via Apps Script
-      const uidMatch=(r.quienInforma||'').match(/uid:([^\s|]+)/);
-      if(uidMatch) apiGet({action:'notificarVecino',uid:uidMatch[1],emailVecino:r.quienInforma?.split('|').find(s=>s.includes('@'))?.trim()||'',nombreVecino:r.quienInforma?.split('|')[0]?.trim()||''}).catch(()=>{});
     }
+    // Notificar vecino en ambos casos
+    await apiGet({action:'procesarPendiente',accion,uid,nombre:r.nombre||''}).catch(()=>{});
     cargarPendientes();
     cargarProveedores();
+    cargarEstadisticasAdmin();
   }catch(e){alert('Error: '+e.message);}
+  if(btn){ btn.disabled=false; btn.textContent=accion==='Aprobado'?'✅ Aprobar':'✕ Rechazar'; }
 }
 
 async function marcarDatosIncorrectos(btn){
