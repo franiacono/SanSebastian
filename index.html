@@ -802,6 +802,20 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
     <div class="auth-row"><label>DNI</label><input class="auth-input" id="edit-prov-dni"></div>
     <div class="auth-row"><label>Teléfono *</label><input class="auth-input" id="edit-prov-telefono"></div>
     <div class="auth-row"><label>Servicio *</label><input class="auth-input" id="edit-prov-servicio"></div>
+    <div class="auth-row">
+      <label>¿Es del barrio?</label>
+      <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">
+        <label style="display:flex;align-items:center;gap:5px;padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:.83rem;background:white">
+          <input type="radio" name="edit-prov-barrio-opt" value=""> 🤷 No sé / Externo
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:.83rem;background:white">
+          <input type="radio" name="edit-prov-barrio-opt" value="si"> 🏘️ Sí, es del barrio
+        </label>
+      </div>
+      <div id="edit-prov-barrio-cual-box" style="display:none;margin-top:8px">
+        <select class="auth-select" id="edit-prov-barrio-cual"><option value="">— Seleccioná —</option></select>
+      </div>
+    </div>
     <div class="auth-row"><label>Recomendación / Tipo</label>
       <select class="auth-select" id="edit-prov-recomendacion">
         <option value="Muy Recomendable">⭐ Muy Recomendable</option>
@@ -907,10 +921,10 @@ const FB_CONFIG = {
   measurementId: "G-BC6P5470XG"
 };
 
-const ADMIN_EMAILS = ['francisco.iacono@gmail.com','adminproveedoressansebastian@gmail.com'];
+const ADMIN_EMAILS = ['francisco.iacono@gmail.com','adminproveedoressansebastian@gmail.com','entrevecinos.ar@gmail.com'];
 const VAPID_KEY    = 'BBNWLH5KZLq7Zdj7ARf3hE1zRQxR1Sbk1k7Xk2-5Hf9t9L5rKaYcNSFu5WrGWJmyh-QKrok5jNZBTgpUXxjLS30';
 // Apps Script solo para emails y push (sigue igual)
-const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbwTsl_gDK3Do43uJLtXOCRs0EqsXf_N2EyExN1ggTj1xULfm6SijtbWOk5u8qDWIjjMuw/exec';
+const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbwA1GGES5bf9m5u653dFDcxOhKDti0q2Tzf0rVDGw9HGvu_PnJQlOq4609fu_nN7V0Zfw/exec';
 const SCRIPT_PWD   = 'EV_v3c!n0s#2025xK';
 const ADMIN_PWD    = 'EV_4dm!n#2025zR9';
 
@@ -1853,25 +1867,32 @@ async function accionPendiente(id, accion, btn){
     const snap=await getDoc(docRef);
     if(!snap.exists()) return;
     const r=snap.data();
-    await updateDoc(docRef,{estado:accion});
+    await updateDoc(docRef,{estado:accion,fecha:serverTimestamp()});
+    const uidMatch=(r.quienInforma||'').match(/uid:([^\s|]+)/);
+    const uid=uidMatch?uidMatch[1]:'';
+    const emailMatch=(r.quienInforma||'').match(/[\w.-]+@[\w.-]+\.\w+/);
+    const emailVecino=emailMatch?emailMatch[0]:'';
+    console.log('procesarPendiente:', accion, '| quienInforma:', r.quienInforma, '| uid:', uid);
     if(accion==='Aprobado'){
       await addDoc(collection(db,'proveedores'),{
         nombre:r.nombre,empresa:r.empresa||'',dni:r.dni||'',telefono:r.telefono,
         servicio:r.servicio,recomendacion:r.recomendacion,notas:r.notas||'',
-        barrio:r.barrio||'',
-        barrioOrigen:r.barrioOrigen||'',
-        barriosServicio:r.barriosServicio||[],
-        barrioVecino:r.barrioVecino||'',
+        barrio:r.barrio||'',barrioOrigen:r.barrioOrigen||'',
+        barriosServicio:r.barriosServicio||[],barrioVecino:r.barrioVecino||'',
         categorias:r.categorias||[catDe(r.servicio)],
-        autoregistrado:r.autoregistrado||false, fechaAprobacion:serverTimestamp()
+        autoregistrado:r.autoregistrado||false,fechaAprobacion:serverTimestamp()
       });
-      // Notificar vecino push via Apps Script
-      const uidMatch=(r.quienInforma||'').match(/uid:([^\s|]+)/);
-      if(uidMatch) apiGet({action:'notificarVecino',uid:uidMatch[1],emailVecino:r.quienInforma?.split('|').find(s=>s.includes('@'))?.trim()||'',nombreVecino:r.quienInforma?.split('|')[0]?.trim()||''}).catch(()=>{});
     }
+    // Notificar vecino en ambos casos
+    try{
+      const resp = await apiGet({action:'procesarPendiente',accion,uid,nombre:r.nombre||'',emailVecino});
+      console.log('procesarPendiente respuesta:', resp);
+    }catch(e){ console.log('procesarPendiente error:', e); }
     cargarPendientes();
     cargarProveedores();
+    cargarEstadisticasAdmin();
   }catch(e){alert('Error: '+e.message);}
+  if(btn){ btn.disabled=false; btn.textContent=accion==='Aprobado'?'✅ Aprobar':'✕ Rechazar'; }
 }
 
 async function marcarDatosIncorrectos(btn){
@@ -2548,6 +2569,17 @@ async function abrirEditarProveedor(id, p){
   try{
     const snap=await getDoc(doc(db,'proveedores',id));
     const fresh=snap.exists()?snap.data():p;
+    // Cargar barrioOrigen
+    const barrioOrig=fresh.barrioOrigen||'';
+    if(barrioOrig){
+      document.querySelector('input[name="edit-prov-barrio-opt"][value="si"]').checked=true;
+      document.getElementById('edit-prov-barrio-cual-box').style.display='block';
+      poblarSelectBarrios('edit-prov-barrio-cual');
+      document.getElementById('edit-prov-barrio-cual').value=barrioOrig;
+    } else {
+      document.querySelector('input[name="edit-prov-barrio-opt"][value=""]').checked=true;
+      document.getElementById('edit-prov-barrio-cual-box').style.display='none';
+    }
     // Determinar valor del select según tipo y recomendacion
     const tipoVal = fresh.tipo==='util' ? 'Utiles' : fresh.tipo==='publicidad' ? 'Publicidad' : (fresh.recomendacion||'Recomendable');
     document.getElementById('edit-prov-recomendacion').value=tipoVal;
@@ -2565,7 +2597,12 @@ async function abrirEditarProveedor(id, p){
   document.getElementById('modal-editar-proveedor').classList.add('open');
 }
 
-document.getElementById('editar-prov-close').addEventListener('click',()=>document.getElementById('modal-editar-proveedor').classList.remove('open'));
+document.querySelectorAll('input[name="edit-prov-barrio-opt"]').forEach(r=>{
+  r.addEventListener('change',()=>{
+    document.getElementById('edit-prov-barrio-cual-box').style.display=r.value==='si'?'block':'none';
+  });
+});
+poblarSelectBarrios('edit-prov-barrio-cual');
 document.getElementById('modal-editar-proveedor').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});
 
 document.getElementById('btn-guardar-prov').addEventListener('click', async()=>{
@@ -2575,6 +2612,7 @@ document.getElementById('btn-guardar-prov').addEventListener('click', async()=>{
   const btn=document.getElementById('btn-guardar-prov');
   btn.disabled=true; btn.textContent='Guardando...';
   try{
+    const barrioOpt=document.querySelector('input[name="edit-prov-barrio-opt"]:checked')?.value||'';
     const rec=document.getElementById('edit-prov-recomendacion').value;
     const datos={
       nombre:document.getElementById('edit-prov-nombre').value.trim(),
@@ -2585,6 +2623,7 @@ document.getElementById('btn-guardar-prov').addEventListener('click', async()=>{
       recomendacion:rec,
       notas:document.getElementById('edit-prov-notas').value.trim(),
       barriosServicio:getCheckboxBarrios('edit-prov-barrios'),
+      barrioOrigen:barrioOpt==='si'?(document.getElementById('edit-prov-barrio-cual').value||''):'',
       categorias:[...document.querySelectorAll('#edit-prov-cats input:checked')].map(i=>i.value),
       tipo: rec==='Utiles' ? 'util' : rec==='Publicidad' ? 'publicidad' : 'proveedor',
     };
