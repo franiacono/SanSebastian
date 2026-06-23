@@ -1856,6 +1856,7 @@ async function accionPendiente(id, accion, btn){
     await updateDoc(docRef,{estado:accion,fecha:serverTimestamp()});
     const uidMatch=(r.quienInforma||'').match(/uid:([^\s|]+)/);
     const uid=uidMatch?uidMatch[1]:'';
+    console.log('procesarPendiente:', accion, '| quienInforma:', r.quienInforma, '| uid:', uid);
     if(accion==='Aprobado'){
       await addDoc(collection(db,'proveedores'),{
         nombre:r.nombre,empresa:r.empresa||'',dni:r.dni||'',telefono:r.telefono,
