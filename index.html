@@ -910,7 +910,7 @@ const FB_CONFIG = {
 const ADMIN_EMAILS = ['francisco.iacono@gmail.com','adminproveedoressansebastian@gmail.com','entrevecinos.ar@gmail.com'];
 const VAPID_KEY    = 'BBNWLH5KZLq7Zdj7ARf3hE1zRQxR1Sbk1k7Xk2-5Hf9t9L5rKaYcNSFu5WrGWJmyh-QKrok5jNZBTgpUXxjLS30';
 // Apps Script solo para emails y push (sigue igual)
-const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbxbCtPSWp81M_3jJ3VQRxZFML0yrFBX9n7spNyo4VGs2C_HADWerBwJX8H0EguYXlLs3A/exec';
+const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbwnT3ES_fRF4PvelQfoP68u6lf0pVX99JhgN3lKKmPitzxihwJOGy3aC-bhrkBisnAo4w/exec';
 const SCRIPT_PWD   = 'EV_v3c!n0s#2025xK';
 const ADMIN_PWD    = 'EV_4dm!n#2025zR9';
 
@@ -1856,6 +1856,8 @@ async function accionPendiente(id, accion, btn){
     await updateDoc(docRef,{estado:accion,fecha:serverTimestamp()});
     const uidMatch=(r.quienInforma||'').match(/uid:([^\s|]+)/);
     const uid=uidMatch?uidMatch[1]:'';
+    const emailMatch=(r.quienInforma||'').match(/[\w.-]+@[\w.-]+\.\w+/);
+    const emailVecino=emailMatch?emailMatch[0]:'';
     console.log('procesarPendiente:', accion, '| quienInforma:', r.quienInforma, '| uid:', uid);
     if(accion==='Aprobado'){
       await addDoc(collection(db,'proveedores'),{
@@ -1869,7 +1871,7 @@ async function accionPendiente(id, accion, btn){
     }
     // Notificar vecino en ambos casos
     try{
-      const resp = await apiGet({action:'procesarPendiente',accion,uid,nombre:r.nombre||''});
+      const resp = await apiGet({action:'procesarPendiente',accion,uid,nombre:r.nombre||'',emailVecino});
       console.log('procesarPendiente respuesta:', resp);
     }catch(e){ console.log('procesarPendiente error:', e); }
     cargarPendientes();
