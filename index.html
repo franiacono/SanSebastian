@@ -1692,6 +1692,7 @@ document.getElementById('btn-form-submit').addEventListener('click', async ()=>{
       recomendacion:recomen,notas,
       quienInforma:(perfilUsuario?.nombre||'')+(perfilUsuario?.nombre?' | ':'')+'uid:'+currentUser.uid+' | '+currentUser.email,
       barrioVecino: perfilUsuario?.barrio||'',
+      loteVecino: perfilUsuario?.lote||'',
       barrio: barrioProv,
       barrioOrigen: barrioOrigen,
       barriosServicio: barriosServicio,
@@ -1851,6 +1852,7 @@ function adminCardHTML(r){
     ${vecinoNombre||vecinoEmail?`<div class="admin-vecino">
       <div style="font-weight:600;font-size:.83rem">${vecinoNombre}</div>
       ${r.barrioVecino?`<span class="admin-badge" style="background:var(--azul-claro);color:var(--azul2);font-size:.72rem">📍 ${r.barrioVecino}</span>`:''}
+      ${r.loteVecino?`<span class="admin-badge" style="background:var(--azul-claro);color:var(--azul2);font-size:.72rem">🏠 Lote ${r.loteVecino}</span>`:''}
       <span class="admin-badge ${r.verificado==='Si'?'verificado':'no-verificado'}" style="margin-left:4px">${r.verificado==='Si'?'✅ Verificado':'⚠️ No verificado'}</span>
       <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
         ${vecinoUid||vecinoEmail?`<button class="btn-marcar-datos" data-marcar-uid="${vecinoUid}" data-marcar-email="${vecinoEmail}">🚩 Marcar datos incorrectos</button>
@@ -2551,9 +2553,38 @@ async function buscarProveedoresAdmin(){
         <td style="padding:7px 8px;color:var(--muted)">${p.servicio||'—'}</td>
         <td style="padding:7px 8px">${p.telefono||'—'}</td>
         <td style="padding:7px 8px"><span class="badge ${badgeCls(p.recomendacion)}" style="font-size:.68rem">${p.recomendacion||'—'}</span></td>
-        <td style="padding:7px 8px"><button class="btn-marcar-datos" style="font-size:.72rem;color:var(--azul);border-color:var(--azul)" data-edit-id="${p.id}">✏️ Editar</button></td>
+        <td style="padding:7px 8px">
+          <button class="btn-marcar-datos" style="font-size:.72rem;color:var(--azul);border-color:var(--azul)" data-edit-id="${p.id}">✏️ Editar</button>
+          <button class="btn-marcar-datos" style="font-size:.72rem;color:var(--naranja);border-color:var(--naranja);margin-top:4px" data-volver-id="${p.id}" data-volver-nombre="${(p.nombre||'').replace(/"/g,'')}" data-volver-tel="${p.telefono||''}">↩️ Pendiente</button>
+        </td>
       </tr>`).join('')}</tbody></table></div>`;
     res.querySelectorAll('[data-edit-id]').forEach(btn=>btn.addEventListener('click',()=>abrirEditarProveedor(btn.dataset.editId, found.find(p=>p.id===btn.dataset.editId))));
+    res.querySelectorAll('[data-volver-id]').forEach(btn=>btn.addEventListener('click', async()=>{
+      if(!confirm(`¿Volver "${btn.dataset.volverNombre}" a revisión pendiente?`)) return;
+      btn.disabled=true; btn.textContent='...';
+      try{
+        // Crear nuevo pendiente desde el proveedor
+        const snap=await getDoc(doc(db,'proveedores',btn.dataset.volverId));
+        if(snap.exists()){
+          const p=snap.data();
+          await addDoc(collection(db,'pendientes'),{
+            nombre:p.nombre, empresa:p.empresa||'', dni:p.dni||'',
+            telefono:p.telefono, servicio:p.servicio, recomendacion:p.recomendacion||'Recomendable',
+            notas:p.notas||'', barrio:p.barrio||'', barrioOrigen:p.barrioOrigen||'',
+            barriosServicio:p.barriosServicio||[], categorias:p.categorias||[],
+            autoregistrado:p.autoregistrado||false,
+            estado:'Pendiente', fecha:serverTimestamp(),
+            quienInforma:'Admin (revisión)',
+          });
+          // Eliminar de proveedores
+          await deleteDoc(doc(db,'proveedores',btn.dataset.volverId));
+          await cargarProveedores();
+          buscarProveedoresAdmin();
+          cargarEstadisticasAdmin();
+        }
+      }catch(e){alert('Error: '+e.message);}
+      btn.disabled=false; btn.textContent='↩️ Pendiente';
+    }));
   }catch(e){res.innerHTML='<p style="color:var(--rojo);font-size:.82rem">Error al cargar.</p>';}
 }
 
