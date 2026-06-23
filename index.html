@@ -1882,6 +1882,9 @@ async function accionPendiente(id, accion, btn){
         barrio:r.barrio||'',barrioOrigen:r.barrioOrigen||'',
         barriosServicio:r.barriosServicio||[],barrioVecino:r.barrioVecino||'',
         categorias:r.categorias||[catDe(r.servicio)],
+        quienInforma:r.quienInforma||'',
+        barrioVecino:r.barrioVecino||'',
+        loteVecino:r.loteVecino||'',
         autoregistrado:r.autoregistrado||false,fechaAprobacion:serverTimestamp()
       });
     }
@@ -2483,6 +2486,9 @@ document.getElementById('btn-confirmar-aprobar').addEventListener('click', async
         barrio:r.barrio||'',barrioOrigen:r.barrioOrigen||'',
         barriosServicio:r.barriosServicio||[],barrioVecino:r.barrioVecino||'',
         categorias:cats.length?cats:[catDe(r.servicio)],
+        quienInforma:r.quienInforma||'',
+        barrioVecino:r.barrioVecino||'',
+        loteVecino:r.loteVecino||'',
         autoregistrado:r.autoregistrado||false,fechaAprobacion:serverTimestamp()
       });
       await updateDoc(doc(db,'pendientes',id),{estado:'Aprobado',fecha:serverTimestamp()});
@@ -2547,12 +2553,20 @@ async function buscarProveedoresAdmin(){
     if(!found.length){res.innerHTML='<p style="color:var(--muted);font-size:.82rem">No encontrado.</p>';return;}
     res.innerHTML=`<p style="font-size:.78rem;color:var(--muted);margin-bottom:8px">${found.length} proveedor${found.length!==1?'es':''}</p>
     <div style="overflow-x:auto"><table style="width:100%;font-size:.77rem;border-collapse:collapse">
-      <thead><tr style="background:var(--crema2)">${['Nombre','Servicio','Teléfono','Recomendación',''].map(h=>`<th style="padding:7px 8px;text-align:left;border-bottom:1px solid var(--border);font-weight:600">${h}</th>`).join('')}</tr></thead>
+      <thead><tr style="background:var(--crema2)">${['Nombre','Servicio','Teléfono','Recomendación','Recomendado por',''].map(h=>`<th style="padding:7px 8px;text-align:left;border-bottom:1px solid var(--border);font-weight:600">${h}</th>`).join('')}</tr></thead>
       <tbody>${found.map(p=>`<tr style="border-bottom:1px solid var(--crema2)">
         <td style="padding:7px 8px;font-weight:500">${p.nombre||'—'}</td>
         <td style="padding:7px 8px;color:var(--muted)">${p.servicio||'—'}</td>
         <td style="padding:7px 8px">${p.telefono||'—'}</td>
         <td style="padding:7px 8px"><span class="badge ${badgeCls(p.recomendacion)}" style="font-size:.68rem">${p.recomendacion||'—'}</span></td>
+        <td style="padding:7px 8px;font-size:.72rem;color:var(--muted)">${(()=>{
+          const qi=p.quienInforma||'';
+          if(!qi||qi.includes('auto-registro')||qi.includes('Admin')) return '<span style="color:var(--muted)">—</span>';
+          const nombre=qi.split('|')[0].trim();
+          const barrio=p.barrioVecino||'';
+          const lote=p.loteVecino||'';
+          return `${nombre}${barrio?`<br>📍 ${barrio}`:''}${lote?` · Lote ${lote}`:''}`;
+        })()}</td>
         <td style="padding:7px 8px">
           <button class="btn-marcar-datos" style="font-size:.72rem;color:var(--azul);border-color:var(--azul)" data-edit-id="${p.id}">✏️ Editar</button>
           <button class="btn-marcar-datos" style="font-size:.72rem;color:var(--naranja);border-color:var(--naranja);margin-top:4px" data-volver-id="${p.id}" data-volver-nombre="${(p.nombre||'').replace(/"/g,'')}" data-volver-tel="${p.telefono||''}">↩️ Pendiente</button>
