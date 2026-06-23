@@ -2473,7 +2473,12 @@ document.getElementById('btn-confirmar-aprobar').addEventListener('click', async
 async function cargarEstadisticasAdmin(){
   try{
     const ahora = new Date();
-    const haceSemana = new Date(ahora.getTime() - 7*24*60*60*1000);
+    // Inicio de la semana actual (lunes a las 00:00)
+    const inicioSemana = new Date(ahora);
+    const dia = inicioSemana.getDay(); // 0=domingo, 1=lunes...
+    const diasDesdelunes = dia === 0 ? 6 : dia - 1;
+    inicioSemana.setDate(inicioSemana.getDate() - diasDesdelunes);
+    inicioSemana.setHours(0, 0, 0, 0);
 
     // Pendientes
     const snapPend = await getDocs(query(collection(db,'pendientes'),where('estado','==','Pendiente')));
@@ -2484,7 +2489,7 @@ async function cargarEstadisticasAdmin(){
     let nuevos = 0;
     snapUsers.forEach(d=>{
       const f = d.data().fechaRegistro?.toDate?.();
-      if(f && f >= haceSemana) nuevos++;
+      if(f && f >= inicioSemana) nuevos++;
     });
     document.querySelector('#stat-usuarios .stat-num').textContent = snapUsers.size;
     document.querySelector('#stat-nuevos .stat-num').textContent = nuevos;
