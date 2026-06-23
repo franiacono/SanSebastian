@@ -1868,7 +1868,10 @@ async function accionPendiente(id, accion, btn){
       });
     }
     // Notificar vecino en ambos casos
-    await apiGet({action:'procesarPendiente',accion,uid,nombre:r.nombre||''}).catch(()=>{});
+    try{
+      const resp = await apiGet({action:'procesarPendiente',accion,uid,nombre:r.nombre||''});
+      console.log('procesarPendiente respuesta:', resp);
+    }catch(e){ console.log('procesarPendiente error:', e); }
     cargarPendientes();
     cargarProveedores();
     cargarEstadisticasAdmin();
