@@ -1409,7 +1409,7 @@ function procesarDatos(filas){
     if(!mapa[key].barrioOrigen && f.barrioOrigen) mapa[key].barrioOrigen=f.barrioOrigen;
     if(f.barriosServicio&&f.barriosServicio.length) mapa[key].barriosServicio=[...new Set([...mapa[key].barriosServicio,...f.barriosServicio])];
     if(norm(f.recomendacion)==='publicidad') mapa[key].destacado=true;
-    else if(f.recomendacion) mapa[key].resenas.push({recomendacion:f.recomendacion,notas:f.notas||'',barrioVecino:f.barrioVecino||''});
+    else if(f.recomendacion) mapa[key].resenas.push({recomendacion:f.recomendacion,comentario:f.comentario||'',notas:f.notas||'',barrioVecino:f.barrioVecino||''});
   });
   proveedores=Object.values(mapa).map(p=>({
     ...p, score:p.destacado?{promedio:5,total:0,etiqueta:'Destacado',estrellas:5}:calcScore(p.resenas),
