@@ -148,8 +148,10 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
 .badge.malas-experiencias{background:#fef3c7;color:#92400e}
 .badge.no-recomendable{background:#fee2e2;color:#991b1b}
 .badge.destacado-badge-lbl{background:linear-gradient(135deg,#fef3c7,#fde68a);color:#78350f}
-.score-stars{font-size:.73rem;color:var(--dorado);margin-top:1px}
-.reviews-count{font-size:.65rem;color:var(--muted);margin-top:1px}
+.rating-widget{display:flex;flex-direction:column;align-items:flex-end;gap:2px;margin-top:4px}
+.rating-num{font-size:1.5rem;font-weight:700;color:var(--azul);line-height:1}
+.rating-stars{font-size:.82rem;color:var(--dorado);letter-spacing:1px;line-height:1}
+.rating-count{font-size:.65rem;color:var(--muted);line-height:1}
 .destacado-badge{background:linear-gradient(135deg,#fef3c7,#fde68a);color:#78350f;border-radius:6px;padding:2px 8px;font-size:.68rem;font-weight:700;display:inline-block;margin-bottom:3px}
 .card-contacto{display:flex;flex-wrap:wrap;gap:4px;padding:0 12px 8px}
 .contacto-item{display:inline-flex;align-items:center;gap:4px;background:var(--crema);border:1px solid var(--border);border-radius:6px;padding:3px 9px;font-size:.73rem;color:var(--text);white-space:nowrap}
@@ -1605,9 +1607,8 @@ function cardHTML(p,isDest){
         ${p.autoregistrado===true?'<span class="badge-autoregistrado">🏪 Registrado por el proveedor</span>':''}
       </div>
       <div class="card-right">
-        <div class="badge ${bc}">${el}</div><br>
-        ${st?`<div class="score-stars">${st}</div>`:''}
-        <div class="reviews-count">${p.resenas.length>0?p.resenas.length+' reseña'+(p.resenas.length!==1?'s':''):'Sin reseñas aún'}</div>
+        <div class="badge ${bc}">${el}</div>
+        ${sc.total>0?`<div class="rating-widget"><div class="rating-num">${sc.promedio.toFixed(1)}</div><div class="rating-stars">${st}</div><div class="rating-count">${sc.total} calificación${sc.total!==1?'es':''}</div></div>`:(p.resenas.length>0?`<div class="rating-count" style="margin-top:6px">${p.resenas.length} reseña${p.resenas.length!==1?'s':''}</div>`:'')}
       </div>
     </div>
     <div class="card-contacto">
