@@ -1591,7 +1591,7 @@ function cardHTML(p,isDest){
   const empOk=p.empresa&&!['n/a',''].includes(norm(p.empresa));
   const numWA=(t=>{t=t.replace(/\D/g,'');return t.startsWith('54')?t:t.startsWith('0')?'54'+t.slice(1):'54'+t;})(p.telefono||'');
   const pData=JSON.stringify({nombre:p.nombre,empresa:p.empresa,dni:p.dni,telefono:p.telefono,servicio:p.servicio,barrio:p.barrio||''});
-  const resHtml=p.resenas.map(r=>`<div class="resena-item"><div style="display:flex;align-items:center;gap:8px"><span class="badge ${badgeCls(r.recomendacion)}" style="font-size:.7rem">${r.recomendacion||''}</span>${r.barrioVecino?`<span style="font-size:.72rem;color:var(--azul2)">📍 ${r.barrioVecino}</span>`:''}</div>${r.comentario?`<div class="resena-notas">"${r.comentario}"</div>`:''}${r.notas&&!['n/a',''].includes(norm(r.notas))?`<div class="resena-notas" style="font-size:.75rem;color:var(--muted)">📝 ${r.notas}</div>`:''}</div>`).join('');
+  const resHtml=p.resenas.map(r=>`<div class="resena-item"><div style="display:flex;align-items:center;gap:8px"><span class="badge ${badgeCls(r.recomendacion)}" style="font-size:.7rem">${r.recomendacion||''}</span>${r.barrioVecino?`<span style="font-size:.72rem;color:var(--azul2)">📍 ${r.barrioVecino}</span>`:''}</div>${(r.comentario||(r.notas&&!['n/a',''].includes(norm(r.notas?r.notas:''))))?`<div class="resena-notas">"${r.comentario||r.notas}"</div>`:''}</div>`).join('');
   const toggle=p.resenas.length?`<div class="card-resenas-toggle"><span class="toggle-label">Ver reseñas (${p.resenas.length}) ▾</span></div><div class="card-detail" style="display:none"><div class="resenas-title">Reseñas</div>${resHtml}</div>`:'';
   return `<div class="proveedor-card${isDest?' destacado':''}" data-resenas="${p.resenas.length}">
     <div class="card-main">
@@ -1850,8 +1850,8 @@ function adminCardHTML(r){
       </div>
       ${r.estado==='Pendiente'?`<div class="admin-actions"><button class="btn-aprobar" data-aprobar="${r.id}">✅ Aprobar</button><button class="btn-rechazar" data-rechazar="${r.id}">❌ Rechazar</button></div>`:''}
     </div>
-    ${r.comentario?`<div style="font-size:.82rem;color:var(--text);margin-top:8px;font-style:italic">💬 "${r.comentario}"</div>`:''}
-    ${r.notas?`<div style="font-size:.82rem;color:var(--muted);margin-top:4px;font-style:italic">📝 "${r.notas}"</div>`:''}
+    ${(r.comentario||r.notas)?`<div style="font-size:.82rem;color:var(--text);margin-top:8px;font-style:italic">💬 "${r.comentario||r.notas}"</div>`:''}
+    ${r.comentario&&r.notas?`<div style="font-size:.82rem;color:var(--muted);margin-top:4px;font-style:italic">📝 "${r.notas}"</div>`:''}
     ${vecinoNombre||vecinoEmail?`<div class="admin-vecino">
       <div style="font-weight:600;font-size:.83rem">${vecinoNombre}</div>
       ${r.barrioVecino?`<span class="admin-badge" style="background:var(--azul-claro);color:var(--azul2);font-size:.72rem">📍 ${r.barrioVecino}</span>`:''}
