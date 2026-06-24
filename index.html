@@ -828,7 +828,7 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
         <option value="Utiles">📞 Teléfono útil</option>
       </select>
     </div>
-    <div class="auth-row" id="edit-prov-solo-llamada-row" style="display:none">
+    <div class="auth-row" id="edit-prov-solo-llamada-row">
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.88rem">
         <input type="checkbox" id="edit-prov-solo-llamada">
         📵 Solo llamada (no tiene WhatsApp — Ej: Bomberos, Ambulancia)
@@ -1413,7 +1413,8 @@ function procesarDatos(filas){
   filas.forEach((f,idx)=>{
     if(norm(f.recomendacion)==='utiles') return;
     const key=genKey(f);
-    if(!mapa[key]) mapa[key]={nombre:f.nombre,empresa:f.empresa||"",dni:f.dni||"",telefono:f.telefono,servicio:f.servicio,barrio:"",destacado:false,resenas:[],idxOriginal:idx,autoregistrado:f.autoregistrado===true,barriosServicio:[],firestoreId:f.id||"",categorias:f.categorias||[]};
+    if(!mapa[key]) mapa[key]={nombre:f.nombre,empresa:f.empresa||"",dni:f.dni||"",telefono:f.telefono,servicio:f.servicio,barrio:"",destacado:false,resenas:[],idxOriginal:idx,autoregistrado:f.autoregistrado===true,barriosServicio:[],firestoreId:f.id||"",categorias:f.categorias||[],soloLlamada:false};
+    if(f.soloLlamada===true) mapa[key].soloLlamada=true;
     if(!mapa[key].barrio && f.barrio && f.barrio.trim()!=='') mapa[key].barrio=normBarrio(f.barrio);
     if(!mapa[key].barrioOrigen && f.barrioOrigen) mapa[key].barrioOrigen=f.barrioOrigen;
     if(f.barriosServicio&&f.barriosServicio.length) mapa[key].barriosServicio=[...new Set([...mapa[key].barriosServicio,...f.barriosServicio])];
@@ -1430,22 +1431,29 @@ function procesarDatos(filas){
 function genKey(f){const n=norm(f.nombre),d=norm(f.dni||''),t=norm(f.telefono||'');if(d&&d!=='n/a')return n+'_d_'+d;if(t&&t!=='n/a')return n+'_t_'+t.replace(/\D/g,'').slice(-8);return n+'_e_'+norm(f.empresa||'');}
 
 function calcScore(r){
-  if(!r||!r.length) return {promedio:0,total:0,etiqueta:'Sin datos',estrellas:0};
-  const ord={'Muy Recomendable':5,'Recomendable':4,'Malas Experiencias':2,'No Recomendable':1};
-  const vals=r.map(x=>ord[x.recomendacion]||0).filter(v=>v>0);
-  if(!vals.length) return {promedio:0,total:0,etiqueta:'Sin datos',estrellas:0};
-  const prom=vals.reduce((a,b)=>a+b,0)/vals.length;
+  if(!r||!r.length) return {promedio:0,total:0,etiqueta:'Sin datos',estrellas:0,stars:'',orden:0};
   const contar = lbl => r.filter(x=>x.recomendacion===lbl).length;
   const mr=contar('Muy Recomendable'), rec=contar('Recomendable');
   const mal=contar('Malas Experiencias'), noRec=contar('No Recomendable');
   const positivas=mr+rec, negativas=mal+noRec, total=r.length;
+  const contadas=positivas+negativas;
+  if(!contadas) return {promedio:0,total:0,etiqueta:'Sin datos',estrellas:0,stars:'',orden:0};
+  // Etiqueta: lógica original sin cambios
   let etq='Sin datos';
   if(positivas>=5 && negativas===0) etq='Muy Recomendable';
   else if(negativas/total>0.5) etq='No Recomendable';
   else if(negativas/total>0.3) etq='Malas Experiencias';
   else if(positivas>=1) etq='Recomendable';
+  // Promedio en escala 0-5 basado en % de satisfacción
+  // positivas=5.0, negativas=0.0, proporcional entre medio
+  const pct=positivas/contadas; // 0 a 1
+  const prom=parseFloat((pct*5).toFixed(1));
+  // Estrellas basadas en el promedio
   const st=prom>=4.5?'★★★★★':prom>=3.5?'★★★★☆':prom>=2.5?'★★★☆☆':prom>=1.5?'★★☆☆☆':'★☆☆☆☆';
-  return {promedio:prom,total,etiqueta:etq,estrellas:prom,stars:st};
+  // Wilson score para ordenar (z=1.281, 90% confidence)
+  const z=1.281;
+  const orden=(pct+(z*z)/(2*contadas)-z*Math.sqrt((pct*(1-pct)+(z*z)/(4*contadas))/contadas))/(1+(z*z)/contadas);
+  return {promedio:prom,total:contadas,etiqueta:etq,estrellas:prom,stars:st,orden};
 }
 
 function poblarRubros(){
@@ -1542,7 +1550,7 @@ function renderResults(){
       const etB=b.score.total===0?'Sin datos':b.score.etiqueta;
       const etDif=(ord[etB]||0)-(ord[etA]||0);
       if(etDif!==0) return etDif;
-      return (b.score.promedio||0)-(a.score.promedio||0);
+      return (b.score.orden||0)-(a.score.orden||0);
     });
 
   const cont = document.getElementById('results-container');
@@ -1624,7 +1632,7 @@ function cardHTML(p,isDest){
       </div>
     </div>
     <div class="card-contacto">
-      ${telOk?`<button class="contacto-item tel btn-wa" data-num="${numWA}" data-srv="${p.servicio.replace(/"/g,'&quot;')}"><svg viewBox="0 0 24 24" width="13" height="13" fill="#25D366" style="vertical-align:middle;margin-right:2px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> ${p.telefono}</button>`:''}
+      ${telOk?(p.soloLlamada?`<a class="contacto-item tel" href="tel:${p.telefono.replace(/\s/g,'')}" style="text-decoration:none">📞 ${p.telefono}</a>`:`<button class="contacto-item tel btn-wa" data-num="${numWA}" data-srv="${p.servicio.replace(/"/g,'&quot;')}"><svg viewBox="0 0 24 24" width="13" height="13" fill="#25D366" style="vertical-align:middle;margin-right:2px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> ${p.telefono}</button>`):''}
       ${empOk?`<span class="contacto-item">🏢 ${p.empresa}</span>`:''}
       ${p.barrioOrigen?`<span class="contacto-item" style="color:var(--azul2);border-color:var(--azul-mid);background:var(--azul-claro)">🏘️ ${p.barrioOrigen}</span>`:''}
     </div>
@@ -2658,7 +2666,6 @@ async function abrirEditarProveedor(id, p){
     // Determinar valor del select según tipo y recomendacion
     const tipoVal = fresh.tipo==='util' ? 'Utiles' : fresh.tipo==='publicidad' ? 'Publicidad' : (fresh.recomendacion||'Recomendable');
     document.getElementById('edit-prov-recomendacion').value=tipoVal;
-    document.getElementById('edit-prov-solo-llamada-row').style.display=tipoVal==='Utiles'?'block':'none';
     document.getElementById('edit-prov-solo-llamada').checked=fresh.soloLlamada===true;
     document.getElementById('edit-prov-comentario').value=fresh.comentario||p.comentario||'';
     document.getElementById('edit-prov-notas').value=fresh.notas||p.notas||'';
@@ -2681,9 +2688,7 @@ document.querySelectorAll('input[name="edit-prov-barrio-opt"]').forEach(r=>{
     document.getElementById('edit-prov-barrio-cual-box').style.display=r.value==='si'?'block':'none';
   });
 });
-document.getElementById('edit-prov-recomendacion').addEventListener('change',function(){
-  document.getElementById('edit-prov-solo-llamada-row').style.display=this.value==='Utiles'?'block':'none';
-});
+document.getElementById('edit-prov-recomendacion').addEventListener('change',function(){});
 poblarSelectBarrios('edit-prov-barrio-cual');
 document.getElementById('editar-prov-close').addEventListener('click',()=>document.getElementById('modal-editar-proveedor').classList.remove('open'));
 document.getElementById('modal-editar-proveedor').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});
@@ -2710,7 +2715,7 @@ document.getElementById('btn-guardar-prov').addEventListener('click', async()=>{
       barrioOrigen:barrioOpt==='si'?(document.getElementById('edit-prov-barrio-cual').value||''):'',
       categorias:[...document.querySelectorAll('#edit-prov-cats input:checked')].map(i=>i.value),
       tipo: rec==='Utiles' ? 'util' : rec==='Publicidad' ? 'publicidad' : 'proveedor',
-      soloLlamada: rec==='Utiles' ? document.getElementById('edit-prov-solo-llamada').checked : false,
+      soloLlamada: document.getElementById('edit-prov-solo-llamada').checked,
     };
     await updateDoc(doc(db,'proveedores',id), datos);
     // Actualizar barriosServicio y categorias en TODOS los docs del mismo proveedor
