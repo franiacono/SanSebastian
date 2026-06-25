@@ -933,9 +933,13 @@ const FB_CONFIG = {
 const ADMIN_EMAILS = ['francisco.iacono@gmail.com','adminproveedoressansebastian@gmail.com','entrevecinos.ar@gmail.com'];
 const VAPID_KEY    = 'BBNWLH5KZLq7Zdj7ARf3hE1zRQxR1Sbk1k7Xk2-5Hf9t9L5rKaYcNSFu5WrGWJmyh-QKrok5jNZBTgpUXxjLS30';
 // Apps Script solo para emails y push (sigue igual)
-const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbwA1GGES5bf9m5u653dFDcxOhKDti0q2Tzf0rVDGw9HGvu_PnJQlOq4609fu_nN7V0Zfw/exec';
-const SCRIPT_PWD   = 'EV_v3c!n0s#2025xK';
-const ADMIN_PWD    = 'EV_4dm!n#2025zR9';
+const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbwP9OdUHCx1ZKNOKYzj4406HTwjHfxpJFGSjHpU9I4jmU4LtK97ICjHre7Iza-bH4hrqw/exec';
+// Las passwords NO viven en el cliente — el Apps Script valida via Firebase ID Token
+const apiGet = async (p) => {
+  const user = currentUser;
+  const token = user ? await user.getIdToken() : '';
+  return fetch(SCRIPT_URL+'?'+new URLSearchParams({...p, idToken: token})).then(r=>r.json());
+};
 
 // ── BARRIOS CONFIG ───────────────────────────────────────────────────────────
 const BARRIOS_CONFIG = [
@@ -995,6 +999,7 @@ const CATS = [
 ];
 
 const norm = t => { if(!t)return ''; return String(t).toLowerCase().trim().replace(/á/g,'a').replace(/é/g,'e').replace(/í/g,'i').replace(/ó/g,'o').replace(/ú/g,'u').replace(/ü/g,'u'); };
+const esc  = t => { if(!t)return ''; return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); };
 const catDe = srv => { const s=norm(srv); const c=CATS.find(c=>c.keys.some(k=>s.includes(k))); return c?c.label:'Varios'; };
 const normBarrio = b => { const n=norm(b); if(n==='si'||n==='sí'||n==='s')return 'Sí'; if(n==='no')return 'No'; return b; };
 const slugify = t => norm(t).replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
@@ -1032,7 +1037,7 @@ function fixMobileLabels(){
 fixMobileLabels();
 
 const isAdmin = () => ADMIN_EMAILS.includes((currentUser?.email||'').toLowerCase());
-const apiGet  = p => { const pwd=isAdmin()?ADMIN_PWD:SCRIPT_PWD; return fetch(SCRIPT_URL+'?'+new URLSearchParams({...p,password:pwd})).then(r=>r.json()); };
+// apiGet definido arriba con Firebase ID Token
 
 // ── POBLAR BARRIOS ────────────────────────────────────────────────────────────
 function poblarSelectBarrios(selectId, incluirVacio=true) {
@@ -1617,9 +1622,9 @@ function cardHTML(p,isDest){
       <div class="card-avatar">${em}</div>
       <div class="card-info">
         ${isDest?'<div class="destacado-badge">⭐ Destacado</div>':''}
-        <div class="card-nombre">${empOk?p.empresa:p.nombre}</div>
-        <div class="card-sub">${empOk?p.nombre:p.servicio}</div>
-        <span class="card-servicio-tag">${p.servicio}</span>
+        <div class="card-nombre">${empOk?esc(p.empresa):esc(p.nombre)}</div>
+        <div class="card-sub">${empOk?esc(p.nombre):esc(p.servicio)}</div>
+        <span class="card-servicio-tag">${esc(p.servicio)}</span>
         ${p.autoregistrado===true?'<span class="badge-autoregistrado">🏪 Registrado por el proveedor</span>':''}
       </div>
       <div class="card-right">
@@ -1632,18 +1637,18 @@ function cardHTML(p,isDest){
       </div>
     </div>
     <div class="card-contacto">
-      ${telOk?(p.soloLlamada?`<a class="contacto-item tel" href="tel:${p.telefono.replace(/\s/g,'')}" style="text-decoration:none">📞 ${p.telefono}</a>`:`<button class="contacto-item tel btn-wa" data-num="${numWA}" data-srv="${p.servicio.replace(/"/g,'&quot;')}"><svg viewBox="0 0 24 24" width="13" height="13" fill="#25D366" style="vertical-align:middle;margin-right:2px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> ${p.telefono}</button>`):''}
-      ${empOk?`<span class="contacto-item">🏢 ${p.empresa}</span>`:''}
-      ${p.barrioOrigen?`<span class="contacto-item" style="color:var(--azul2);border-color:var(--azul-mid);background:var(--azul-claro)">🏘️ ${p.barrioOrigen}</span>`:''}
+      ${telOk?(p.soloLlamada?`<a class="contacto-item tel" href="tel:${p.telefono.replace(/\s/g,'')}" style="text-decoration:none">📞 ${esc(p.telefono)}</a>`:`<button class="contacto-item tel btn-wa" data-num="${numWA}" data-srv="${esc(p.servicio)}"><svg viewBox="0 0 24 24" width="13" height="13" fill="#25D366" style="vertical-align:middle;margin-right:2px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> ${esc(p.telefono)}</button>`):''}
+      ${empOk?`<span class="contacto-item">🏢 ${esc(p.empresa)}</span>`:''}
+      ${p.barrioOrigen?`<span class="contacto-item" style="color:var(--azul2);border-color:var(--azul-mid);background:var(--azul-claro)">🏘️ ${esc(p.barrioOrigen)}</span>`:''}
     </div>
     ${p.barriosServicio&&p.barriosServicio.length?`
       <div class="barrio-srv-label">📍 Barrios donde presta servicios</div>
-      <div class="barrios-servicio-badges">${p.barriosServicio.map(b=>`<span class="barrio-srv-badge">${b==='Consultar'?'🔍 Consultar por otros barrios':b==='Toda la zona'?'🌐 Toda la zona':b}</span>`).join('')}</div>`:''}
+      <div class="barrios-servicio-badges">${p.barriosServicio.map(b=>`<span class="barrio-srv-badge">${b==='Consultar'?'🔍 Consultar por otros barrios':b==='Toda la zona'?'🌐 Toda la zona':esc(b)}</span>`).join('')}</div>`:''}
     ${p.resenas.length?`<div class="card-resenas-toggle"><span class="toggle-label">Ver reseñas (${p.resenas.length}) ▾</span></div><div class="card-detail" style="display:none"><div class="resenas-title">Reseñas</div>${resHtml}</div>`:''}
     <div class="card-footer-actions">
       <button class="btn-recomendar-card" data-p='${pData.replace(/'/g,"&apos;")}'>✍️ Recomendar</button>
-      <button class="btn-compartir-card" data-nombre="${p.nombre}" data-srv="${p.servicio}" data-tel="${p.telefono||''}">🔗</button>
-      ${isAdmin()?`<button class="btn-editar-card" data-id="${p.firestoreId||''}" style="background:transparent;border:1.5px solid var(--naranja);color:var(--naranja);border-radius:8px;padding:6px 12px;font-size:.75rem;font-family:'Inter',sans-serif;cursor:pointer">✏️</button>`:''}
+      <button class="btn-compartir-card" data-nombre="${esc(p.nombre)}" data-srv="${esc(p.servicio)}" data-tel="${esc(p.telefono||'')}">🔗</button>
+      ${isAdmin()?`<button class="btn-editar-card" data-id="${esc(p.firestoreId||'')}" style="background:transparent;border:1.5px solid var(--naranja);color:var(--naranja);border-radius:8px;padding:6px 12px;font-size:.75rem;font-family:'Inter',sans-serif;cursor:pointer">✏️</button>`:''}
     </div>
   </div>`;
 }
@@ -1788,12 +1793,12 @@ async function cargarTelefonos(){
     const btnUtil=(t)=>{
       const tel=(t.telefono||'').replace(/\s/g,'');
       if(t.soloLlamada){
-        return `<a class="tel-util-btn" href="tel:${tel}" style="text-decoration:none">📞 ${t.telefono}</a>`;
+        return `<a class="tel-util-btn" href="tel:${tel}" style="text-decoration:none">📞 ${esc(t.telefono)}</a>`;
       }
       const numWA=tel.replace(/\D/g,'');const waNum=numWA.startsWith('54')?numWA:numWA.startsWith('0')?'54'+numWA.slice(1):'54'+numWA;
-      return `<button class="tel-util-btn btn-wa" data-num="${waNum}" data-srv="${t.nombre}"><svg viewBox="0 0 24 24" width="12" height="12" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> ${t.telefono}</button>`;
+      return `<button class="tel-util-btn btn-wa" data-num="${waNum}" data-srv="${esc(t.nombre)}"><svg viewBox="0 0 24 24" width="12" height="12" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> ${esc(t.telefono)}</button>`;
     };
-    c.innerHTML=`<div class="tel-util-list">${itemsFiltrados.map(t=>`<div class="tel-util-item"><div class="tel-util-emoji">${t.emoji||'📞'}</div><div class="tel-util-info"><div class="tel-util-nombre">${t.nombre}</div>${t.notas?`<div class="tel-util-notas">${t.notas}</div>`:''}</div>${btnUtil(t)}</div>`).join('')}</div>`;
+    c.innerHTML=`<div class="tel-util-list">${itemsFiltrados.map(t=>`<div class="tel-util-item"><div class="tel-util-emoji">${t.emoji||'📞'}</div><div class="tel-util-info"><div class="tel-util-nombre">${esc(t.nombre)}</div>${t.notas?`<div class="tel-util-notas">${esc(t.notas)}</div>`:''}</div>${btnUtil(t)}</div>`).join('')}</div>`;
     c.querySelectorAll('.btn-wa').forEach(btn=>btn.addEventListener('click',()=>abrirWA(btn.dataset.num,btn.dataset.srv)));
   }catch(e){c.innerHTML='<div class="empty-state"><p>Error al cargar</p></div>';}
 }
@@ -2053,14 +2058,14 @@ async function cargarMensajes(){
       const ultimo=t.mensajes[t.mensajes.length-1];
       return `<div class="chat-thread" data-thread="${t.threadId}">
         <div class="chat-thread-header" data-toggle="admin" data-tid="${t.threadId}">
-          <div><div class="chat-thread-asunto">👤 ${t.nombre||'Sin nombre'} ${t.email?`<span style="font-weight:400;color:var(--muted);font-size:.78rem">&lt;${t.email}&gt;</span>`:''} ${sinLeer?`<span class="chat-thread-badge">${sinLeer} nuevo${sinLeer>1?'s':''}</span>`:''}</div>
+          <div><div class="chat-thread-asunto">👤 ${esc(t.nombre)||'Sin nombre'} ${esc(t.email)?`<span style="font-weight:400;color:var(--muted);font-size:.78rem">&lt;${esc(t.email)}&gt;</span>`:''} ${sinLeer?`<span class="chat-thread-badge">${sinLeer} nuevo${sinLeer>1?'s':''}</span>`:''}</div>
           <div class="chat-thread-meta">${t.telefono?`📞 ${t.telefono} · `:''}Último: ${fmtFecha(ultimo?.fecha||'')} · ${t.mensajes.length} mensaje${t.mensajes.length!==1?'s':''}</div></div>
           <span style="color:var(--muted)">▾</span>
         </div>
         <div class="chat-body" id="cbody-${t.threadId}">
-          <div class="chat-mensajes">${t.mensajes.map(m=>`<div class="chat-burbuja ${m.autor==='admin'?'enviado':'recibido'}">${m.mensaje}<div class="chat-burbuja-meta">${m.autor==='admin'?'Vos':'Vecino'} · ${fmtFecha(m.fecha)}</div></div>`).join('')}</div>
+          <div class="chat-mensajes">${t.mensajes.map(m=>`<div class="chat-burbuja ${m.autor==='admin'?'enviado':'recibido'}">${esc(m.mensaje)}<div class="chat-burbuja-meta">${m.autor==='admin'?'Vos':'Vecino'} · ${fmtFecha(m.fecha)}</div></div>`).join('')}</div>
           <div class="chat-reply-box">
-            <textarea class="chat-reply-input" data-reply-admin="${t.threadId}" data-email="${t.email||''}" data-nombre="${t.nombre||''}" placeholder="Escribí tu respuesta..."></textarea>
+            <textarea class="chat-reply-input" data-reply-admin="${t.threadId}" data-email="${esc(t.email)||''}" data-nombre="${esc(t.nombre)||''}" placeholder="Escribí tu respuesta..."></textarea>
             <div style="display:flex;gap:8px;margin-top:8px"><button class="btn-aprobar" data-send-admin="${t.threadId}">Responder</button></div>
           </div>
         </div>
@@ -2592,8 +2597,8 @@ async function buscarProveedoresAdmin(){
     <div style="overflow-x:auto"><table style="width:100%;font-size:.77rem;border-collapse:collapse">
       <thead><tr style="background:var(--crema2)">${['Nombre','Servicio','Teléfono','Recomendación','Recomendado por',''].map(h=>`<th style="padding:7px 8px;text-align:left;border-bottom:1px solid var(--border);font-weight:600">${h}</th>`).join('')}</tr></thead>
       <tbody>${found.map(p=>`<tr style="border-bottom:1px solid var(--crema2)">
-        <td style="padding:7px 8px;font-weight:500">${p.nombre||'—'}</td>
-        <td style="padding:7px 8px;color:var(--muted)">${p.servicio||'—'}</td>
+        <td style="padding:7px 8px;font-weight:500">${esc(p.nombre)||'—'}</td>
+        <td style="padding:7px 8px;color:var(--muted)">${esc(p.servicio)||'—'}</td>
         <td style="padding:7px 8px">${p.telefono||'—'}</td>
         <td style="padding:7px 8px"><span class="badge ${badgeCls(p.recomendacion)}" style="font-size:.68rem">${p.recomendacion||'—'}</span></td>
         <td style="padding:7px 8px;font-size:.72rem;color:var(--muted)">${(()=>{
