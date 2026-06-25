@@ -936,7 +936,7 @@ const VAPID_KEY    = 'BBNWLH5KZLq7Zdj7ARf3hE1zRQxR1Sbk1k7Xk2-5Hf9t9L5rKaYcNSFu5W
 const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbzwbiU39HdhvMsOfPlaXaqLgjvab9ENZnGlbUJx-1g9tOr5or-ha9CBsUwbXTMi_xQUIQ/exec';
 // Las passwords NO viven en el cliente — el Apps Script valida via Firebase ID Token
 const apiGet = async (p) => {
-  const user = firebase.auth().currentUser;
+  const user = currentUser;
   const token = user ? await user.getIdToken() : '';
   return fetch(SCRIPT_URL+'?'+new URLSearchParams({...p, idToken: token})).then(r=>r.json());
 };
