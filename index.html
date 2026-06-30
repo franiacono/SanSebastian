@@ -669,6 +669,7 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
           <div id="admin-resultados-usuario"></div>
         </div>
         <div id="admin-tab-estadisticas" style="display:none">
+          <div id="metricas-container" style="margin-bottom:20px"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
           <div style="display:flex;gap:8px;margin-bottom:14px">
             <button class="admin-tab active" id="btn-rank-semanal" style="flex:1">Esta semana</button>
             <button class="admin-tab" id="btn-rank-mensual" style="flex:1">Este mes</button>
@@ -1842,9 +1843,80 @@ document.querySelectorAll('.admin-tab').forEach(tab=>{
     if(tab.dataset.atab==='pendientes'||tab.dataset.atab==='recientes') cargarPendientes();
     if(tab.dataset.atab==='usuarios') buscarUsuariosAdmin();
     if(tab.dataset.atab==='proveedores') buscarProveedoresAdmin();
-    if(tab.dataset.atab==='estadisticas') cargarRanking('semanal');
+    if(tab.dataset.atab==='estadisticas'){ cargarRanking('semanal'); cargarMetricas(); }
   });
 });
+
+// ── MÉTRICAS DIARIAS/SEMANALES/MENSUALES/ANUALES ───────────────────────────────
+async function cargarMetricas(){
+  const cont = document.getElementById('metricas-container');
+  cont.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando...</div>';
+  try{
+    const ahora = new Date();
+    const inicioDia = new Date(ahora); inicioDia.setHours(0,0,0,0);
+    const inicioSemana = new Date(ahora);
+    const dia = inicioSemana.getDay();
+    inicioSemana.setDate(inicioSemana.getDate() - (dia===0?6:dia-1));
+    inicioSemana.setHours(0,0,0,0);
+    const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+    const inicioAnio = new Date(ahora.getFullYear(), 0, 1);
+
+    const contarDesde = (fecha) => ({
+      dia: fecha>=inicioDia?1:0, semana: fecha>=inicioSemana?1:0,
+      mes: fecha>=inicioMes?1:0, anio: fecha>=inicioAnio?1:0
+    });
+    const sumar = (acc,c) => { acc.dia+=c.dia; acc.semana+=c.semana; acc.mes+=c.mes; acc.anio+=c.anio; };
+
+    // Usuarios nuevos
+    const usuariosNuevos = {dia:0,semana:0,mes:0,anio:0,total:0};
+    const snapUsers = await getDocs(collection(db,'usuarios'));
+    usuariosNuevos.total = snapUsers.size;
+    snapUsers.forEach(d=>{
+      const f = d.data().fechaRegistro?.toDate?.();
+      if(f) sumar(usuariosNuevos, contarDesde(f));
+    });
+
+    // Proveedores nuevos
+    const proveedoresNuevos = {dia:0,semana:0,mes:0,anio:0,total:0};
+    const snapProv = await getDocs(collection(db,'proveedores'));
+    proveedoresNuevos.total = snapProv.size;
+    snapProv.forEach(d=>{
+      const f = d.data().fechaAprobacion?.toDate?.();
+      if(f) sumar(proveedoresNuevos, contarDesde(f));
+    });
+
+    // Clicks de contacto (llamada+whatsapp) y compartir, desde eventos
+    const clicksContacto = {dia:0,semana:0,mes:0,anio:0,total:0};
+    const clicksCompartir = {dia:0,semana:0,mes:0,anio:0,total:0};
+    const snapEv = await getDocs(collection(db,'eventos'));
+    snapEv.forEach(d=>{
+      const e = d.data();
+      const f = e.fecha?.toDate?.();
+      if(!f) return;
+      const c = contarDesde(f);
+      if(e.tipo==='llamada'||e.tipo==='whatsapp'){ sumar(clicksContacto,c); clicksContacto.total++; }
+      if(e.tipo==='compartir'){ sumar(clicksCompartir,c); clicksCompartir.total++; }
+    });
+
+    const filas = [
+      {label:'👥 Usuarios nuevos', d:usuariosNuevos},
+      {label:'📋 Proveedores nuevos', d:proveedoresNuevos},
+      {label:'📞 Clicks contactar', d:clicksContacto},
+      {label:'🔗 Clicks compartir', d:clicksCompartir},
+    ];
+    cont.innerHTML = `<div style="overflow-x:auto"><table style="width:100%;font-size:.82rem;border-collapse:collapse">
+      <thead><tr style="background:var(--crema2)">${['Métrica','Hoy','Esta semana','Este mes','Este año','Total'].map(h=>`<th style="padding:8px;text-align:left;border-bottom:1px solid var(--border);font-weight:600">${h}</th>`).join('')}</tr></thead>
+      <tbody>${filas.map(f=>`<tr style="border-bottom:1px solid var(--crema2)">
+        <td style="padding:8px;font-weight:500">${f.label}</td>
+        <td style="padding:8px;text-align:center">${f.d.dia}</td>
+        <td style="padding:8px;text-align:center">${f.d.semana}</td>
+        <td style="padding:8px;text-align:center">${f.d.mes}</td>
+        <td style="padding:8px;text-align:center">${f.d.anio}</td>
+        <td style="padding:8px;text-align:center;font-weight:700;color:var(--azul)">${f.d.total}</td>
+      </tr>`).join('')}</tbody>
+    </table></div>`;
+  }catch(e){ console.log('Métricas error:',e); cont.innerHTML='<div class="empty-state"><div class="icon">⚠️</div><p>Error al cargar métricas</p></div>'; }
+}
 
 let pendientesData=[];
 
