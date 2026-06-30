@@ -670,9 +670,12 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
         </div>
         <div id="admin-tab-estadisticas" style="display:none">
           <div id="metricas-container" style="margin-bottom:20px"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
-          <div style="display:flex;gap:8px;margin-bottom:14px">
-            <button class="admin-tab active" id="btn-rank-semanal" style="flex:1">Esta semana</button>
-            <button class="admin-tab" id="btn-rank-mensual" style="flex:1">Este mes</button>
+          <div class="admin-tabs" style="margin-bottom:14px">
+            <button class="admin-tab" data-rank="dia">Hoy</button>
+            <button class="admin-tab active" data-rank="semana">Esta semana</button>
+            <button class="admin-tab" data-rank="mes">Este mes</button>
+            <button class="admin-tab" data-rank="anio">Este año</button>
+            <button class="admin-tab" data-rank="historico">Histórico</button>
           </div>
           <div id="ranking-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
         </div>
@@ -1843,7 +1846,7 @@ document.querySelectorAll('.admin-tab').forEach(tab=>{
     if(tab.dataset.atab==='pendientes'||tab.dataset.atab==='recientes') cargarPendientes();
     if(tab.dataset.atab==='usuarios') buscarUsuariosAdmin();
     if(tab.dataset.atab==='proveedores') buscarProveedoresAdmin();
-    if(tab.dataset.atab==='estadisticas'){ cargarRanking('semanal'); cargarMetricas(); }
+    if(tab.dataset.atab==='estadisticas'){ cargarRanking('semana'); cargarMetricas(); }
   });
 });
 
@@ -2692,17 +2695,22 @@ async function cargarRanking(periodo){
   cont.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando...</div>';
   try{
     const ahora = new Date();
-    let desde;
-    if(periodo==='semanal'){
+    let desde = null;
+    if(periodo==='dia'){
+      desde = new Date(ahora); desde.setHours(0,0,0,0);
+    } else if(periodo==='semana'){
       desde = new Date(ahora);
       const dia = desde.getDay();
-      const diasDesdelunes = dia === 0 ? 6 : dia - 1;
-      desde.setDate(desde.getDate() - diasDesdelunes);
+      desde.setDate(desde.getDate() - (dia===0?6:dia-1));
       desde.setHours(0,0,0,0);
-    } else {
+    } else if(periodo==='mes'){
       desde = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+    } else if(periodo==='anio'){
+      desde = new Date(ahora.getFullYear(), 0, 1);
     }
-    const snap = await getDocs(query(collection(db,'eventos'),where('fecha','>=',desde)));
+    // 'historico' → desde queda null, sin filtro de fecha
+    const q2 = desde ? query(collection(db,'eventos'),where('fecha','>=',desde)) : collection(db,'eventos');
+    const snap = await getDocs(q2);
     const conteo = {}; // proveedorId -> {nombre, llamada, whatsapp, compartir}
     snap.forEach(d=>{
       const e = d.data();
@@ -2728,15 +2736,12 @@ async function cargarRanking(periodo){
     </table></div>`;
   }catch(e){ console.log('Ranking error:',e); cont.innerHTML='<div class="empty-state"><div class="icon">⚠️</div><p>Error al cargar el ranking</p></div>'; }
 }
-document.getElementById('btn-rank-semanal').addEventListener('click', ()=>{
-  document.getElementById('btn-rank-semanal').classList.add('active');
-  document.getElementById('btn-rank-mensual').classList.remove('active');
-  cargarRanking('semanal');
-});
-document.getElementById('btn-rank-mensual').addEventListener('click', ()=>{
-  document.getElementById('btn-rank-mensual').classList.add('active');
-  document.getElementById('btn-rank-semanal').classList.remove('active');
-  cargarRanking('mensual');
+document.querySelectorAll('[data-rank]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('[data-rank]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    cargarRanking(btn.dataset.rank);
+  });
 });
 
 // ── EMAIL A PROVEEDOR AL AUTO-REGISTRARSE ─────────────────────────────────────
