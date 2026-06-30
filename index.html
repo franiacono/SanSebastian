@@ -1679,8 +1679,23 @@ function abrirWA(num,servicio){
 // ── TRACKING DE EVENTOS (clicks de contacto y compartir) ──────────────────────
 // Cada click genera: 1 increment atómico en el doc del proveedor + 1 doc en 'eventos'
 // Costo: 2 escrituras por click. Para uso normal de un barrio, muy por debajo del límite gratuito diario.
+// Cooldown de 1 minuto por usuario+proveedor+tipo de acción para evitar que clicks repetidos
+// (intencionales o accidentales) inflen las métricas.
+const COOLDOWN_MS = 60*1000; // 1 minuto
+function pasoCooldown(clave){
+  try{
+    const ultimo = parseInt(localStorage.getItem(clave)||'0',10);
+    const ahora  = Date.now();
+    if(ahora - ultimo < COOLDOWN_MS) return false;
+    localStorage.setItem(clave, String(ahora));
+    return true;
+  }catch(e){ return true; } // si localStorage falla, no bloqueamos el tracking
+}
 async function trackEvento(tipo, proveedorId, proveedorNombre){
   if(!proveedorId) return;
+  const uid = currentUser?.uid || 'anon';
+  const clave = `cooldown_${tipo}_${proveedorId}_${uid}`;
+  if(!pasoCooldown(clave)) return; // mismo usuario+proveedor+acción dentro del último minuto, no contar
   try{
     const campo = tipo==='llamada' ? 'clicksLlamada' : tipo==='whatsapp' ? 'clicksWhatsapp' : 'clicksCompartir';
     updateDoc(doc(db,'proveedores',proveedorId),{[campo]:increment(1)}).catch(()=>{});
