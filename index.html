@@ -638,15 +638,19 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
         <div id="admin-stats" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:20px">
           <div class="admin-stat-card" id="stat-pendientes"><div class="stat-num">—</div><div class="stat-label">⏳ Pendientes</div></div>
           <div class="admin-stat-card" id="stat-usuarios"><div class="stat-num">—</div><div class="stat-label">👥 Usuarios totales</div></div>
-          <div class="admin-stat-card" id="stat-nuevos"><div class="stat-num">—</div><div class="stat-label">🆕 Nuevos esta semana</div></div>
+          <div class="admin-stat-card" id="stat-nuevos-usuarios"><div class="stat-num">—</div><div class="stat-label">🆕 Nuevos usuarios esta semana</div></div>
           <div class="admin-stat-card" id="stat-proveedores"><div class="stat-num">—</div><div class="stat-label">📋 Proveedores</div></div>
+          <div class="admin-stat-card" id="stat-nuevos-proveedores"><div class="stat-num">—</div><div class="stat-label">🆕 Nuevos proveedores esta semana</div></div>
           <div class="admin-stat-card" id="stat-mensajes"><div class="stat-num">—</div><div class="stat-label">💬 Consultas sin leer</div></div>
+          <div class="admin-stat-card" id="stat-clicks-contacto"><div class="stat-num">—</div><div class="stat-label">📞 Clicks de contacto (total)</div></div>
+          <div class="admin-stat-card" id="stat-clicks-compartir"><div class="stat-num">—</div><div class="stat-label">🔗 Veces compartido (total)</div></div>
         </div>
         <div class="admin-tabs">
           <button class="admin-tab active" data-atab="pendientes">Pendientes</button>
           <button class="admin-tab" data-atab="recientes">Recientes</button>
           <button class="admin-tab" data-atab="proveedores">Proveedores</button>
           <button class="admin-tab" data-atab="usuarios">Usuarios</button>
+          <button class="admin-tab" data-atab="estadisticas">📊 Estadísticas</button>
         </div>
         <div id="admin-tab-pendientes"><div id="pendientes-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div></div>
         <div id="admin-tab-recientes" style="display:none"><div id="aprobados-container"></div></div>
@@ -663,6 +667,17 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
             <button class="btn-submit" id="btn-admin-buscar" style="padding:10px 18px">Buscar</button>
           </div>
           <div id="admin-resultados-usuario"></div>
+        </div>
+        <div id="admin-tab-estadisticas" style="display:none">
+          <div id="metricas-container" style="margin-bottom:20px"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
+          <div class="admin-tabs" style="margin-bottom:14px">
+            <button class="admin-tab" data-rank="dia">Hoy</button>
+            <button class="admin-tab active" data-rank="semana">Esta semana</button>
+            <button class="admin-tab" data-rank="mes">Este mes</button>
+            <button class="admin-tab" data-rank="anio">Este año</button>
+            <button class="admin-tab" data-rank="historico">Histórico</button>
+          </div>
+          <div id="ranking-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
         </div>
       </div>
     </div>
@@ -914,7 +929,7 @@ import { getAuth, GoogleAuthProvider, signInWithPopup,
          sendEmailVerification }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc,
-         collection, query, where, orderBy, getDocs, onSnapshot, serverTimestamp, limit }
+         collection, query, where, orderBy, getDocs, onSnapshot, serverTimestamp, limit, increment }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 import { getMessaging, getToken, onMessage }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js';
@@ -1591,10 +1606,12 @@ function renderResults(){
     });
   });
   cont.querySelectorAll('.btn-recomendar-card').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();recomendarDesdeCard(btn.dataset.p);}));
-  cont.querySelectorAll('.btn-wa').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();abrirWA(btn.dataset.num,btn.dataset.srv);}));
+  cont.querySelectorAll('.btn-wa').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();abrirWA(btn.dataset.num,btn.dataset.srv);trackEvento('whatsapp',btn.dataset.id,btn.dataset.nombre);}));
+  cont.querySelectorAll('.btn-llamar').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();trackEvento('llamada',btn.dataset.id,btn.dataset.nombre);}));
   cont.querySelectorAll('.btn-compartir-card').forEach(btn=>{
     btn.addEventListener('click', async e=>{
       e.stopPropagation();
+      trackEvento('compartir',btn.dataset.id,btn.dataset.nombre);
       const url='https://entrevecinos.ar/?tel='+encodeURIComponent(btn.dataset.tel);
       const texto=`👀 Mirá lo que encontré en EntreVecinos: ${btn.dataset.nombre} (${btn.dataset.srv})`;
       if(navigator.share){ try{ await navigator.share({title:btn.dataset.nombre,text:texto,url}); }catch(ex){} }
@@ -1637,7 +1654,7 @@ function cardHTML(p,isDest){
       </div>
     </div>
     <div class="card-contacto">
-      ${telOk?(p.soloLlamada?`<a class="contacto-item tel" href="tel:${p.telefono.replace(/\s/g,'')}" style="text-decoration:none">📞 ${esc(p.telefono)}</a>`:`<button class="contacto-item tel btn-wa" data-num="${numWA}" data-srv="${esc(p.servicio)}"><svg viewBox="0 0 24 24" width="13" height="13" fill="#25D366" style="vertical-align:middle;margin-right:2px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> ${esc(p.telefono)}</button>`):''}
+      ${telOk?(p.soloLlamada?`<a class="contacto-item tel btn-llamar" data-id="${esc(p.firestoreId||'')}" data-nombre="${esc(p.nombre)}" href="tel:${p.telefono.replace(/\s/g,'')}" style="text-decoration:none">📞 ${esc(p.telefono)}</a>`:`<button class="contacto-item tel btn-wa" data-num="${numWA}" data-srv="${esc(p.servicio)}" data-id="${esc(p.firestoreId||'')}" data-nombre="${esc(p.nombre)}"><svg viewBox="0 0 24 24" width="13" height="13" fill="#25D366" style="vertical-align:middle;margin-right:2px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> ${esc(p.telefono)}</button>`):''}
       ${empOk?`<span class="contacto-item">🏢 ${esc(p.empresa)}</span>`:''}
       ${p.barrioOrigen?`<span class="contacto-item" style="color:var(--azul2);border-color:var(--azul-mid);background:var(--azul-claro)">🏘️ ${esc(p.barrioOrigen)}</span>`:''}
     </div>
@@ -1647,7 +1664,7 @@ function cardHTML(p,isDest){
     ${p.resenas.length?`<div class="card-resenas-toggle"><span class="toggle-label">Ver reseñas (${p.resenas.length}) ▾</span></div><div class="card-detail" style="display:none"><div class="resenas-title">Reseñas</div>${resHtml}</div>`:''}
     <div class="card-footer-actions">
       <button class="btn-recomendar-card" data-p='${pData.replace(/'/g,"&apos;")}'>✍️ Recomendar</button>
-      <button class="btn-compartir-card" data-nombre="${esc(p.nombre)}" data-srv="${esc(p.servicio)}" data-tel="${esc(p.telefono||'')}">🔗</button>
+      <button class="btn-compartir-card" data-nombre="${esc(p.nombre)}" data-srv="${esc(p.servicio)}" data-tel="${esc(p.telefono||'')}" data-id="${esc(p.firestoreId||'')}">🔗</button>
       ${isAdmin()?`<button class="btn-editar-card" data-id="${esc(p.firestoreId||'')}" style="background:transparent;border:1.5px solid var(--naranja);color:var(--naranja);border-radius:8px;padding:6px 12px;font-size:.75rem;font-family:'Inter',sans-serif;cursor:pointer">✏️</button>`:''}
     </div>
   </div>`;
@@ -1657,6 +1674,33 @@ function abrirWA(num,servicio){
   const msg='Hola! Te contacto porque vi tu servicio de '+servicio+' en EntreVecinos (entrevecinos.ar). ';
   const url='whatsapp://send?phone='+num+'&text='+encodeURIComponent(msg);
   const a=document.createElement('a'); a.href=url; document.body.appendChild(a); a.click(); setTimeout(()=>document.body.removeChild(a),200);
+}
+
+// ── TRACKING DE EVENTOS (clicks de contacto y compartir) ──────────────────────
+// Cada click genera: 1 increment atómico en el doc del proveedor + 1 doc en 'eventos'
+// Costo: 2 escrituras por click. Para uso normal de un barrio, muy por debajo del límite gratuito diario.
+// Cooldown de 1 minuto por usuario+proveedor+tipo de acción para evitar que clicks repetidos
+// (intencionales o accidentales) inflen las métricas.
+const COOLDOWN_MS = 60*1000; // 1 minuto
+function pasoCooldown(clave){
+  try{
+    const ultimo = parseInt(localStorage.getItem(clave)||'0',10);
+    const ahora  = Date.now();
+    if(ahora - ultimo < COOLDOWN_MS) return false;
+    localStorage.setItem(clave, String(ahora));
+    return true;
+  }catch(e){ return true; } // si localStorage falla, no bloqueamos el tracking
+}
+async function trackEvento(tipo, proveedorId, proveedorNombre){
+  if(!proveedorId) return;
+  const uid = currentUser?.uid || 'anon';
+  const clave = `cooldown_${tipo}_${proveedorId}_${uid}`;
+  if(!pasoCooldown(clave)) return; // mismo usuario+proveedor+acción dentro del último minuto, no contar
+  try{
+    const campo = tipo==='llamada' ? 'clicksLlamada' : tipo==='whatsapp' ? 'clicksWhatsapp' : 'clicksCompartir';
+    updateDoc(doc(db,'proveedores',proveedorId),{[campo]:increment(1)}).catch(()=>{});
+    addDoc(collection(db,'eventos'),{tipo,proveedorId,proveedorNombre:proveedorNombre||'',fecha:serverTimestamp()}).catch(()=>{});
+  }catch(e){ console.log('trackEvento error:',e); }
 }
 
 // ── RECOMENDAR ────────────────────────────────────────────────────────────────
@@ -1805,19 +1849,92 @@ async function cargarTelefonos(){
 
 // ── ADMIN ─────────────────────────────────────────────────────────────────────
 document.getElementById('btn-actualizar-admin').addEventListener('click', ()=>{ cargarPendientes(); cargarEstadisticasAdmin(); });
-document.querySelectorAll('.admin-tab').forEach(tab=>{
+document.querySelectorAll('.admin-tab[data-atab]').forEach(tab=>{
   tab.addEventListener('click',()=>{
-    document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.admin-tab[data-atab]').forEach(t=>t.classList.remove('active'));
     tab.classList.add('active');
     document.getElementById('admin-tab-pendientes').style.display=tab.dataset.atab==='pendientes'?'block':'none';
     document.getElementById('admin-tab-recientes').style.display=tab.dataset.atab==='recientes'?'block':'none';
     document.getElementById('admin-tab-proveedores').style.display=tab.dataset.atab==='proveedores'?'block':'none';
     document.getElementById('admin-tab-usuarios').style.display=tab.dataset.atab==='usuarios'?'block':'none';
+    document.getElementById('admin-tab-estadisticas').style.display=tab.dataset.atab==='estadisticas'?'block':'none';
     if(tab.dataset.atab==='pendientes'||tab.dataset.atab==='recientes') cargarPendientes();
     if(tab.dataset.atab==='usuarios') buscarUsuariosAdmin();
     if(tab.dataset.atab==='proveedores') buscarProveedoresAdmin();
+    if(tab.dataset.atab==='estadisticas'){ cargarRanking('semana'); cargarMetricas(); }
   });
 });
+
+// ── MÉTRICAS DIARIAS/SEMANALES/MENSUALES/ANUALES ───────────────────────────────
+async function cargarMetricas(){
+  const cont = document.getElementById('metricas-container');
+  cont.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando...</div>';
+  try{
+    const ahora = new Date();
+    const inicioDia = new Date(ahora); inicioDia.setHours(0,0,0,0);
+    const inicioSemana = new Date(ahora);
+    const dia = inicioSemana.getDay();
+    inicioSemana.setDate(inicioSemana.getDate() - (dia===0?6:dia-1));
+    inicioSemana.setHours(0,0,0,0);
+    const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+    const inicioAnio = new Date(ahora.getFullYear(), 0, 1);
+
+    const contarDesde = (fecha) => ({
+      dia: fecha>=inicioDia?1:0, semana: fecha>=inicioSemana?1:0,
+      mes: fecha>=inicioMes?1:0, anio: fecha>=inicioAnio?1:0
+    });
+    const sumar = (acc,c) => { acc.dia+=c.dia; acc.semana+=c.semana; acc.mes+=c.mes; acc.anio+=c.anio; };
+
+    // Usuarios nuevos
+    const usuariosNuevos = {dia:0,semana:0,mes:0,anio:0,total:0};
+    const snapUsers = await getDocs(collection(db,'usuarios'));
+    usuariosNuevos.total = snapUsers.size;
+    snapUsers.forEach(d=>{
+      const f = d.data().fechaRegistro?.toDate?.();
+      if(f) sumar(usuariosNuevos, contarDesde(f));
+    });
+
+    // Proveedores nuevos
+    const proveedoresNuevos = {dia:0,semana:0,mes:0,anio:0,total:0};
+    const snapProv = await getDocs(collection(db,'proveedores'));
+    proveedoresNuevos.total = snapProv.size;
+    snapProv.forEach(d=>{
+      const f = d.data().fechaAprobacion?.toDate?.();
+      if(f) sumar(proveedoresNuevos, contarDesde(f));
+    });
+
+    // Clicks de contacto (llamada+whatsapp) y compartir, desde eventos
+    const clicksContacto = {dia:0,semana:0,mes:0,anio:0,total:0};
+    const clicksCompartir = {dia:0,semana:0,mes:0,anio:0,total:0};
+    const snapEv = await getDocs(collection(db,'eventos'));
+    snapEv.forEach(d=>{
+      const e = d.data();
+      const f = e.fecha?.toDate?.();
+      if(!f) return;
+      const c = contarDesde(f);
+      if(e.tipo==='llamada'||e.tipo==='whatsapp'){ sumar(clicksContacto,c); clicksContacto.total++; }
+      if(e.tipo==='compartir'){ sumar(clicksCompartir,c); clicksCompartir.total++; }
+    });
+
+    const filas = [
+      {label:'👥 Usuarios nuevos', d:usuariosNuevos},
+      {label:'📋 Proveedores nuevos', d:proveedoresNuevos},
+      {label:'📞 Clicks contactar', d:clicksContacto},
+      {label:'🔗 Clicks compartir', d:clicksCompartir},
+    ];
+    cont.innerHTML = `<div style="overflow-x:auto"><table style="width:100%;font-size:.82rem;border-collapse:collapse">
+      <thead><tr style="background:var(--crema2)">${['Métrica','Hoy','Esta semana','Este mes','Este año','Total'].map(h=>`<th style="padding:8px;text-align:left;border-bottom:1px solid var(--border);font-weight:600">${h}</th>`).join('')}</tr></thead>
+      <tbody>${filas.map(f=>`<tr style="border-bottom:1px solid var(--crema2)">
+        <td style="padding:8px;font-weight:500">${f.label}</td>
+        <td style="padding:8px;text-align:center">${f.d.dia}</td>
+        <td style="padding:8px;text-align:center">${f.d.semana}</td>
+        <td style="padding:8px;text-align:center">${f.d.mes}</td>
+        <td style="padding:8px;text-align:center">${f.d.anio}</td>
+        <td style="padding:8px;text-align:center;font-weight:700;color:var(--azul)">${f.d.total}</td>
+      </tr>`).join('')}</tbody>
+    </table></div>`;
+  }catch(e){ console.log('Métricas error:',e); cont.innerHTML='<div class="empty-state"><div class="icon">⚠️</div><p>Error al cargar métricas</p></div>'; }
+}
 
 let pendientesData=[];
 
@@ -2557,23 +2674,90 @@ async function cargarEstadisticasAdmin(){
 
     // Usuarios totales y nuevos esta semana
     const snapUsers = await getDocs(collection(db,'usuarios'));
-    let nuevos = 0;
+    let nuevosUsuarios = 0;
     snapUsers.forEach(d=>{
       const f = d.data().fechaRegistro?.toDate?.();
-      if(f && f >= inicioSemana) nuevos++;
+      if(f && f >= inicioSemana) nuevosUsuarios++;
     });
     document.querySelector('#stat-usuarios .stat-num').textContent = snapUsers.size;
-    document.querySelector('#stat-nuevos .stat-num').textContent = nuevos;
+    document.querySelector('#stat-nuevos-usuarios .stat-num').textContent = nuevosUsuarios;
 
-    // Proveedores
+    // Proveedores totales y nuevos esta semana
     const snapProv = await getDocs(collection(db,'proveedores'));
+    let nuevosProveedores = 0;
+    let totalClicksContacto = 0, totalClicksCompartir = 0;
+    snapProv.forEach(d=>{
+      const p = d.data();
+      const f = p.fechaAprobacion?.toDate?.();
+      if(f && f >= inicioSemana) nuevosProveedores++;
+      totalClicksContacto += (p.clicksLlamada||0) + (p.clicksWhatsapp||0);
+      totalClicksCompartir += (p.clicksCompartir||0);
+    });
     document.querySelector('#stat-proveedores .stat-num').textContent = snapProv.size;
+    document.querySelector('#stat-nuevos-proveedores .stat-num').textContent = nuevosProveedores;
+    document.querySelector('#stat-clicks-contacto .stat-num').textContent = totalClicksContacto;
+    document.querySelector('#stat-clicks-compartir .stat-num').textContent = totalClicksCompartir;
 
     // Mensajes sin leer del admin
     const snapMsg = await getDocs(query(collection(db,'mensajes'),where('autor','==','vecino'),where('leido','==','No')));
     document.querySelector('#stat-mensajes .stat-num').textContent = snapMsg.size;
   }catch(e){ console.log('Stats error:',e); }
 }
+
+// ── RANKING DE PROVEEDORES (más buscados/compartidos/contactados) ─────────────
+async function cargarRanking(periodo){
+  const cont = document.getElementById('ranking-container');
+  cont.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando...</div>';
+  try{
+    const ahora = new Date();
+    let desde = null;
+    if(periodo==='dia'){
+      desde = new Date(ahora); desde.setHours(0,0,0,0);
+    } else if(periodo==='semana'){
+      desde = new Date(ahora);
+      const dia = desde.getDay();
+      desde.setDate(desde.getDate() - (dia===0?6:dia-1));
+      desde.setHours(0,0,0,0);
+    } else if(periodo==='mes'){
+      desde = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+    } else if(periodo==='anio'){
+      desde = new Date(ahora.getFullYear(), 0, 1);
+    }
+    // 'historico' → desde queda null, sin filtro de fecha
+    const q2 = desde ? query(collection(db,'eventos'),where('fecha','>=',desde)) : collection(db,'eventos');
+    const snap = await getDocs(q2);
+    const conteo = {}; // proveedorId -> {nombre, llamada, whatsapp, compartir}
+    snap.forEach(d=>{
+      const e = d.data();
+      if(!conteo[e.proveedorId]) conteo[e.proveedorId]={nombre:e.proveedorNombre||'(sin nombre)',llamada:0,whatsapp:0,compartir:0};
+      if(e.tipo==='llamada')   conteo[e.proveedorId].llamada++;
+      if(e.tipo==='whatsapp')  conteo[e.proveedorId].whatsapp++;
+      if(e.tipo==='compartir') conteo[e.proveedorId].compartir++;
+    });
+    const lista = Object.values(conteo).map(c=>({...c,total:c.llamada+c.whatsapp+c.compartir}));
+    lista.sort((a,b)=>b.total-a.total);
+    const top = lista.slice(0,15);
+    if(!top.length){ cont.innerHTML='<div class="empty-state"><div class="icon">📊</div><p>Sin actividad registrada en este período</p></div>'; return; }
+    cont.innerHTML = `<div style="overflow-x:auto"><table style="width:100%;font-size:.8rem;border-collapse:collapse">
+      <thead><tr style="background:var(--crema2)">${['#','Proveedor','📞 Llamadas','💬 WhatsApp','🔗 Compartido','Total'].map(h=>`<th style="padding:8px;text-align:left;border-bottom:1px solid var(--border);font-weight:600">${h}</th>`).join('')}</tr></thead>
+      <tbody>${top.map((c,i)=>`<tr style="border-bottom:1px solid var(--crema2)">
+        <td style="padding:8px;font-weight:600;color:var(--muted)">${i+1}</td>
+        <td style="padding:8px;font-weight:500">${esc(c.nombre)}</td>
+        <td style="padding:8px;text-align:center">${c.llamada}</td>
+        <td style="padding:8px;text-align:center">${c.whatsapp}</td>
+        <td style="padding:8px;text-align:center">${c.compartir}</td>
+        <td style="padding:8px;font-weight:700;color:var(--azul)">${c.total}</td>
+      </tr>`).join('')}</tbody>
+    </table></div>`;
+  }catch(e){ console.log('Ranking error:',e); cont.innerHTML='<div class="empty-state"><div class="icon">⚠️</div><p>Error al cargar el ranking</p></div>'; }
+}
+document.querySelectorAll('[data-rank]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('[data-rank]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    cargarRanking(btn.dataset.rank);
+  });
+});
 
 // ── EMAIL A PROVEEDOR AL AUTO-REGISTRARSE ─────────────────────────────────────
 document.getElementById('btn-admin-buscar-prov').addEventListener('click', ()=>buscarProveedoresAdmin());
