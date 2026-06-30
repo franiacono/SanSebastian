@@ -1834,9 +1834,9 @@ async function cargarTelefonos(){
 
 // ── ADMIN ─────────────────────────────────────────────────────────────────────
 document.getElementById('btn-actualizar-admin').addEventListener('click', ()=>{ cargarPendientes(); cargarEstadisticasAdmin(); });
-document.querySelectorAll('.admin-tab').forEach(tab=>{
+document.querySelectorAll('.admin-tab[data-atab]').forEach(tab=>{
   tab.addEventListener('click',()=>{
-    document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.admin-tab[data-atab]').forEach(t=>t.classList.remove('active'));
     tab.classList.add('active');
     document.getElementById('admin-tab-pendientes').style.display=tab.dataset.atab==='pendientes'?'block':'none';
     document.getElementById('admin-tab-recientes').style.display=tab.dataset.atab==='recientes'?'block':'none';
