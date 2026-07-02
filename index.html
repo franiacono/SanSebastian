@@ -2760,7 +2760,10 @@ async function cargarRanking(periodo){
         <td class="total">${c.total}</td>
       </tr>`).join('')}</tbody>
     </table></div>`;
-  }catch(e){ console.log('Ranking error:',e); cont.innerHTML='<div class="empty-state"><div class="icon">⚠️</div><p>Error al cargar el ranking</p></div>'; }
+  }catch(e){ 
+    console.error('Ranking error:',e);
+    cont.innerHTML=`<div class="empty-state"><div class="icon">⚠️</div><p>Error al cargar el ranking</p><p style="font-size:.75rem;color:var(--muted)">${e.message||''}</p></div>`; 
+  }
 }
 document.querySelectorAll('[data-rank]').forEach(btn=>{
   btn.addEventListener('click', ()=>{
