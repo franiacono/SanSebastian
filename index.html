@@ -235,9 +235,20 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
 .admin-stat-card{background:white;border:1.5px solid var(--border);border-radius:12px;padding:16px;text-align:center}
 .stat-num{font-size:1.8rem;font-weight:700;color:var(--azul);font-family:'Fraunces',serif}
 .stat-label{font-size:.75rem;color:var(--muted);margin-top:4px;font-weight:500}
+.tabla-metricas{width:100%;font-size:.82rem;border-collapse:collapse}
+.tabla-metricas th,.tabla-metricas td{padding:8px;border-bottom:1px solid var(--crema2);text-align:left}
+.tabla-metricas thead tr{background:var(--crema2)}
+.tabla-metricas th{font-weight:600}
+.tabla-metricas td.num{text-align:center}
+.tabla-metricas td.total{text-align:center;font-weight:700;color:var(--azul)}
+@media(max-width:480px){
+  .tabla-metricas{font-size:.72rem}
+  .tabla-metricas th,.tabla-metricas td{padding:6px 4px}
+}
 .admin-empty .icon{font-size:2.5rem;margin-bottom:12px}
-.admin-tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--crema2);border-radius:10px;padding:4px}
-.admin-tab{flex:1;padding:8px;border:none;background:transparent;border-radius:8px;font-size:.82rem;font-family:'Inter',sans-serif;cursor:pointer;color:var(--muted);font-weight:500;transition:all .2s}
+.admin-tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--crema2);border-radius:10px;padding:4px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.admin-tabs::-webkit-scrollbar{display:none}
+.admin-tab{flex:0 0 auto;padding:8px 12px;border:none;background:transparent;border-radius:8px;font-size:.82rem;font-family:'Inter',sans-serif;cursor:pointer;color:var(--muted);font-weight:500;transition:all .2s;white-space:nowrap}
 .admin-tab.active{background:white;color:var(--azul);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.1)}
 
 /* ── MENSAJES/CHAT ── */
@@ -1922,15 +1933,15 @@ async function cargarMetricas(){
       {label:'📞 Clicks contactar', d:clicksContacto},
       {label:'🔗 Clicks compartir', d:clicksCompartir},
     ];
-    cont.innerHTML = `<div style="overflow-x:auto"><table style="width:100%;font-size:.82rem;border-collapse:collapse">
-      <thead><tr style="background:var(--crema2)">${['Métrica','Hoy','Esta semana','Este mes','Este año','Total'].map(h=>`<th style="padding:8px;text-align:left;border-bottom:1px solid var(--border);font-weight:600">${h}</th>`).join('')}</tr></thead>
-      <tbody>${filas.map(f=>`<tr style="border-bottom:1px solid var(--crema2)">
-        <td style="padding:8px;font-weight:500">${f.label}</td>
-        <td style="padding:8px;text-align:center">${f.d.dia}</td>
-        <td style="padding:8px;text-align:center">${f.d.semana}</td>
-        <td style="padding:8px;text-align:center">${f.d.mes}</td>
-        <td style="padding:8px;text-align:center">${f.d.anio}</td>
-        <td style="padding:8px;text-align:center;font-weight:700;color:var(--azul)">${f.d.total}</td>
+    cont.innerHTML = `<div style="overflow-x:auto"><table class="tabla-metricas">
+      <thead><tr>${['Métrica','Hoy','Semana','Mes','Año','Total'].map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+      <tbody>${filas.map(f=>`<tr>
+        <td style="font-weight:500">${f.label}</td>
+        <td class="num">${f.d.dia}</td>
+        <td class="num">${f.d.semana}</td>
+        <td class="num">${f.d.mes}</td>
+        <td class="num">${f.d.anio}</td>
+        <td class="total">${f.d.total}</td>
       </tr>`).join('')}</tbody>
     </table></div>`;
   }catch(e){ console.log('Métricas error:',e); cont.innerHTML='<div class="empty-state"><div class="icon">⚠️</div><p>Error al cargar métricas</p></div>'; }
@@ -2738,15 +2749,15 @@ async function cargarRanking(periodo){
     lista.sort((a,b)=>b.total-a.total);
     const top = lista.slice(0,15);
     if(!top.length){ cont.innerHTML='<div class="empty-state"><div class="icon">📊</div><p>Sin actividad registrada en este período</p></div>'; return; }
-    cont.innerHTML = `<div style="overflow-x:auto"><table style="width:100%;font-size:.8rem;border-collapse:collapse">
-      <thead><tr style="background:var(--crema2)">${['#','Proveedor','📞 Llamadas','💬 WhatsApp','🔗 Compartido','Total'].map(h=>`<th style="padding:8px;text-align:left;border-bottom:1px solid var(--border);font-weight:600">${h}</th>`).join('')}</tr></thead>
-      <tbody>${top.map((c,i)=>`<tr style="border-bottom:1px solid var(--crema2)">
-        <td style="padding:8px;font-weight:600;color:var(--muted)">${i+1}</td>
-        <td style="padding:8px;font-weight:500">${esc(c.nombre)}</td>
-        <td style="padding:8px;text-align:center">${c.llamada}</td>
-        <td style="padding:8px;text-align:center">${c.whatsapp}</td>
-        <td style="padding:8px;text-align:center">${c.compartir}</td>
-        <td style="padding:8px;font-weight:700;color:var(--azul)">${c.total}</td>
+    cont.innerHTML = `<div style="overflow-x:auto"><table class="tabla-metricas">
+      <thead><tr>${['#','Proveedor','📞','💬','🔗','Total'].map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+      <tbody>${top.map((c,i)=>`<tr>
+        <td style="font-weight:600;color:var(--muted)">${i+1}</td>
+        <td style="font-weight:500">${esc(c.nombre)}</td>
+        <td class="num">${c.llamada}</td>
+        <td class="num">${c.whatsapp}</td>
+        <td class="num">${c.compartir}</td>
+        <td class="total">${c.total}</td>
       </tr>`).join('')}</tbody>
     </table></div>`;
   }catch(e){ console.log('Ranking error:',e); cont.innerHTML='<div class="empty-state"><div class="icon">⚠️</div><p>Error al cargar el ranking</p></div>'; }
