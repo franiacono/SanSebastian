@@ -1617,12 +1617,12 @@ function renderResults(){
     });
   });
   cont.querySelectorAll('.btn-recomendar-card').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();recomendarDesdeCard(btn.dataset.p);}));
-  cont.querySelectorAll('.btn-wa').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();abrirWA(btn.dataset.num,btn.dataset.srv);trackEvento('whatsapp',btn.dataset.id,btn.dataset.nombre);}));
-  cont.querySelectorAll('.btn-llamar').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();trackEvento('llamada',btn.dataset.id,btn.dataset.nombre);}));
+  cont.querySelectorAll('.btn-wa').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();abrirWA(btn.dataset.num,btn.dataset.srv);trackEvento('whatsapp',btn.dataset.id,btn.dataset.nombre,btn.dataset.empresa);}));
+  cont.querySelectorAll('.btn-llamar').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();trackEvento('llamada',btn.dataset.id,btn.dataset.nombre,btn.dataset.empresa);}));
   cont.querySelectorAll('.btn-compartir-card').forEach(btn=>{
     btn.addEventListener('click', async e=>{
       e.stopPropagation();
-      trackEvento('compartir',btn.dataset.id,btn.dataset.nombre);
+      trackEvento('compartir',btn.dataset.id,btn.dataset.nombre,btn.dataset.empresa);
       const url='https://entrevecinos.ar/?tel='+encodeURIComponent(btn.dataset.tel);
       const texto=`👀 Mirá lo que encontré en EntreVecinos: ${btn.dataset.nombre} (${btn.dataset.srv})`;
       if(navigator.share){ try{ await navigator.share({title:btn.dataset.nombre,text:texto,url}); }catch(ex){} }
@@ -1665,7 +1665,7 @@ function cardHTML(p,isDest){
       </div>
     </div>
     <div class="card-contacto">
-      ${telOk?(p.soloLlamada?`<a class="contacto-item tel btn-llamar" data-id="${esc(p.firestoreId||'')}" data-nombre="${esc(p.nombre)}" href="tel:${p.telefono.replace(/\s/g,'')}" style="text-decoration:none">📞 ${esc(p.telefono)}</a>`:`<button class="contacto-item tel btn-wa" data-num="${numWA}" data-srv="${esc(p.servicio)}" data-id="${esc(p.firestoreId||'')}" data-nombre="${esc(p.nombre)}"><svg viewBox="0 0 24 24" width="13" height="13" fill="#25D366" style="vertical-align:middle;margin-right:2px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> ${esc(p.telefono)}</button>`):''}
+      ${telOk?(p.soloLlamada?`<a class="contacto-item tel btn-llamar" data-id="${esc(p.firestoreId||'')}" data-nombre="${esc(p.nombre)}" data-empresa="${esc(p.empresa||'')}" href="tel:${p.telefono.replace(/\s/g,'')}" style="text-decoration:none">📞 ${esc(p.telefono)}</a>`:`<button class="contacto-item tel btn-wa" data-num="${numWA}" data-srv="${esc(p.servicio)}" data-id="${esc(p.firestoreId||'')}" data-nombre="${esc(p.nombre)}" data-empresa="${esc(p.empresa||'')}"><svg viewBox="0 0 24 24" width="13" height="13" fill="#25D366" style="vertical-align:middle;margin-right:2px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> ${esc(p.telefono)}</button>`):''}
       ${empOk?`<span class="contacto-item">🏢 ${esc(p.empresa)}</span>`:''}
       ${p.barrioOrigen?`<span class="contacto-item" style="color:var(--azul2);border-color:var(--azul-mid);background:var(--azul-claro)">🏘️ ${esc(p.barrioOrigen)}</span>`:''}
     </div>
@@ -1675,7 +1675,7 @@ function cardHTML(p,isDest){
     ${p.resenas.length?`<div class="card-resenas-toggle"><span class="toggle-label">Ver reseñas (${p.resenas.length}) ▾</span></div><div class="card-detail" style="display:none"><div class="resenas-title">Reseñas</div>${resHtml}</div>`:''}
     <div class="card-footer-actions">
       <button class="btn-recomendar-card" data-p='${pData.replace(/'/g,"&apos;")}'>✍️ Recomendar</button>
-      <button class="btn-compartir-card" data-nombre="${esc(p.nombre)}" data-srv="${esc(p.servicio)}" data-tel="${esc(p.telefono||'')}" data-id="${esc(p.firestoreId||'')}">🔗</button>
+      <button class="btn-compartir-card" data-nombre="${esc(p.nombre)}" data-empresa="${esc(p.empresa||'')}" data-srv="${esc(p.servicio)}" data-tel="${esc(p.telefono||'')}" data-id="${esc(p.firestoreId||'')}">🔗</button>
       ${isAdmin()?`<button class="btn-editar-card" data-id="${esc(p.firestoreId||'')}" style="background:transparent;border:1.5px solid var(--naranja);color:var(--naranja);border-radius:8px;padding:6px 12px;font-size:.75rem;font-family:'Inter',sans-serif;cursor:pointer">✏️</button>`:''}
     </div>
   </div>`;
@@ -1702,7 +1702,7 @@ function pasoCooldown(clave){
     return true;
   }catch(e){ return true; } // si localStorage falla, no bloqueamos el tracking
 }
-async function trackEvento(tipo, proveedorId, proveedorNombre){
+async function trackEvento(tipo, proveedorId, proveedorNombre, proveedorEmpresa){
   if(!proveedorId) return;
   const uid = currentUser?.uid || 'anon';
   const clave = `cooldown_${tipo}_${proveedorId}_${uid}`;
@@ -1710,7 +1710,7 @@ async function trackEvento(tipo, proveedorId, proveedorNombre){
   try{
     const campo = tipo==='llamada' ? 'clicksLlamada' : tipo==='whatsapp' ? 'clicksWhatsapp' : 'clicksCompartir';
     updateDoc(doc(db,'proveedores',proveedorId),{[campo]:increment(1)}).catch(()=>{});
-    addDoc(collection(db,'eventos'),{tipo,proveedorId,proveedorNombre:proveedorNombre||'',fecha:serverTimestamp()}).catch(()=>{});
+    addDoc(collection(db,'eventos'),{tipo,proveedorId,proveedorNombre:proveedorNombre||'',proveedorEmpresa:proveedorEmpresa||'',fecha:serverTimestamp()}).catch(()=>{});
   }catch(e){ console.log('trackEvento error:',e); }
 }
 
@@ -2740,7 +2740,7 @@ async function cargarRanking(periodo){
     const conteo = {}; // proveedorId -> {nombre, llamada, whatsapp, compartir}
     snap.forEach(d=>{
       const e = d.data();
-      if(!conteo[e.proveedorId]) conteo[e.proveedorId]={nombre:e.proveedorNombre||'(sin nombre)',llamada:0,whatsapp:0,compartir:0};
+      if(!conteo[e.proveedorId]) conteo[e.proveedorId]={nombre:e.proveedorNombre||'(sin nombre)',empresa:e.proveedorEmpresa||'',llamada:0,whatsapp:0,compartir:0};
       if(e.tipo==='llamada')   conteo[e.proveedorId].llamada++;
       if(e.tipo==='whatsapp')  conteo[e.proveedorId].whatsapp++;
       if(e.tipo==='compartir') conteo[e.proveedorId].compartir++;
@@ -2753,7 +2753,7 @@ async function cargarRanking(periodo){
       <thead><tr>${['#','Proveedor','📞','💬','🔗','Total'].map(h=>`<th>${h}</th>`).join('')}</tr></thead>
       <tbody>${top.map((c,i)=>`<tr>
         <td style="font-weight:600;color:var(--muted)">${i+1}</td>
-        <td style="font-weight:500">${esc(c.nombre)}</td>
+        <td style="font-weight:500">${esc(c.nombre)}${c.empresa?`<br><span style="font-size:.72rem;color:var(--muted);font-weight:400">${esc(c.empresa)}</span>`:''}</td>
         <td class="num">${c.llamada}</td>
         <td class="num">${c.whatsapp}</td>
         <td class="num">${c.compartir}</td>
