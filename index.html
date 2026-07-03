@@ -49,7 +49,28 @@
 body{font-family:'Inter',sans-serif;background:var(--crema);color:var(--text);min-height:100vh}
 
 /* ── AUTH ── */
-.auth-screen{position:fixed;inset:0;z-index:600;display:flex;align-items:flex-start;justify-content:center;background:linear-gradient(135deg,#0f2240 0%,#1a3a5c 50%,#1e4d7a 100%);overflow-y:auto;visibility:hidden;pointer-events:none;padding:20px 16px}
+.auth-screen{position:fixed;inset:0;z-index:600;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;background:var(--crema);overflow-y:auto;visibility:hidden;pointer-events:none}
+.auth-screen.visible{visibility:visible;pointer-events:auto}
+@media(min-width:860px){.auth-screen{flex-direction:row;justify-content:center;overflow:hidden}}
+.landing-hero{width:100%;max-width:480px;background:var(--azul);color:white;padding:36px 24px 28px}
+.landing-logo-wrap{text-align:center;margin-bottom:28px}
+.landing-title{font-family:'Fraunces',serif;font-size:2rem;font-weight:700;color:white;margin:0 0 6px}
+.landing-tagline{font-size:.95rem;color:rgba(255,255,255,.75);margin:0}
+.landing-cards{display:flex;flex-direction:column;gap:14px;margin-bottom:24px}
+.landing-card{display:flex;align-items:flex-start;gap:14px;background:rgba(255,255,255,.1);border-radius:12px;padding:14px 16px}
+.landing-card strong{display:block;font-size:.88rem;font-weight:600;color:white;margin-bottom:3px}
+.landing-card p{font-size:.8rem;color:rgba(255,255,255,.72);margin:0;line-height:1.5}
+.landing-icon{font-size:1.4rem;flex-shrink:0;margin-top:1px}
+.landing-note{text-align:center;font-size:.72rem;color:rgba(255,255,255,.5);margin:0}
+.auth-card{width:100%;max-width:480px;background:white;padding:28px 24px;box-shadow:0 4px 24px rgba(0,0,0,.08)}
+.auth-card.standalone{border-radius:16px;margin:20px auto}
+@media(min-width:860px){
+  #screen-login{flex-direction:row;align-items:stretch;justify-content:center;padding:0}
+  .landing-hero{max-width:460px;min-height:100vh;border-radius:0;padding:56px 40px;display:flex;flex-direction:column;justify-content:center}
+  .landing-title{font-size:2.4rem}
+  .landing-card p{font-size:.85rem}
+  .auth-card{max-width:420px;min-height:100vh;border-radius:0;padding:56px 40px;display:flex;flex-direction:column;justify-content:center;box-shadow:none;border-left:1px solid var(--border)}
+}
 .auth-screen.visible{visibility:visible;pointer-events:auto}
 .auth-card{background:var(--white);border-radius:20px;padding:40px 36px;width:100%;max-width:420px;box-shadow:0 32px 80px rgba(0,0,0,.4)}
 .auth-logo{width:64px;height:64px;background:var(--azul);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px;font-weight:700;color:white;font-family:'Fraunces',serif;letter-spacing:-1px}
@@ -342,10 +363,44 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
 
 <!-- ── AUTH SCREENS ── -->
 <div id="screen-login" class="auth-screen visible">
-  <div class="auth-card">
-    <div class="auth-logo">EV</div>
-    <h1>EntreVecinos</h1>
-    <p class="auth-subtitle">Proveedores de confianza en tu barrio</p>
+
+  <!-- LANDING HERO -->
+  <div class="landing-hero">
+    <div class="landing-logo-wrap">
+      <h1 class="landing-title">EntreVecinos</h1>
+      <p class="landing-tagline">Proveedores recomendados por tus vecinos</p>
+    </div>
+
+    <div class="landing-cards">
+      <div class="landing-card">
+        <span class="landing-icon">🔍</span>
+        <div>
+          <strong>Encontrá lo que necesitás</strong>
+          <p>Plomeros, electricistas, construcción, limpieza, jardinería, médicos, abogados, comidas, agua, internet, lavanderías, leña y mucho más — todo en un solo lugar, recomendado por vecinos reales.</p>
+        </div>
+      </div>
+      <div class="landing-card">
+        <span class="landing-icon">⭐</span>
+        <div>
+          <strong>Calificado por la comunidad</strong>
+          <p>Cada proveedor tiene reseñas de vecinos. Sabés quién cumple y quién no antes de llamar — sin sorpresas.</p>
+        </div>
+      </div>
+      <div class="landing-card">
+        <span class="landing-icon">🏪</span>
+        <div>
+          <strong>¿Ofrecés un servicio o producto?</strong>
+          <p>Registrate gratis y llegá a cientos de vecinos que te buscan. Las buenas reseñas de tus clientes mejoran tu posicionamiento — cuantas más tenés, más visible sos en el directorio.</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="landing-note">Gratis · Solo para barrios privados de GBA Norte · Sin publicidad</p>
+  </div>
+
+  <!-- FORMULARIO LOGIN -->
+  <div class="auth-card" style="margin-top:0;border-top-left-radius:0;border-top-right-radius:0">
+    <p class="auth-subtitle" style="margin-bottom:16px;font-size:.9rem">Ingresá para ver proveedores, calificaciones y teléfonos útiles de tu barrio</p>
     <button class="btn-google" id="btn-google-login">
       <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
       Continuar con Google
@@ -355,12 +410,12 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
     <div class="auth-row"><label>Contraseña</label><input class="auth-input" type="password" id="login-pass" placeholder="••••••••"></div>
     <button class="btn-primary" id="btn-login">Ingresar</button>
     <p class="auth-error" id="login-error"></p>
-    <div class="auth-switch">¿No tenés cuenta? <a id="ir-registro">Registrate</a></div>
+    <div class="auth-switch">¿No tenés cuenta? <a id="ir-registro">Registrate gratis</a></div>
     <div class="auth-switch" style="margin-top:8px"><a id="ir-reset">¿Olvidaste tu contraseña?</a></div>
   </div>
 </div>
 
-<div id="screen-register" class="auth-screen">
+<div id="screen-register" class="auth-screen" style="padding:20px 16px;justify-content:center">
   <div class="auth-card">
     <div class="auth-logo">EV</div>
     <h1>Crear cuenta</h1>
@@ -378,7 +433,7 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
   </div>
 </div>
 
-<div id="screen-perfil" class="auth-screen">
+<div id="screen-perfil" class="auth-screen" style="padding:20px 16px;justify-content:center">
   <div class="auth-card" style="max-width:480px">
     <div class="auth-logo">👤</div>
     <h1>Completá tu perfil</h1>
@@ -431,7 +486,7 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
   </div>
 </div>
 
-<div id="screen-verify-email" class="auth-screen">
+<div id="screen-verify-email" class="auth-screen" style="padding:20px 16px;justify-content:center">
   <div class="auth-card" style="text-align:center">
     <div style="font-size:3rem;margin-bottom:16px">📧</div>
     <h1 style="font-family:'Fraunces',serif;color:var(--azul);margin-bottom:8px">Verificá tu email</h1>
@@ -449,7 +504,7 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
   </div>
 </div>
 
-<div id="screen-reset" class="auth-screen">
+<div id="screen-reset" class="auth-screen" style="padding:20px 16px;justify-content:center">
   <div class="auth-card">
     <div class="auth-logo">🔑</div>
     <h1>Recuperar contraseña</h1>
@@ -1832,8 +1887,11 @@ async function cargarTelefonos(){
       const n = norm(t.nombre||'');
       const matchArea = n.match(/(?:area|sector)\s*(\d+)/);
       if(!matchArea) return true; // sin área específica → visible para todos
-      if(!areaUserNum || esProveedor) return false; // sin área o proveedor → no ve guardias de área
-      return matchArea[1] === areaUserNum; // solo ve su propia área
+      // Filtro de área interna solo aplica a San Sebastián
+      const esSanSebastian = norm(barrioUsuario||'').includes('san sebastian');
+      if(!esSanSebastian) return true; // otros barrios ven todos los útiles de su barrio sin filtro de área
+      if(!areaUserNum || esProveedor) return false; // San Sebastián sin área o proveedor → no ve guardias de área
+      return matchArea[1] === areaUserNum; // San Sebastián ve solo su área
     });
 
     const EMERGENCIAS = ['ambulancia','bombero','emergencia','policia','policía','hospital','samu','107','911','100'];
