@@ -1066,7 +1066,7 @@ const isAdmin = () => ADMIN_EMAILS.includes((currentUser?.email||'').toLowerCase
 // apiGet definido arriba con Firebase ID Token
 
 // ── POBLAR BARRIOS ────────────────────────────────────────────────────────────
-function poblarSelectBarrios(selectId, incluirVacio=true) {
+function poblarSelectBarrios(selectId, incluirVacio=true, options={}) {
   const sel = document.getElementById(selectId);
   if(!sel) return;
   const placeholder = options?.placeholder ?? '— Seleccioná tu barrio —';
