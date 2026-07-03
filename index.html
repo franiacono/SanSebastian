@@ -1066,10 +1066,11 @@ const isAdmin = () => ADMIN_EMAILS.includes((currentUser?.email||'').toLowerCase
 // apiGet definido arriba con Firebase ID Token
 
 // ── POBLAR BARRIOS ────────────────────────────────────────────────────────────
-function poblarSelectBarrios(selectId, incluirVacio=true) {
+function poblarSelectBarrios(selectId, incluirVacio=true, options={}) {
   const sel = document.getElementById(selectId);
   if(!sel) return;
-  sel.innerHTML = (incluirVacio ? '<option value="">— Seleccioná tu barrio —</option>' : '') +
+  const placeholder = options?.placeholder ?? '— Seleccioná tu barrio —';
+  sel.innerHTML = (incluirVacio ? `<option value="">${placeholder}</option>` : '') +
     BARRIOS_CONFIG.map(b=>`<option value="${b.nombre}">${b.nombre}</option>`).join('');
 }
 function poblarSelectSectores(selectId, barrioNombre, incluirVacio=true) {
@@ -1116,7 +1117,7 @@ function getCheckboxBarrios(containerId){
 }
 
 // Selector barrio proveedor en form recomendar
-poblarSelectBarrios('f-barrio-cual');
+poblarSelectBarrios('f-barrio-cual', true, {placeholder: '— Seleccioná el barrio del proveedor —'});
 poblarCheckboxBarrios('f-barrios-servicio');
 document.querySelectorAll('input[name="f-barrio-prov-opt"]').forEach(r=>{
   r.addEventListener('change',()=>{
@@ -1403,7 +1404,7 @@ document.getElementById('btn-recomendar-otro').addEventListener('click', resetFo
 document.getElementById('nav-recomendar').addEventListener('click',()=>{
   showPage('recomendar');
   poblarCheckboxBarrios('f-barrios-servicio');
-  poblarSelectBarrios('f-barrio-cual');
+  poblarSelectBarrios('f-barrio-cual', true, {placeholder: '— Seleccioná el barrio del proveedor —'});
   resetFormRecomendar();
 });
 document.getElementById('nav-consultas').addEventListener('click', ()=>showPage('consultas'));
@@ -1730,7 +1731,7 @@ function recomendarDesdeCard(pDataStr){
     document.getElementById('f-servicio').value = p.servicio||'';
     // Poblar checkboxes
     poblarCheckboxBarrios('f-barrios-servicio');
-    poblarSelectBarrios('f-barrio-cual');
+    poblarSelectBarrios('f-barrio-cual', true, {placeholder: '— Seleccioná el barrio del proveedor —'});
     showPage('recomendar');
     window.scrollTo(0,0);
   }catch(e){}
@@ -1813,10 +1814,10 @@ async function cargarTelefonos(){
     // Filtrar por barrio del usuario
     const items=Object.values(mapa).filter(t=>{
       const bs=t.barriosServicio||[];
-      if(!barrioUsuario) return true;
-      if(bs.length===0) return true;
+      if(bs.length===0) return true;          // sin restricción → visible para todos
       if(bs.includes('Toda la zona')) return true;
       if(bs.includes('Consultar')) return true;
+      if(!barrioUsuario) return false;         // sin barrio asignado → solo ve los sin restricción
       if(bs.includes(barrioUsuario)) return true;
       return false;
     });
