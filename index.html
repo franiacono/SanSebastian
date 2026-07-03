@@ -51,6 +51,7 @@ body{font-family:'Inter',sans-serif;background:var(--crema);color:var(--text);mi
 /* ── AUTH ── */
 .auth-screen{position:fixed;inset:0;z-index:600;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;background:var(--crema);overflow-y:auto;visibility:hidden;pointer-events:none}
 .auth-screen.visible{visibility:visible;pointer-events:auto}
+@media(min-width:860px){.auth-screen{flex-direction:row;justify-content:center;overflow:hidden}}
 .landing-hero{width:100%;max-width:480px;background:var(--azul);color:white;padding:36px 24px 28px}
 .landing-logo-wrap{text-align:center;margin-bottom:28px}
 .landing-title{font-family:'Fraunces',serif;font-size:2rem;font-weight:700;color:white;margin:0 0 6px}
@@ -63,6 +64,13 @@ body{font-family:'Inter',sans-serif;background:var(--crema);color:var(--text);mi
 .landing-note{text-align:center;font-size:.72rem;color:rgba(255,255,255,.5);margin:0}
 .auth-card{width:100%;max-width:480px;background:white;padding:28px 24px;box-shadow:0 4px 24px rgba(0,0,0,.08)}
 .auth-card.standalone{border-radius:16px;margin:20px auto}
+@media(min-width:860px){
+  #screen-login{flex-direction:row;align-items:stretch;justify-content:center;padding:0}
+  .landing-hero{max-width:460px;min-height:100vh;border-radius:0;padding:56px 40px;display:flex;flex-direction:column;justify-content:center}
+  .landing-title{font-size:2.4rem}
+  .landing-card p{font-size:.85rem}
+  .auth-card{max-width:420px;min-height:100vh;border-radius:0;padding:56px 40px;display:flex;flex-direction:column;justify-content:center;box-shadow:none;border-left:1px solid var(--border)}
+}
 .auth-screen.visible{visibility:visible;pointer-events:auto}
 .auth-card{background:var(--white);border-radius:20px;padding:40px 36px;width:100%;max-width:420px;box-shadow:0 32px 80px rgba(0,0,0,.4)}
 .auth-logo{width:64px;height:64px;background:var(--azul);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px;font-weight:700;color:white;font-family:'Fraunces',serif;letter-spacing:-1px}
