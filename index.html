@@ -153,6 +153,7 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
 .card-nombre{font-weight:700;font-size:.88rem;color:var(--text);margin-bottom:1px}
 .card-sub{font-size:.73rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card-servicio-tag{display:inline-block;background:var(--azul-claro);color:var(--azul2);border-radius:5px;padding:2px 6px;font-size:.67rem;font-weight:600;margin-top:3px}
+.card-descripcion-propia{font-size:.8rem;color:var(--muted);padding:8px 14px;border-top:1px solid var(--crema2);line-height:1.5}
 .badge-autoregistrado{display:inline-flex;align-items:center;gap:4px;background:#fef3c7;color:#92400e;border:1px solid #fde68a;border-radius:20px;padding:2px 8px;font-size:.68rem;font-weight:600;margin-top:3px;margin-left:4px}
 .barrio-check-item{display:flex;align-items:center;gap:6px;padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:.8rem;transition:all .2s;background:white}
 .barrio-check-item:hover{border-color:var(--azul2);background:var(--azul-claro)}
@@ -744,6 +745,10 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
             <button class="admin-tab" data-rank="historico">Histórico</button>
           </div>
           <div id="ranking-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
+          <div style="margin-top:24px">
+            <div style="font-size:.85rem;font-weight:600;color:var(--azul);margin-bottom:10px">👤 Usuarios más activos</div>
+            <div id="ranking-usuarios-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
+          </div>
         </div>
       </div>
     </div>
@@ -1500,8 +1505,9 @@ function procesarDatos(filas){
   filas.forEach((f,idx)=>{
     if(norm(f.recomendacion)==='utiles') return;
     const key=genKey(f);
-    if(!mapa[key]) mapa[key]={nombre:f.nombre,empresa:f.empresa||"",dni:f.dni||"",telefono:f.telefono,servicio:f.servicio,barrio:"",destacado:false,resenas:[],idxOriginal:idx,autoregistrado:f.autoregistrado===true,barriosServicio:[],firestoreId:f.id||"",categorias:f.categorias||[],soloLlamada:false};
+    if(!mapa[key]) mapa[key]={nombre:f.nombre,empresa:f.empresa||"",dni:f.dni||"",telefono:f.telefono,servicio:f.servicio,barrio:"",destacado:false,resenas:[],idxOriginal:idx,autoregistrado:f.autoregistrado===true,barriosServicio:[],firestoreId:f.id||"",categorias:f.categorias||[],soloLlamada:false,descripcionPropia:''};
     if(f.soloLlamada===true) mapa[key].soloLlamada=true;
+    if(f.autoregistrado===true && f.comentario) mapa[key].descripcionPropia=f.comentario;
     if(!mapa[key].barrio && f.barrio && f.barrio.trim()!=='') mapa[key].barrio=normBarrio(f.barrio);
     if(!mapa[key].barrioOrigen && f.barrioOrigen) mapa[key].barrioOrigen=f.barrioOrigen;
     if(f.barriosServicio&&f.barriosServicio.length) mapa[key].barriosServicio=[...new Set([...mapa[key].barriosServicio,...f.barriosServicio])];
@@ -1720,6 +1726,7 @@ function cardHTML(p,isDest){
         }
       </div>
     </div>
+    ${p.descripcionPropia?`<div class="card-descripcion-propia">💬 <strong>${esc(p.descripcionPropia)}</strong></div>`:''}
     <div class="card-contacto">
       ${telOk?(p.soloLlamada?`<a class="contacto-item tel btn-llamar" data-id="${esc(p.firestoreId||'')}" data-nombre="${esc(p.nombre)}" data-empresa="${esc(p.empresa||'')}" href="tel:${p.telefono.replace(/\s/g,'')}" style="text-decoration:none">📞 ${esc(p.telefono)}</a>`:`<button class="contacto-item tel btn-wa" data-num="${numWA}" data-srv="${esc(p.servicio)}" data-id="${esc(p.firestoreId||'')}" data-nombre="${esc(p.nombre)}" data-empresa="${esc(p.empresa||'')}"><svg viewBox="0 0 24 24" width="13" height="13" fill="#25D366" style="vertical-align:middle;margin-right:2px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> ${esc(p.telefono)}</button>`):''}
       ${empOk?`<span class="contacto-item">🏢 ${esc(p.empresa)}</span>`:''}
@@ -1766,7 +1773,7 @@ async function trackEvento(tipo, proveedorId, proveedorNombre, proveedorEmpresa)
   try{
     const campo = tipo==='llamada' ? 'clicksLlamada' : tipo==='whatsapp' ? 'clicksWhatsapp' : 'clicksCompartir';
     updateDoc(doc(db,'proveedores',proveedorId),{[campo]:increment(1)}).catch(()=>{});
-    addDoc(collection(db,'eventos'),{tipo,proveedorId,proveedorNombre:proveedorNombre||'',proveedorEmpresa:proveedorEmpresa||'',fecha:serverTimestamp()}).catch(()=>{});
+    addDoc(collection(db,'eventos'),{tipo,proveedorId,proveedorNombre:proveedorNombre||'',proveedorEmpresa:proveedorEmpresa||'',uid:currentUser?.uid||'',userName:perfilUsuario?.nombre||currentUser?.email||'',fecha:serverTimestamp()}).catch(()=>{});
   }catch(e){ console.log('trackEvento error:',e); }
 }
 
@@ -1931,7 +1938,7 @@ document.querySelectorAll('.admin-tab[data-atab]').forEach(tab=>{
     if(tab.dataset.atab==='pendientes'||tab.dataset.atab==='recientes') cargarPendientes();
     if(tab.dataset.atab==='usuarios') buscarUsuariosAdmin();
     if(tab.dataset.atab==='proveedores') buscarProveedoresAdmin();
-    if(tab.dataset.atab==='estadisticas'){ cargarRanking('semana'); cargarMetricas(); }
+    if(tab.dataset.atab==='estadisticas'){ cargarRanking('semana'); cargarRankingUsuarios('semana'); cargarMetricas(); }
   });
 });
 
@@ -2829,8 +2836,48 @@ document.querySelectorAll('[data-rank]').forEach(btn=>{
     document.querySelectorAll('[data-rank]').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
     cargarRanking(btn.dataset.rank);
+    cargarRankingUsuarios(btn.dataset.rank);
   });
 });
+
+async function cargarRankingUsuarios(periodo){
+  const cont = document.getElementById('ranking-usuarios-container');
+  cont.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando...</div>';
+  try{
+    const ahora = new Date();
+    let desde = null;
+    if(periodo==='dia'){ desde=new Date(ahora); desde.setHours(0,0,0,0); }
+    else if(periodo==='semana'){ desde=new Date(ahora); const d=desde.getDay(); desde.setDate(desde.getDate()-(d===0?6:d-1)); desde.setHours(0,0,0,0); }
+    else if(periodo==='mes'){ desde=new Date(ahora.getFullYear(),ahora.getMonth(),1); }
+    else if(periodo==='anio'){ desde=new Date(ahora.getFullYear(),0,1); }
+    const q2 = desde ? query(collection(db,'eventos'),where('fecha','>=',desde)) : collection(db,'eventos');
+    const snap = await getDocs(q2);
+    const conteo = {}; // uid -> {nombre, llamada, whatsapp, compartir}
+    snap.forEach(d=>{
+      const e = d.data();
+      if(!e.uid || e.uid==='anon') return;
+      if(!conteo[e.uid]) conteo[e.uid]={nombre:e.userName||e.uid,llamada:0,whatsapp:0,compartir:0};
+      if(e.tipo==='llamada')   conteo[e.uid].llamada++;
+      if(e.tipo==='whatsapp')  conteo[e.uid].whatsapp++;
+      if(e.tipo==='compartir') conteo[e.uid].compartir++;
+    });
+    const lista = Object.values(conteo).map(c=>({...c,total:c.llamada+c.whatsapp+c.compartir}));
+    lista.sort((a,b)=>b.total-a.total);
+    const top = lista.slice(0,10);
+    if(!top.length){ cont.innerHTML='<div class="empty-state" style="padding:16px"><div class="icon">👤</div><p>Sin actividad registrada en este período</p></div>'; return; }
+    cont.innerHTML = `<div style="overflow-x:auto"><table class="tabla-metricas">
+      <thead><tr>${['#','Usuario','📞','💬','🔗','Total'].map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+      <tbody>${top.map((c,i)=>`<tr>
+        <td style="font-weight:600;color:var(--muted)">${i+1}</td>
+        <td style="font-weight:500">${esc(c.nombre)}</td>
+        <td class="num">${c.llamada}</td>
+        <td class="num">${c.whatsapp}</td>
+        <td class="num">${c.compartir}</td>
+        <td class="total">${c.total}</td>
+      </tr>`).join('')}</tbody>
+    </table></div>`;
+  }catch(e){ console.log('RankingUsuarios error:',e); cont.innerHTML='<div class="empty-state"><div class="icon">⚠️</div><p>Error al cargar</p></div>'; }
+}
 
 // ── EMAIL A PROVEEDOR AL AUTO-REGISTRARSE ─────────────────────────────────────
 document.getElementById('btn-admin-buscar-prov').addEventListener('click', ()=>buscarProveedoresAdmin());
