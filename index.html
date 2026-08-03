@@ -2312,7 +2312,12 @@ async function enviarRespuestaAdmin(threadId,btnEl){
 async function cargarMisConsultas(){
   const c=document.getElementById('misconsultas-container');
   if(!c) return;
-  c.innerHTML='<div class="loading"><div class="spinner"></div>Cargando...</div>';
+  // Reemplazar con nodo limpio para evitar listeners acumulados
+  const fresh=c.cloneNode(false);
+  if(c.parentNode) c.parentNode.replaceChild(fresh,c);
+  const cont=document.getElementById('misconsultas-container');
+  if(!cont) return;
+  cont.innerHTML='<div class="loading"><div class="spinner"></div>Cargando...</div>';
   try{
     // Una sola query: todos los mensajes donde el uid del vecino coincide
     // O donde el threadId empieza con thread_uid (mensajes del admin en el mismo thread)
@@ -2341,9 +2346,9 @@ async function cargarMisConsultas(){
     const threads=Object.values(threadMap);
     threads.forEach(t=>t.mensajes.sort((a,b)=>(a.fechaMs||0)-(b.fechaMs||0)));
     threads.sort((a,b)=>{const fa=a.mensajes[a.mensajes.length-1]?.fecha||'';const fb=b.mensajes[b.mensajes.length-1]?.fecha||'';return fb>fa?1:-1;});
-    if(!threads.length){c.innerHTML='<p style="color:var(--muted);font-size:.83rem;text-align:center;padding:20px 0">Todavía no enviaste ninguna consulta.</p>';actualizarBadgeConsultas(0);return;}
+    if(!threads.length){cont.innerHTML='<p style="color:var(--muted);font-size:.83rem;text-align:center;padding:20px 0">Todavía no enviaste ninguna consulta.</p>';actualizarBadgeConsultas(0);return;}
     let sinLeerTotal=0;
-    c.innerHTML=threads.map(t=>{
+    cont.innerHTML=threads.map(t=>{
       const sinLeer=t.mensajes.filter(m=>m.autor==='admin'&&m.leido==='No').length;
       sinLeerTotal+=sinLeer;
       const ultimo=t.mensajes[t.mensajes.length-1];
@@ -2363,13 +2368,12 @@ async function cargarMisConsultas(){
       </div>`;
     }).join('');
     actualizarBadgeConsultas(sinLeerTotal);
-    const nuevo=c.cloneNode(false);nuevo.innerHTML=c.innerHTML;c.parentNode.replaceChild(nuevo,c);
-    nuevo.addEventListener('click',async e=>{
+    cont.addEventListener('click',async e=>{
       const hdr=e.target.closest('[data-toggle="vec"]');
       if(hdr){const b=document.getElementById('vbody-'+hdr.dataset.tid);const abrir=b.style.display==='none'||!b.style.display;b.style.display=abrir?'block':'none';if(abrir){const cm=b.querySelector('.chat-mensajes');if(cm)cm.scrollTop=cm.scrollHeight;await marcarLeidoVecino(hdr.dataset.tid);}return;}
       const btn2=e.target.closest('[data-send-vec]');if(btn2&&!btn2.disabled)enviarRespuestaVecino(btn2.dataset.sendVec,btn2);
     });
-  }catch(e){console.error('cargarMisConsultas error:',e);c.innerHTML=`<p style="color:var(--rojo);font-size:.83rem">Error al cargar: ${e.message||e}</p>`;}
+  }catch(e){console.error('cargarMisConsultas error:',e);const el2=document.getElementById('misconsultas-container');if(el2)el2.innerHTML=`<p style="color:var(--rojo);font-size:.83rem">Error al cargar: ${e.message||e}</p>`;}
 }
 
 async function marcarLeidoVecino(threadId){
