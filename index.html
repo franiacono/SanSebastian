@@ -2314,26 +2314,30 @@ async function cargarMisConsultas(){
   if(!c) return;
   c.innerHTML='<div class="loading"><div class="spinner"></div>Cargando...</div>';
   try{
+    // Una sola query: todos los mensajes donde el uid del vecino coincide
+    // O donde el threadId empieza con thread_uid (mensajes del admin en el mismo thread)
     const snap=await getDocs(query(collection(db,'mensajes'),where('uid','==',currentUser.uid)));
+    const threadIds=new Set();
     const threadMap={};
     snap.forEach(d=>{
       const m={id:d.id,...d.data()};
       const tid=m.threadId||d.id;
+      threadIds.add(tid);
       if(!threadMap[tid]) threadMap[tid]={threadId:tid,mensajes:[]};
       const fechaMs=m.fecha?.toMillis?.()||m.fecha?.seconds*1000||0;
       threadMap[tid].mensajes.push({...m,fecha:m.fecha?.toDate?.()?.toISOString()||'',fechaMs});
     });
-    // Buscar todos los mensajes del thread del usuario
-    const snap2=await getDocs(query(collection(db,'mensajes'),where('threadId','>=','thread_'+currentUser.uid+'_'),where('threadId','<=','thread_'+currentUser.uid+'_\uf8ff')));
-    snap2.forEach(d=>{
-      const m={id:d.id,...d.data()};
-      const tid=m.threadId;
-      if(!threadMap[tid]) threadMap[tid]={threadId:tid,mensajes:[]};
-      if(!threadMap[tid].mensajes.find(x=>x.id===d.id)){
-        const fechaMs=m.fecha?.toMillis?.()||m.fecha?.seconds*1000||0;
-        threadMap[tid].mensajes.push({...m,fecha:m.fecha?.toDate?.()?.toISOString()||'',fechaMs});
-      }
-    });
+    // Buscar respuestas del admin en esos threads
+    for(const tid of threadIds){
+      const snap2=await getDocs(query(collection(db,'mensajes'),where('threadId','==',tid)));
+      snap2.forEach(d=>{
+        const m={id:d.id,...d.data()};
+        if(!threadMap[tid].mensajes.find(x=>x.id===d.id)){
+          const fechaMs=m.fecha?.toMillis?.()||m.fecha?.seconds*1000||0;
+          threadMap[tid].mensajes.push({...m,fecha:m.fecha?.toDate?.()?.toISOString()||'',fechaMs});
+        }
+      });
+    }
     const threads=Object.values(threadMap);
     threads.forEach(t=>t.mensajes.sort((a,b)=>(a.fechaMs||0)-(b.fechaMs||0)));
     threads.sort((a,b)=>{const fa=a.mensajes[a.mensajes.length-1]?.fecha||'';const fb=b.mensajes[b.mensajes.length-1]?.fecha||'';return fb>fa?1:-1;});
