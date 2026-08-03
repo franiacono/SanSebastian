@@ -2369,7 +2369,7 @@ async function cargarMisConsultas(){
       if(hdr){const b=document.getElementById('vbody-'+hdr.dataset.tid);const abrir=b.style.display==='none'||!b.style.display;b.style.display=abrir?'block':'none';if(abrir){const cm=b.querySelector('.chat-mensajes');if(cm)cm.scrollTop=cm.scrollHeight;await marcarLeidoVecino(hdr.dataset.tid);}return;}
       const btn2=e.target.closest('[data-send-vec]');if(btn2&&!btn2.disabled)enviarRespuestaVecino(btn2.dataset.sendVec,btn2);
     });
-  }catch(e){c.innerHTML='<p style="color:var(--rojo);font-size:.83rem">Error al cargar.</p>';}
+  }catch(e){console.error('cargarMisConsultas error:',e);c.innerHTML=`<p style="color:var(--rojo);font-size:.83rem">Error al cargar: ${e.message||e}</p>`;}
 }
 
 async function marcarLeidoVecino(threadId){
