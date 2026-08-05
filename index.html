@@ -1508,7 +1508,8 @@ function procesarDatos(filas){
     const key=genKey(f);
     if(!mapa[key]) mapa[key]={nombre:f.nombre,empresa:f.empresa||"",dni:f.dni||"",telefono:f.telefono,servicio:f.servicio,barrio:"",destacado:false,resenas:[],idxOriginal:idx,autoregistrado:f.autoregistrado===true,barriosServicio:[],firestoreId:f.id||"",categorias:f.categorias||[],soloLlamada:false,descripcionPropia:''};
     if(f.soloLlamada===true) mapa[key].soloLlamada=true;
-    if(f.autoregistrado===true && f.comentario) mapa[key].descripcionPropia=f.comentario;
+    if(f.descripcionPropia) mapa[key].descripcionPropia=f.descripcionPropia;
+    else if(f.autoregistrado===true && f.comentario) mapa[key].descripcionPropia=f.comentario;
     if(!mapa[key].barrio && f.barrio && f.barrio.trim()!=='') mapa[key].barrio=normBarrio(f.barrio);
     if(!mapa[key].barrioOrigen && f.barrioOrigen) mapa[key].barrioOrigen=f.barrioOrigen;
     if(f.barriosServicio&&f.barriosServicio.length) mapa[key].barriosServicio=[...new Set([...mapa[key].barriosServicio,...f.barriosServicio])];
