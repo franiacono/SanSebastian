@@ -529,7 +529,7 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
       <nav class="header-nav">
         <button class="nav-btn active" id="nav-buscar">🔍 <span class="label">Buscar</span></button>
         <button class="nav-btn" id="nav-telefonos">📞 <span class="label">Útiles</span></button>
-        <button class="nav-btn" id="nav-recomendar">✍️ <span class="label">Calificar</span></button>
+        <button class="nav-btn" id="nav-recomendar">✍️ <span class="label">Recomendar</span></button>
         <button class="nav-btn" id="nav-consultas" style="position:relative;display:none">💬 <span class="label">Consultas</span><span id="notif-badge" class="notif-badge" style="display:none">0</span></button>
         <button class="nav-btn" id="nav-ayuda">ℹ️ <span class="label">Ayuda</span></button>
         <button class="nav-btn" id="nav-admin" style="display:none">🛠️ <span class="label">Admin</span></button>
@@ -591,8 +591,8 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
     <div class="page" id="page-recomendar">
       <div class="form-card">
         <div class="form-header">
-          <h2>⭐ Calificá un proveedor</h2>
-          <p style="opacity:.85;font-size:.88rem">Compartí tu experiencia — buena o mala — para ayudar a tus vecinos</p>
+          <h2>✍️ Recomendá un proveedor</h2>
+          <p style="opacity:.85;font-size:.88rem">Compartí tu experiencia con la comunidad</p>
         </div>
         <div class="form-body">
           <div id="form-body">
@@ -601,18 +601,17 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
             <div class="form-row"><label>DNI</label><input class="form-input" type="text" id="f-dni" placeholder="Opcional"></div>
             <div class="form-row"><label>Teléfono *</label><input class="form-input" type="tel" id="f-telefono" placeholder="11 2345-6789"></div>
             <div class="form-row"><label>Tipo de servicio *</label><input class="form-input" type="text" id="f-servicio" placeholder="Ej: Plomería, Electricidad, Limpieza..."></div>
-            <div class="form-row"><label>Tu calificación *</label>
+            <div class="form-row"><label>Tu experiencia *</label>
               <select class="form-select" id="f-recomendacion">
-                <option value="">— ¿Cómo fue tu experiencia? —</option>
+                <option value="">— Seleccioná —</option>
                 <option value="Muy Recomendable">⭐ Muy Recomendable</option>
                 <option value="Recomendable">👍 Recomendable</option>
                 <option value="Malas Experiencias">⚠️ Malas Experiencias</option>
                 <option value="No Recomendable">🚫 No Recomendable</option>
               </select>
-              <p style="font-size:.75rem;color:var(--muted);margin-top:5px">💡 Las experiencias negativas también son valiosas — ayudan a otros vecinos a evitar problemas.</p>
             </div>
-            <div class="form-row"><label>Comentario *</label><textarea class="form-textarea" id="f-recomen" placeholder="Contá tu experiencia con detalle..."></textarea></div>
-            <div class="form-row"><label>Notas adicionales</label><textarea class="form-textarea" id="f-notas" placeholder="Horarios, especialidades, zona... (opcional)" style="min-height:60px"></textarea></div>
+            <div class="form-row"><label>Comentario *</label><textarea class="form-textarea" id="f-recomen" placeholder="Contá tu experiencia..."></textarea></div>
+            <div class="form-row"><label>Notas para el administrador</label><textarea class="form-textarea" id="f-notas" placeholder="Info adicional que quieras que vea el admin (no se publica)" style="min-height:60px"></textarea></div>
             <div class="form-row">
               <label>¿El proveedor es de algún barrio privado?</label>
               <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">
@@ -644,7 +643,7 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
             <div style="font-size:2rem;margin-bottom:10px">✅</div>
             <h3 style="font-family:'Fraunces',serif;color:var(--azul);margin-bottom:6px">¡Gracias por tu recomendación!</h3>
             <p style="font-size:.85rem;color:var(--muted);margin-bottom:14px">Será revisada antes de publicarse.</p>
-            <button id="btn-recomendar-otro" class="btn-secondary" style="font-size:.85rem;padding:10px 20px">✍️ Calificar otro proveedor</button>
+            <button id="btn-recomendar-otro" class="btn-secondary" style="font-size:.85rem;padding:10px 20px">✍️ Recomendar otro proveedor</button>
           </div>
         </div>
       </div>
@@ -925,8 +924,9 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
       <label>Rubros / Categorías</label>
       <div id="edit-prov-cats" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:6px;max-height:180px;overflow-y:auto"></div>
     </div>
+    <div class="auth-row"><label>Descripción del proveedor <span style="font-size:.75rem;color:var(--muted);font-weight:400">(aparece en negrita en la card)</span></label><textarea class="auth-input" id="edit-prov-descripcion" placeholder="Ej: Especialistas en plomería y gas, 10 años de experiencia en barrios privados..." style="height:70px;resize:vertical"></textarea></div>
     <div class="auth-row"><label>Comentario (experiencia del vecino)</label><textarea class="auth-input" id="edit-prov-comentario" style="height:60px;resize:vertical"></textarea></div>
-    <div class="auth-row"><label>Notas adicionales</label><textarea class="auth-input" id="edit-prov-notas" style="height:60px;resize:vertical"></textarea></div>
+    <div class="auth-row"><label>Notas (solo admin)</label><textarea class="auth-input" id="edit-prov-notas" style="height:60px;resize:vertical"></textarea></div>
     <div class="auth-row">
       <label>Barrios donde presta servicios</label>
       <div id="edit-prov-barrios" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px"></div>
@@ -1738,7 +1738,7 @@ function cardHTML(p,isDest){
       <div class="barrios-servicio-badges">${p.barriosServicio.map(b=>`<span class="barrio-srv-badge">${b==='Consultar'?'🔍 Consultar por otros barrios':b==='Toda la zona'?'🌐 Toda la zona':esc(b)}</span>`).join('')}</div>`:''}
     ${p.resenas.length?`<div class="card-resenas-toggle"><span class="toggle-label">Ver reseñas (${p.resenas.length}) ▾</span></div><div class="card-detail" style="display:none"><div class="resenas-title">Reseñas</div>${resHtml}</div>`:''}
     <div class="card-footer-actions">
-      <button class="btn-recomendar-card" data-p='${pData.replace(/'/g,"&apos;")}'>⭐ Dejar reseña</button>
+      <button class="btn-recomendar-card" data-p='${pData.replace(/'/g,"&apos;")}'>✍️ Recomendar</button>
       <button class="btn-compartir-card" data-nombre="${esc(p.nombre)}" data-empresa="${esc(p.empresa||'')}" data-srv="${esc(p.servicio)}" data-tel="${esc(p.telefono||'')}" data-id="${esc(p.firestoreId||'')}">🔗</button>
       ${isAdmin()?`<button class="btn-editar-card" data-id="${esc(p.firestoreId||'')}" style="background:transparent;border:1.5px solid var(--naranja);color:var(--naranja);border-radius:8px;padding:6px 12px;font-size:.75rem;font-family:'Inter',sans-serif;cursor:pointer">✏️</button>`:''}
     </div>
@@ -1782,8 +1782,10 @@ async function trackEvento(tipo, proveedorId, proveedorNombre, proveedorEmpresa)
 function recomendarDesdeCard(pDataStr){
   try{
     const p=JSON.parse(pDataStr.replace(/&apos;/g,"'"));
-    // Resetear form completo primero (rehabilita el botón, limpia mensajes)
-    resetFormRecomendar();
+    // Primero resetear y mostrar el form
+    document.getElementById('form-success').style.display='none';
+    document.getElementById('form-body').style.display='block';
+    document.getElementById('form-msg').style.display='none';
     // Cargar datos del proveedor
     document.getElementById('f-nombre').value   = p.nombre||'';
     document.getElementById('f-empresa').value  = p.empresa||'';
@@ -1849,7 +1851,6 @@ document.getElementById('btn-form-submit').addEventListener('click', async ()=>{
     apiGet({action:'notificarAdminRecomendacion', nombre, servicio, vecino:perfilUsuario?.nombre||''}).catch(()=>{});
     document.getElementById('form-body').style.display='none';
     document.getElementById('form-success').style.display='block';
-    btn.disabled=false; btn.textContent='Enviar recomendación';
   }catch(e){msg.textContent='❌ Error al enviar. Intentá de nuevo.';msg.style.color='var(--rojo)';msg.style.display='block';btn.disabled=false;btn.textContent='Enviar recomendación';}
 });
 
@@ -2311,43 +2312,34 @@ async function enviarRespuestaAdmin(threadId,btnEl){
 async function cargarMisConsultas(){
   const c=document.getElementById('misconsultas-container');
   if(!c) return;
-  // Reemplazar con nodo limpio para evitar listeners acumulados
-  const fresh=c.cloneNode(false);
-  if(c.parentNode) c.parentNode.replaceChild(fresh,c);
-  const cont=document.getElementById('misconsultas-container');
-  if(!cont) return;
-  cont.innerHTML='<div class="loading"><div class="spinner"></div>Cargando...</div>';
+  c.innerHTML='<div class="loading"><div class="spinner"></div>Cargando...</div>';
   try{
-    // Una sola query: todos los mensajes donde el uid del vecino coincide
-    // O donde el threadId empieza con thread_uid (mensajes del admin en el mismo thread)
     const snap=await getDocs(query(collection(db,'mensajes'),where('uid','==',currentUser.uid)));
-    const threadIds=new Set();
     const threadMap={};
     snap.forEach(d=>{
       const m={id:d.id,...d.data()};
       const tid=m.threadId||d.id;
-      threadIds.add(tid);
       if(!threadMap[tid]) threadMap[tid]={threadId:tid,mensajes:[]};
       const fechaMs=m.fecha?.toMillis?.()||m.fecha?.seconds*1000||0;
       threadMap[tid].mensajes.push({...m,fecha:m.fecha?.toDate?.()?.toISOString()||'',fechaMs});
     });
-    // Buscar respuestas del admin en esos threads
-    for(const tid of threadIds){
-      const snap2=await getDocs(query(collection(db,'mensajes'),where('threadId','==',tid)));
-      snap2.forEach(d=>{
-        const m={id:d.id,...d.data()};
-        if(!threadMap[tid].mensajes.find(x=>x.id===d.id)){
-          const fechaMs=m.fecha?.toMillis?.()||m.fecha?.seconds*1000||0;
-          threadMap[tid].mensajes.push({...m,fecha:m.fecha?.toDate?.()?.toISOString()||'',fechaMs});
-        }
-      });
-    }
+    // Buscar todos los mensajes del thread del usuario
+    const snap2=await getDocs(query(collection(db,'mensajes'),where('threadId','>=','thread_'+currentUser.uid+'_'),where('threadId','<=','thread_'+currentUser.uid+'_\uf8ff')));
+    snap2.forEach(d=>{
+      const m={id:d.id,...d.data()};
+      const tid=m.threadId;
+      if(!threadMap[tid]) threadMap[tid]={threadId:tid,mensajes:[]};
+      if(!threadMap[tid].mensajes.find(x=>x.id===d.id)){
+        const fechaMs=m.fecha?.toMillis?.()||m.fecha?.seconds*1000||0;
+        threadMap[tid].mensajes.push({...m,fecha:m.fecha?.toDate?.()?.toISOString()||'',fechaMs});
+      }
+    });
     const threads=Object.values(threadMap);
     threads.forEach(t=>t.mensajes.sort((a,b)=>(a.fechaMs||0)-(b.fechaMs||0)));
     threads.sort((a,b)=>{const fa=a.mensajes[a.mensajes.length-1]?.fecha||'';const fb=b.mensajes[b.mensajes.length-1]?.fecha||'';return fb>fa?1:-1;});
-    if(!threads.length){cont.innerHTML='<p style="color:var(--muted);font-size:.83rem;text-align:center;padding:20px 0">Todavía no enviaste ninguna consulta.</p>';actualizarBadgeConsultas(0);return;}
+    if(!threads.length){c.innerHTML='<p style="color:var(--muted);font-size:.83rem;text-align:center;padding:20px 0">Todavía no enviaste ninguna consulta.</p>';actualizarBadgeConsultas(0);return;}
     let sinLeerTotal=0;
-    cont.innerHTML=threads.map(t=>{
+    c.innerHTML=threads.map(t=>{
       const sinLeer=t.mensajes.filter(m=>m.autor==='admin'&&m.leido==='No').length;
       sinLeerTotal+=sinLeer;
       const ultimo=t.mensajes[t.mensajes.length-1];
@@ -2367,12 +2359,13 @@ async function cargarMisConsultas(){
       </div>`;
     }).join('');
     actualizarBadgeConsultas(sinLeerTotal);
-    cont.addEventListener('click',async e=>{
+    const nuevo=c.cloneNode(false);nuevo.innerHTML=c.innerHTML;c.parentNode.replaceChild(nuevo,c);
+    nuevo.addEventListener('click',async e=>{
       const hdr=e.target.closest('[data-toggle="vec"]');
       if(hdr){const b=document.getElementById('vbody-'+hdr.dataset.tid);const abrir=b.style.display==='none'||!b.style.display;b.style.display=abrir?'block':'none';if(abrir){const cm=b.querySelector('.chat-mensajes');if(cm)cm.scrollTop=cm.scrollHeight;await marcarLeidoVecino(hdr.dataset.tid);}return;}
       const btn2=e.target.closest('[data-send-vec]');if(btn2&&!btn2.disabled)enviarRespuestaVecino(btn2.dataset.sendVec,btn2);
     });
-  }catch(e){console.error('cargarMisConsultas error:',e);const el2=document.getElementById('misconsultas-container');if(el2)el2.innerHTML=`<p style="color:var(--rojo);font-size:.83rem">Error al cargar: ${e.message||e}</p>`;}
+  }catch(e){c.innerHTML='<p style="color:var(--rojo);font-size:.83rem">Error al cargar.</p>';}
 }
 
 async function marcarLeidoVecino(threadId){
@@ -2963,6 +2956,7 @@ async function abrirEditarProveedor(id, p){
   document.getElementById('edit-prov-dni').value=p.dni||'';
   document.getElementById('edit-prov-telefono').value=p.telefono||'';
   document.getElementById('edit-prov-servicio').value=p.servicio||'';
+  document.getElementById('edit-prov-descripcion').value=p.descripcionPropia||'';
   document.getElementById('edit-prov-comentario').value=p.comentario||'';
   document.getElementById('edit-prov-notas').value=p.notas||'';
   // Leer datos frescos de Firestore
@@ -2984,6 +2978,7 @@ async function abrirEditarProveedor(id, p){
     const tipoVal = fresh.tipo==='util' ? 'Utiles' : fresh.tipo==='publicidad' ? 'Publicidad' : (fresh.recomendacion||'Recomendable');
     document.getElementById('edit-prov-recomendacion').value=tipoVal;
     document.getElementById('edit-prov-solo-llamada').checked=fresh.soloLlamada===true;
+    document.getElementById('edit-prov-descripcion').value=fresh.descripcionPropia||p.descripcionPropia||'';
     document.getElementById('edit-prov-comentario').value=fresh.comentario||p.comentario||'';
     document.getElementById('edit-prov-notas').value=fresh.notas||p.notas||'';
     const catsActuales=fresh.categorias||p.categorias||[];
@@ -3026,6 +3021,7 @@ document.getElementById('btn-guardar-prov').addEventListener('click', async()=>{
       telefono:document.getElementById('edit-prov-telefono').value.trim(),
       servicio:document.getElementById('edit-prov-servicio').value.trim(),
       recomendacion:rec,
+      descripcionPropia:document.getElementById('edit-prov-descripcion').value.trim(),
       comentario:document.getElementById('edit-prov-comentario').value.trim(),
       notas:document.getElementById('edit-prov-notas').value.trim(),
       barriosServicio:getCheckboxBarrios('edit-prov-barrios'),
@@ -3047,6 +3043,7 @@ document.getElementById('btn-guardar-prov').addEventListener('click', async()=>{
             barriosServicio:datos.barriosServicio,
             categorias:datos.categorias,
             barrioOrigen:datos.barrioOrigen||d.data().barrioOrigen||'',
+            descripcionPropia:datos.descripcionPropia||d.data().descripcionPropia||'',
           }));
         }
       }
