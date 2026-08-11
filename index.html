@@ -1614,14 +1614,21 @@ chipRow.querySelectorAll('.chip').forEach(btn=>{
 
 document.getElementById('btn-limpiar-filtros').addEventListener('click', limpiarFiltros);
 let searchDebounceTimer = null;
+function dispararTrackBusqueda(){
+  const q = document.getElementById('search-input').value.trim();
+  if(q.length >= 3) trackBusqueda(q);
+}
 document.getElementById('search-input').addEventListener('input', ()=>{
   renderResults();
-  // Trackear búsqueda con debounce de 2 segundos para capturar términos completos
   clearTimeout(searchDebounceTimer);
-  searchDebounceTimer = setTimeout(()=>{
-    const q = document.getElementById('search-input').value.trim();
-    if(q.length >= 3) trackBusqueda(q);
-  }, 2000);
+  searchDebounceTimer = setTimeout(dispararTrackBusqueda, 2000);
+});
+document.getElementById('search-input').addEventListener('blur', ()=>{
+  clearTimeout(searchDebounceTimer);
+  dispararTrackBusqueda();
+});
+document.getElementById('search-input').addEventListener('keydown', e=>{
+  if(e.key==='Enter'){ clearTimeout(searchDebounceTimer); dispararTrackBusqueda(); }
 });
 document.getElementById('cat-select').addEventListener('change',  ()=>renderResults());
 document.getElementById('barrio-filter-select').addEventListener('change', ()=>renderResults());
