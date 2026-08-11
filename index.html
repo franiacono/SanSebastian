@@ -524,7 +524,7 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
     <div class="header-inner">
       <div class="header-brand">
         <div class="header-logo">EV</div>
-        <div class="header-title">EntreVecinos<span id="header-barrio-label">Barrios privados</span></div>
+        <div class="header-title">EntreVecinos<span id="header-barrio-label">Proveedores de confianza</span></div>
       </div>
       <nav class="header-nav">
         <button class="nav-btn active" id="nav-buscar">🔍 <span class="label">Buscar</span></button>
@@ -748,6 +748,10 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
           <div style="margin-top:24px">
             <div style="font-size:.85rem;font-weight:600;color:var(--azul);margin-bottom:10px">👤 Usuarios más activos</div>
             <div id="ranking-usuarios-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
+          </div>
+          <div style="margin-top:24px">
+            <div style="font-size:.85rem;font-weight:600;color:var(--azul);margin-bottom:10px">🔍 Términos más buscados</div>
+            <div id="ranking-busquedas-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
           </div>
         </div>
       </div>
@@ -1397,7 +1401,7 @@ function entrarALaApp() {
   document.getElementById('dd-nombre').textContent  = perfilUsuario?.nombre||'Sin nombre';
   document.getElementById('dd-email').textContent   = currentUser?.email||'';
   document.getElementById('dd-barrio').textContent  = perfilUsuario?.barrio ? `📍 ${perfilUsuario.barrio}${perfilUsuario.area?' · Sector '+perfilUsuario.area:''}` : '';
-  document.getElementById('header-barrio-label').textContent = perfilUsuario?.barrio || 'Barrios privados';
+  document.getElementById('header-barrio-label').textContent = 'Proveedores de confianza';
   if(isAdmin()){
     document.getElementById('nav-admin').style.display='inline-flex';
     document.getElementById('nav-mensajes').style.display='inline-flex';
@@ -1422,9 +1426,19 @@ function entrarALaApp() {
   setTimeout(()=>pedirPermisoNotificaciones(currentUser?.uid), 3000);
   // Badge consultas
   if(!isAdmin()) setTimeout(()=>cargarMisConsultas(), 1500);
+  // Auto-refresh admin
+  if(isAdmin()) iniciarAdminRefresh();
   // Actualizar último acceso
   updateDoc(doc(db,'usuarios',currentUser.uid), {ultimoAcceso:serverTimestamp()}).catch(()=>{});
-  document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') cargarProveedores(); });
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible'){
+      cargarProveedores();
+      if(isAdmin() && document.getElementById('page-admin')?.classList.contains('active')){
+        cargarEstadisticasAdmin();
+        cargarPendientes();
+      }
+    }
+  });
 }
 
 function gaEvent(name, params){ try{window.gtag&&gtag('event',name,params);}catch(e){} }
@@ -1469,7 +1483,24 @@ document.getElementById('nav-recomendar').addEventListener('click',()=>{
   resetFormRecomendar();
 });
 document.getElementById('nav-consultas').addEventListener('click', ()=>showPage('consultas'));
-document.getElementById('nav-admin').addEventListener('click',     ()=>showPage('admin'));
+document.getElementById('nav-admin').addEventListener('click', ()=>{
+  showPage('admin');
+  // Recargar stats al entrar al panel
+  cargarEstadisticasAdmin();
+  cargarPendientes();
+});
+
+// Auto-refresh de stats del admin cada 60 segundos mientras está en la pestaña admin
+let adminRefreshInterval = null;
+function iniciarAdminRefresh(){
+  if(adminRefreshInterval) clearInterval(adminRefreshInterval);
+  adminRefreshInterval = setInterval(()=>{
+    const paginaAdmin = document.getElementById('page-admin');
+    if(paginaAdmin?.classList.contains('active')){
+      cargarEstadisticasAdmin();
+    }
+  }, 60000);
+}
 document.getElementById('nav-mensajes').addEventListener('click',  ()=>showPage('mensajes'));
 document.getElementById('nav-ayuda').addEventListener('click',     ()=>showPage('ayuda'));
 
@@ -1582,7 +1613,23 @@ chipRow.querySelectorAll('.chip').forEach(btn=>{
 });
 
 document.getElementById('btn-limpiar-filtros').addEventListener('click', limpiarFiltros);
-document.getElementById('search-input').addEventListener('input', ()=>renderResults());
+let searchDebounceTimer = null;
+function dispararTrackBusqueda(){
+  const q = document.getElementById('search-input').value.trim();
+  if(q.length >= 3) trackBusqueda(q);
+}
+document.getElementById('search-input').addEventListener('input', ()=>{
+  renderResults();
+  clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(dispararTrackBusqueda, 2000);
+});
+document.getElementById('search-input').addEventListener('blur', ()=>{
+  clearTimeout(searchDebounceTimer);
+  dispararTrackBusqueda();
+});
+document.getElementById('search-input').addEventListener('keydown', e=>{
+  if(e.key==='Enter'){ clearTimeout(searchDebounceTimer); dispararTrackBusqueda(); }
+});
 document.getElementById('cat-select').addEventListener('change',  ()=>renderResults());
 document.getElementById('barrio-filter-select').addEventListener('change', ()=>renderResults());
 document.getElementById('sort-select').addEventListener('change',  ()=>renderResults());
@@ -1767,6 +1814,18 @@ function pasoCooldown(clave){
     return true;
   }catch(e){ return true; } // si localStorage falla, no bloqueamos el tracking
 }
+async function trackBusqueda(termino){
+  try{
+    addDoc(collection(db,'eventos'),{
+      tipo:'busqueda',
+      termino:termino.toLowerCase().trim(),
+      uid:currentUser?.uid||'anon',
+      userName:perfilUsuario?.nombre||currentUser?.email||'',
+      fecha:serverTimestamp()
+    }).catch(()=>{});
+  }catch(e){}
+}
+
 async function trackEvento(tipo, proveedorId, proveedorNombre, proveedorEmpresa){
   if(!proveedorId) return;
   const uid = currentUser?.uid || 'anon';
@@ -1985,6 +2044,8 @@ async function cargarMetricas(){
     // Clicks de contacto (llamada+whatsapp) y compartir, desde eventos
     const clicksContacto = {dia:0,semana:0,mes:0,anio:0,total:0};
     const clicksCompartir = {dia:0,semana:0,mes:0,anio:0,total:0};
+    const busquedas = {dia:0,semana:0,mes:0,anio:0,total:0};
+    const terminosMap = {}; // para ranking de términos
     const snapEv = await getDocs(collection(db,'eventos'));
     snapEv.forEach(d=>{
       const e = d.data();
@@ -1993,14 +2054,25 @@ async function cargarMetricas(){
       const c = contarDesde(f);
       if(e.tipo==='llamada'||e.tipo==='whatsapp'){ sumar(clicksContacto,c); clicksContacto.total++; }
       if(e.tipo==='compartir'){ sumar(clicksCompartir,c); clicksCompartir.total++; }
+      if(e.tipo==='busqueda' && e.termino){
+        sumar(busquedas,c); busquedas.total++;
+        if(!terminosMap[e.termino]) terminosMap[e.termino]={count:0,ids:[]};
+        terminosMap[e.termino].count++;
+        terminosMap[e.termino].ids.push(d.id);
+      }
     });
 
     const filas = [
       {label:'👥 Usuarios nuevos', d:usuariosNuevos},
       {label:'📋 Proveedores nuevos', d:proveedoresNuevos},
+      {label:'🔍 Búsquedas realizadas', d:busquedas},
       {label:'📞 Clicks contactar', d:clicksContacto},
       {label:'🔗 Clicks compartir', d:clicksCompartir},
     ];
+
+    // Top términos buscados
+    const topTerminos = Object.entries(terminosMap)
+      .sort((a,b)=>b[1].count-a[1].count).slice(0,50);
     cont.innerHTML = `<div style="overflow-x:auto"><table class="tabla-metricas">
       <thead><tr>${['Métrica','Hoy','Semana','Mes','Año','Total'].map(h=>`<th>${h}</th>`).join('')}</tr></thead>
       <tbody>${filas.map(f=>`<tr>
@@ -2012,6 +2084,49 @@ async function cargarMetricas(){
         <td class="total">${f.d.total}</td>
       </tr>`).join('')}</tbody>
     </table></div>`;
+
+    // Ranking de términos en su propio contenedor
+    const contTerminos = document.getElementById('ranking-busquedas-container');
+    if(contTerminos){
+      if(!topTerminos.length){
+        contTerminos.innerHTML='<div class="empty-state" style="padding:16px"><p>Sin búsquedas registradas aún</p></div>';
+      } else {
+        contTerminos.innerHTML=`
+          <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+            <button id="btn-limpiar-busquedas" style="padding:6px 14px;background:white;color:var(--rojo);border:1.5px solid var(--rojo);border-radius:8px;font-size:.78rem;font-family:'Inter',sans-serif;cursor:pointer;font-weight:500">🗑️ Limpiar todo</button>
+          </div>
+          <div style="overflow-x:auto"><table class="tabla-metricas">
+            <thead><tr><th>#</th><th>Término buscado</th><th style="text-align:center">Búsquedas</th><th></th></tr></thead>
+            <tbody>${topTerminos.map(([t,data],i)=>`<tr data-termino="${esc(t)}" data-ids="${data.ids.join(',')}">
+              <td style="font-weight:600;color:var(--muted)">${i+1}</td>
+              <td style="font-weight:500">${esc(t)}</td>
+              <td class="total">${data.count}</td>
+              <td style="text-align:center"><button class="btn-del-termino" data-termino="${esc(t)}" data-ids="${data.ids.join(',')}" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:.85rem;padding:2px 6px" title="Eliminar este término">✕</button></td>
+            </tr>`).join('')}</tbody>
+          </table></div>`;
+
+        // Eliminar término individual
+        contTerminos.querySelectorAll('.btn-del-termino').forEach(btn=>{
+          btn.addEventListener('click', async()=>{
+            if(!confirm(`¿Eliminar todas las búsquedas de "${btn.dataset.termino}"?`)) return;
+            btn.disabled=true; btn.textContent='...';
+            const ids=btn.dataset.ids.split(',').filter(Boolean);
+            await Promise.all(ids.map(id=>deleteDoc(doc(db,'eventos',id)).catch(()=>{})));
+            cargarMetricas();
+          });
+        });
+
+        // Limpiar todo
+        document.getElementById('btn-limpiar-busquedas').addEventListener('click', async()=>{
+          if(!confirm('¿Eliminar TODAS las búsquedas registradas? Esta acción no se puede deshacer.')) return;
+          const allIds=topTerminos.flatMap(([,data])=>data.ids);
+          const btn=document.getElementById('btn-limpiar-busquedas');
+          btn.disabled=true; btn.textContent='Eliminando...';
+          await Promise.all(allIds.map(id=>deleteDoc(doc(db,'eventos',id)).catch(()=>{})));
+          cargarMetricas();
+        });
+      }
+    }
   }catch(e){ console.log('Métricas error:',e); cont.innerHTML='<div class="empty-state"><div class="icon">⚠️</div><p>Error al cargar métricas</p></div>'; }
 }
 
@@ -2531,7 +2646,7 @@ document.getElementById('btn-guardar-cfg').addEventListener('click', async()=>{
     }
     document.getElementById('dd-nombre').textContent=nombre;
     document.getElementById('dd-barrio').textContent=barrio?`📍 ${barrio}${area?' · Sector '+area:''}`:'' ;
-    document.getElementById('header-barrio-label').textContent=barrio||'Barrios privados';
+    document.getElementById('header-barrio-label').textContent='Proveedores de confianza';
     const av=document.getElementById('user-avatar');
     if(!currentUser?.photoURL) av.textContent=nombre[0].toUpperCase();
     okEl.style.display='block';
