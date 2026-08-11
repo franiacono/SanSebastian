@@ -1582,7 +1582,16 @@ chipRow.querySelectorAll('.chip').forEach(btn=>{
 });
 
 document.getElementById('btn-limpiar-filtros').addEventListener('click', limpiarFiltros);
-document.getElementById('search-input').addEventListener('input', ()=>renderResults());
+let searchDebounceTimer = null;
+document.getElementById('search-input').addEventListener('input', ()=>{
+  renderResults();
+  // Trackear búsqueda con debounce de 500ms, mínimo 3 caracteres
+  clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(()=>{
+    const q = document.getElementById('search-input').value.trim();
+    if(q.length >= 3) trackBusqueda(q);
+  }, 500);
+});
 document.getElementById('cat-select').addEventListener('change',  ()=>renderResults());
 document.getElementById('barrio-filter-select').addEventListener('change', ()=>renderResults());
 document.getElementById('sort-select').addEventListener('change',  ()=>renderResults());
@@ -1767,6 +1776,18 @@ function pasoCooldown(clave){
     return true;
   }catch(e){ return true; } // si localStorage falla, no bloqueamos el tracking
 }
+async function trackBusqueda(termino){
+  try{
+    addDoc(collection(db,'eventos'),{
+      tipo:'busqueda',
+      termino:termino.toLowerCase().trim(),
+      uid:currentUser?.uid||'anon',
+      userName:perfilUsuario?.nombre||currentUser?.email||'',
+      fecha:serverTimestamp()
+    }).catch(()=>{});
+  }catch(e){}
+}
+
 async function trackEvento(tipo, proveedorId, proveedorNombre, proveedorEmpresa){
   if(!proveedorId) return;
   const uid = currentUser?.uid || 'anon';
@@ -1985,6 +2006,8 @@ async function cargarMetricas(){
     // Clicks de contacto (llamada+whatsapp) y compartir, desde eventos
     const clicksContacto = {dia:0,semana:0,mes:0,anio:0,total:0};
     const clicksCompartir = {dia:0,semana:0,mes:0,anio:0,total:0};
+    const busquedas = {dia:0,semana:0,mes:0,anio:0,total:0};
+    const terminosMap = {}; // para ranking de términos
     const snapEv = await getDocs(collection(db,'eventos'));
     snapEv.forEach(d=>{
       const e = d.data();
@@ -1993,14 +2016,29 @@ async function cargarMetricas(){
       const c = contarDesde(f);
       if(e.tipo==='llamada'||e.tipo==='whatsapp'){ sumar(clicksContacto,c); clicksContacto.total++; }
       if(e.tipo==='compartir'){ sumar(clicksCompartir,c); clicksCompartir.total++; }
+      if(e.tipo==='busqueda' && e.termino){
+        sumar(busquedas,c); busquedas.total++;
+        terminosMap[e.termino]=(terminosMap[e.termino]||0)+1;
+      }
     });
 
     const filas = [
       {label:'👥 Usuarios nuevos', d:usuariosNuevos},
       {label:'📋 Proveedores nuevos', d:proveedoresNuevos},
+      {label:'🔍 Búsquedas realizadas', d:busquedas},
       {label:'📞 Clicks contactar', d:clicksContacto},
       {label:'🔗 Clicks compartir', d:clicksCompartir},
     ];
+
+    // Top términos buscados
+    const topTerminos = Object.entries(terminosMap)
+      .sort((a,b)=>b[1]-a[1]).slice(0,15);
+    const terminosHtml = topTerminos.length
+      ? `<div style="margin-top:20px">
+          <div style="font-size:.85rem;font-weight:600;color:var(--azul);margin-bottom:10px">🔍 Términos más buscados</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">${topTerminos.map(([t,n])=>`<span style="background:var(--azul-claro);color:var(--azul);border:1px solid var(--azul-mid);border-radius:20px;padding:4px 12px;font-size:.8rem"><strong>${esc(t)}</strong> <span style="color:var(--muted)">${n}</span></span>`).join('')}</div>
+        </div>`
+      : '';
     cont.innerHTML = `<div style="overflow-x:auto"><table class="tabla-metricas">
       <thead><tr>${['Métrica','Hoy','Semana','Mes','Año','Total'].map(h=>`<th>${h}</th>`).join('')}</tr></thead>
       <tbody>${filas.map(f=>`<tr>
@@ -2011,7 +2049,7 @@ async function cargarMetricas(){
         <td class="num">${f.d.anio}</td>
         <td class="total">${f.d.total}</td>
       </tr>`).join('')}</tbody>
-    </table></div>`;
+    </table></div>${terminosHtml}`;
   }catch(e){ console.log('Métricas error:',e); cont.innerHTML='<div class="empty-state"><div class="icon">⚠️</div><p>Error al cargar métricas</p></div>'; }
 }
 
