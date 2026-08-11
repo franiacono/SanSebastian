@@ -749,6 +749,10 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
             <div style="font-size:.85rem;font-weight:600;color:var(--azul);margin-bottom:10px">👤 Usuarios más activos</div>
             <div id="ranking-usuarios-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
           </div>
+          <div style="margin-top:24px">
+            <div style="font-size:.85rem;font-weight:600;color:var(--azul);margin-bottom:10px">🔍 Términos más buscados</div>
+            <div id="ranking-busquedas-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
+          </div>
         </div>
       </div>
     </div>
@@ -1585,12 +1589,12 @@ document.getElementById('btn-limpiar-filtros').addEventListener('click', limpiar
 let searchDebounceTimer = null;
 document.getElementById('search-input').addEventListener('input', ()=>{
   renderResults();
-  // Trackear búsqueda con debounce de 500ms, mínimo 3 caracteres
+  // Trackear búsqueda con debounce de 2 segundos para capturar términos completos
   clearTimeout(searchDebounceTimer);
   searchDebounceTimer = setTimeout(()=>{
     const q = document.getElementById('search-input').value.trim();
     if(q.length >= 3) trackBusqueda(q);
-  }, 500);
+  }, 2000);
 });
 document.getElementById('cat-select').addEventListener('change',  ()=>renderResults());
 document.getElementById('barrio-filter-select').addEventListener('change', ()=>renderResults());
@@ -2033,12 +2037,6 @@ async function cargarMetricas(){
     // Top términos buscados
     const topTerminos = Object.entries(terminosMap)
       .sort((a,b)=>b[1]-a[1]).slice(0,15);
-    const terminosHtml = topTerminos.length
-      ? `<div style="margin-top:20px">
-          <div style="font-size:.85rem;font-weight:600;color:var(--azul);margin-bottom:10px">🔍 Términos más buscados</div>
-          <div style="display:flex;flex-wrap:wrap;gap:8px">${topTerminos.map(([t,n])=>`<span style="background:var(--azul-claro);color:var(--azul);border:1px solid var(--azul-mid);border-radius:20px;padding:4px 12px;font-size:.8rem"><strong>${esc(t)}</strong> <span style="color:var(--muted)">${n}</span></span>`).join('')}</div>
-        </div>`
-      : '';
     cont.innerHTML = `<div style="overflow-x:auto"><table class="tabla-metricas">
       <thead><tr>${['Métrica','Hoy','Semana','Mes','Año','Total'].map(h=>`<th>${h}</th>`).join('')}</tr></thead>
       <tbody>${filas.map(f=>`<tr>
@@ -2049,7 +2047,24 @@ async function cargarMetricas(){
         <td class="num">${f.d.anio}</td>
         <td class="total">${f.d.total}</td>
       </tr>`).join('')}</tbody>
-    </table></div>${terminosHtml}`;
+    </table></div>`;
+
+    // Ranking de términos en su propio contenedor
+    const contTerminos = document.getElementById('ranking-busquedas-container');
+    if(contTerminos){
+      if(!topTerminos.length){
+        contTerminos.innerHTML='<div class="empty-state" style="padding:16px"><p>Sin búsquedas registradas aún</p></div>';
+      } else {
+        contTerminos.innerHTML=`<div style="overflow-x:auto"><table class="tabla-metricas">
+          <thead><tr><th>#</th><th>Término buscado</th><th style="text-align:center">Búsquedas</th></tr></thead>
+          <tbody>${topTerminos.map(([t,n],i)=>`<tr>
+            <td style="font-weight:600;color:var(--muted)">${i+1}</td>
+            <td style="font-weight:500">${esc(t)}</td>
+            <td class="total">${n}</td>
+          </tr>`).join('')}</tbody>
+        </table></div>`;
+      }
+    }
   }catch(e){ console.log('Métricas error:',e); cont.innerHTML='<div class="empty-state"><div class="icon">⚠️</div><p>Error al cargar métricas</p></div>'; }
 }
 
