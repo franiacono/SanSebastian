@@ -524,7 +524,7 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
     <div class="header-inner">
       <div class="header-brand">
         <div class="header-logo">EV</div>
-        <div class="header-title">EntreVecinos<span id="header-barrio-label">Barrios privados</span></div>
+        <div class="header-title">EntreVecinos<span id="header-barrio-label">Proveedores de confianza</span></div>
       </div>
       <nav class="header-nav">
         <button class="nav-btn active" id="nav-buscar">🔍 <span class="label">Buscar</span></button>
@@ -1401,7 +1401,7 @@ function entrarALaApp() {
   document.getElementById('dd-nombre').textContent  = perfilUsuario?.nombre||'Sin nombre';
   document.getElementById('dd-email').textContent   = currentUser?.email||'';
   document.getElementById('dd-barrio').textContent  = perfilUsuario?.barrio ? `📍 ${perfilUsuario.barrio}${perfilUsuario.area?' · Sector '+perfilUsuario.area:''}` : '';
-  document.getElementById('header-barrio-label').textContent = perfilUsuario?.barrio || 'Barrios privados';
+  document.getElementById('header-barrio-label').textContent = 'Proveedores de confianza';
   if(isAdmin()){
     document.getElementById('nav-admin').style.display='inline-flex';
     document.getElementById('nav-mensajes').style.display='inline-flex';
@@ -2584,7 +2584,7 @@ document.getElementById('btn-guardar-cfg').addEventListener('click', async()=>{
     }
     document.getElementById('dd-nombre').textContent=nombre;
     document.getElementById('dd-barrio').textContent=barrio?`📍 ${barrio}${area?' · Sector '+area:''}`:'' ;
-    document.getElementById('header-barrio-label').textContent=barrio||'Barrios privados';
+    document.getElementById('header-barrio-label').textContent='Proveedores de confianza';
     const av=document.getElementById('user-avatar');
     if(!currentUser?.photoURL) av.textContent=nombre[0].toUpperCase();
     okEl.style.display='block';
