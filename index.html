@@ -2022,7 +2022,9 @@ async function cargarMetricas(){
       if(e.tipo==='compartir'){ sumar(clicksCompartir,c); clicksCompartir.total++; }
       if(e.tipo==='busqueda' && e.termino){
         sumar(busquedas,c); busquedas.total++;
-        terminosMap[e.termino]=(terminosMap[e.termino]||0)+1;
+        if(!terminosMap[e.termino]) terminosMap[e.termino]={count:0,ids:[]};
+        terminosMap[e.termino].count++;
+        terminosMap[e.termino].ids.push(d.id);
       }
     });
 
@@ -2036,7 +2038,7 @@ async function cargarMetricas(){
 
     // Top términos buscados
     const topTerminos = Object.entries(terminosMap)
-      .sort((a,b)=>b[1]-a[1]).slice(0,15);
+      .sort((a,b)=>b[1].count-a[1].count).slice(0,50);
     cont.innerHTML = `<div style="overflow-x:auto"><table class="tabla-metricas">
       <thead><tr>${['Métrica','Hoy','Semana','Mes','Año','Total'].map(h=>`<th>${h}</th>`).join('')}</tr></thead>
       <tbody>${filas.map(f=>`<tr>
@@ -2055,14 +2057,40 @@ async function cargarMetricas(){
       if(!topTerminos.length){
         contTerminos.innerHTML='<div class="empty-state" style="padding:16px"><p>Sin búsquedas registradas aún</p></div>';
       } else {
-        contTerminos.innerHTML=`<div style="overflow-x:auto"><table class="tabla-metricas">
-          <thead><tr><th>#</th><th>Término buscado</th><th style="text-align:center">Búsquedas</th></tr></thead>
-          <tbody>${topTerminos.map(([t,n],i)=>`<tr>
-            <td style="font-weight:600;color:var(--muted)">${i+1}</td>
-            <td style="font-weight:500">${esc(t)}</td>
-            <td class="total">${n}</td>
-          </tr>`).join('')}</tbody>
-        </table></div>`;
+        contTerminos.innerHTML=`
+          <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+            <button id="btn-limpiar-busquedas" style="padding:6px 14px;background:white;color:var(--rojo);border:1.5px solid var(--rojo);border-radius:8px;font-size:.78rem;font-family:'Inter',sans-serif;cursor:pointer;font-weight:500">🗑️ Limpiar todo</button>
+          </div>
+          <div style="overflow-x:auto"><table class="tabla-metricas">
+            <thead><tr><th>#</th><th>Término buscado</th><th style="text-align:center">Búsquedas</th><th></th></tr></thead>
+            <tbody>${topTerminos.map(([t,data],i)=>`<tr data-termino="${esc(t)}" data-ids="${data.ids.join(',')}">
+              <td style="font-weight:600;color:var(--muted)">${i+1}</td>
+              <td style="font-weight:500">${esc(t)}</td>
+              <td class="total">${data.count}</td>
+              <td style="text-align:center"><button class="btn-del-termino" data-termino="${esc(t)}" data-ids="${data.ids.join(',')}" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:.85rem;padding:2px 6px" title="Eliminar este término">✕</button></td>
+            </tr>`).join('')}</tbody>
+          </table></div>`;
+
+        // Eliminar término individual
+        contTerminos.querySelectorAll('.btn-del-termino').forEach(btn=>{
+          btn.addEventListener('click', async()=>{
+            if(!confirm(`¿Eliminar todas las búsquedas de "${btn.dataset.termino}"?`)) return;
+            btn.disabled=true; btn.textContent='...';
+            const ids=btn.dataset.ids.split(',').filter(Boolean);
+            await Promise.all(ids.map(id=>deleteDoc(doc(db,'eventos',id)).catch(()=>{})));
+            cargarMetricas();
+          });
+        });
+
+        // Limpiar todo
+        document.getElementById('btn-limpiar-busquedas').addEventListener('click', async()=>{
+          if(!confirm('¿Eliminar TODAS las búsquedas registradas? Esta acción no se puede deshacer.')) return;
+          const allIds=topTerminos.flatMap(([,data])=>data.ids);
+          const btn=document.getElementById('btn-limpiar-busquedas');
+          btn.disabled=true; btn.textContent='Eliminando...';
+          await Promise.all(allIds.map(id=>deleteDoc(doc(db,'eventos',id)).catch(()=>{})));
+          cargarMetricas();
+        });
       }
     }
   }catch(e){ console.log('Métricas error:',e); cont.innerHTML='<div class="empty-state"><div class="icon">⚠️</div><p>Error al cargar métricas</p></div>'; }
