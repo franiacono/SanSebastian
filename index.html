@@ -1426,9 +1426,19 @@ function entrarALaApp() {
   setTimeout(()=>pedirPermisoNotificaciones(currentUser?.uid), 3000);
   // Badge consultas
   if(!isAdmin()) setTimeout(()=>cargarMisConsultas(), 1500);
+  // Auto-refresh admin
+  if(isAdmin()) iniciarAdminRefresh();
   // Actualizar último acceso
   updateDoc(doc(db,'usuarios',currentUser.uid), {ultimoAcceso:serverTimestamp()}).catch(()=>{});
-  document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') cargarProveedores(); });
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible'){
+      cargarProveedores();
+      if(isAdmin() && document.getElementById('page-admin')?.classList.contains('active')){
+        cargarEstadisticasAdmin();
+        cargarPendientes();
+      }
+    }
+  });
 }
 
 function gaEvent(name, params){ try{window.gtag&&gtag('event',name,params);}catch(e){} }
@@ -1473,7 +1483,24 @@ document.getElementById('nav-recomendar').addEventListener('click',()=>{
   resetFormRecomendar();
 });
 document.getElementById('nav-consultas').addEventListener('click', ()=>showPage('consultas'));
-document.getElementById('nav-admin').addEventListener('click',     ()=>showPage('admin'));
+document.getElementById('nav-admin').addEventListener('click', ()=>{
+  showPage('admin');
+  // Recargar stats al entrar al panel
+  cargarEstadisticasAdmin();
+  cargarPendientes();
+});
+
+// Auto-refresh de stats del admin cada 60 segundos mientras está en la pestaña admin
+let adminRefreshInterval = null;
+function iniciarAdminRefresh(){
+  if(adminRefreshInterval) clearInterval(adminRefreshInterval);
+  adminRefreshInterval = setInterval(()=>{
+    const paginaAdmin = document.getElementById('page-admin');
+    if(paginaAdmin?.classList.contains('active')){
+      cargarEstadisticasAdmin();
+    }
+  }, 60000);
+}
 document.getElementById('nav-mensajes').addEventListener('click',  ()=>showPage('mensajes'));
 document.getElementById('nav-ayuda').addEventListener('click',     ()=>showPage('ayuda'));
 
