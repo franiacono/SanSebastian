@@ -2222,9 +2222,9 @@ async function cargarMetricas(){
       {label:'🔗 Clicks compartir', d:clicksCompartir},
     ];
 
-    // Top términos buscados
+    // Top términos buscados (todos, sin límite)
     const topTerminos = Object.entries(terminosMap)
-      .sort((a,b)=>b[1].count-a[1].count).slice(0,50);
+      .sort((a,b)=>b[1].count-a[1].count);
     cont.innerHTML = `<div style="overflow-x:auto"><table class="tabla-metricas">
       <thead><tr>${['Métrica','Hoy','Semana','Mes','Año','Total'].map(h=>`<th>${h}</th>`).join('')}</tr></thead>
       <tbody>${filas.map(f=>`<tr>
@@ -2243,18 +2243,53 @@ async function cargarMetricas(){
       if(!topTerminos.length){
         contTerminos.innerHTML='<div class="empty-state" style="padding:16px"><p>Sin búsquedas registradas aún</p></div>';
       } else {
+        // Detectar términos sin proveedores que los cubran
+        const sinProv = topTerminos.filter(([t])=>{
+          const tn=norm(t);
+          return !(proveedores||[]).some(p=>
+            norm(p.nombre||'').includes(tn)||
+            norm(p.servicio||'').includes(tn)||
+            norm(p.empresa||'').includes(tn)||
+            (p.categorias||[]).some(c=>norm(c).includes(tn))
+          );
+        });
+
+        // Mensajes para compartir
+        const top10 = topTerminos.slice(0,10);
+        const msgTopTerminos = '🔍 Lo más buscado en EntreVecinos:\n' +
+          top10.map(([t,d],i)=>`${i+1}. ${t} (${d.count} búsqueda${d.count!==1?'s':''})`).join('\n') +
+          '\n\n¿Conocés algún proveedor? Cargalo en entrevecinos.ar 🏘️';
+        const msgGaps = sinProv.length
+          ? '⚠️ Hay vecinos buscando estos servicios en EntreVecinos sin encontrar proveedores:\n' +
+            sinProv.slice(0,10).map(([t,d])=>`• ${t} (${d.count} búsqueda${d.count!==1?'s':''})`).join('\n') +
+            '\n\nSi tenés el dato de alguien, ¡cargalo en entrevecinos.ar! 🙌'
+          : '';
+
         contTerminos.innerHTML=`
-          <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
             <button id="btn-limpiar-busquedas" style="padding:6px 14px;background:white;color:var(--rojo);border:1.5px solid var(--rojo);border-radius:8px;font-size:.78rem;font-family:'Inter',sans-serif;cursor:pointer;font-weight:500">🗑️ Limpiar todo</button>
+            <button id="btn-compartir-top" style="padding:6px 14px;background:var(--azul-claro);color:var(--azul);border:1.5px solid var(--azul-mid);border-radius:8px;font-size:.78rem;font-family:'Inter',sans-serif;cursor:pointer;font-weight:500">📤 Compartir top 10</button>
+            ${sinProv.length?`<button id="btn-toggle-gaps" style="padding:6px 14px;background:#fffbeb;color:var(--naranja);border:1.5px solid var(--naranja);border-radius:8px;font-size:.78rem;font-family:'Inter',sans-serif;cursor:pointer;font-weight:500">⚠️ ${sinProv.length} sin proveedores</button>`:''}
+            <span style="color:var(--muted);font-size:.78rem;margin-left:auto">${topTerminos.length} términos</span>
           </div>
+          ${sinProv.length?`<div id="gaps-panel" style="display:none;background:#fffbeb;border:1.5px solid var(--naranja);border-radius:10px;padding:14px;margin-bottom:12px">
+            <div style="font-size:.82rem;font-weight:600;color:var(--naranja);margin-bottom:8px">⚠️ Búsquedas sin proveedores — podés reclutar en el grupo</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
+              ${sinProv.map(([t,d])=>`<span style="background:white;border:1px solid var(--naranja);padding:4px 10px;border-radius:20px;font-size:.8rem">${esc(t)} <b style="color:var(--naranja)">${d.count}</b></span>`).join('')}
+            </div>
+            <button id="btn-copiar-gaps" style="padding:6px 14px;background:var(--naranja);color:white;border:none;border-radius:8px;font-size:.78rem;font-family:'Inter',sans-serif;cursor:pointer;font-weight:500">📋 Copiar mensaje para el grupo</button>
+          </div>`:''}
           <div style="overflow-x:auto"><table class="tabla-metricas">
             <thead><tr><th>#</th><th>Término buscado</th><th style="text-align:center">Búsquedas</th><th></th></tr></thead>
-            <tbody>${topTerminos.map(([t,data],i)=>`<tr data-termino="${esc(t)}" data-ids="${data.ids.join(',')}">
-              <td style="font-weight:600;color:var(--muted)">${i+1}</td>
-              <td style="font-weight:500">${esc(t)}</td>
-              <td class="total">${data.count}</td>
-              <td style="text-align:center"><button class="btn-del-termino" data-termino="${esc(t)}" data-ids="${data.ids.join(',')}" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:.85rem;padding:2px 6px" title="Eliminar este término">✕</button></td>
-            </tr>`).join('')}</tbody>
+            <tbody>${topTerminos.map(([t,data],i)=>{
+              const sinP=sinProv.some(([st])=>st===t);
+              return `<tr>
+                <td style="font-weight:600;color:var(--muted)">${i+1}</td>
+                <td style="font-weight:500">${esc(t)}${sinP?' <span title="Sin proveedores que cubran esta búsqueda" style="color:var(--naranja)">⚠️</span>':''}</td>
+                <td class="total">${data.count}</td>
+                <td style="text-align:center"><button class="btn-del-termino" data-termino="${esc(t)}" data-ids="${data.ids.join(',')}" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:.85rem;padding:2px 6px" title="Eliminar este término">✕</button></td>
+              </tr>`;
+            }).join('')}</tbody>
           </table></div>`;
 
         // Eliminar término individual
@@ -2277,6 +2312,30 @@ async function cargarMetricas(){
           await Promise.all(allIds.map(id=>deleteDoc(doc(db,'eventos',id)).catch(()=>{})));
           cargarMetricas();
         });
+
+        // Compartir top 10
+        document.getElementById('btn-compartir-top').addEventListener('click',()=>{
+          navigator.clipboard.writeText(msgTopTerminos).then(()=>{
+            const b=document.getElementById('btn-compartir-top');
+            const orig=b.textContent; b.textContent='✅ Copiado!';
+            setTimeout(()=>b.textContent=orig,2000);
+          });
+        });
+
+        // Panel de gaps
+        if(sinProv.length){
+          document.getElementById('btn-toggle-gaps').addEventListener('click',()=>{
+            const p=document.getElementById('gaps-panel');
+            p.style.display=p.style.display==='none'?'block':'none';
+          });
+          document.getElementById('btn-copiar-gaps').addEventListener('click',()=>{
+            navigator.clipboard.writeText(msgGaps).then(()=>{
+              const b=document.getElementById('btn-copiar-gaps');
+              const orig=b.textContent; b.textContent='✅ Copiado!';
+              setTimeout(()=>b.textContent=orig,2000);
+            });
+          });
+        }
       }
     }
   }catch(e){ console.log('Métricas error:',e); cont.innerHTML='<div class="empty-state"><div class="icon">⚠️</div><p>Error al cargar métricas</p></div>'; }
