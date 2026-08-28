@@ -272,6 +272,17 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
 .admin-tabs::-webkit-scrollbar{display:none}
 .admin-tab{flex:0 0 auto;padding:8px 12px;border:none;background:transparent;border-radius:8px;font-size:.82rem;font-family:'Inter',sans-serif;cursor:pointer;color:var(--muted);font-weight:500;transition:all .2s;white-space:nowrap}
 .admin-tab.active{background:white;color:var(--azul);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.recateg-row{background:white;border:1.5px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.recateg-row.diff{border-color:var(--naranja);background:#fffbeb}
+.recateg-row.ok{border-color:#86efac;background:#f0fdf4}
+.recateg-nombre{font-weight:600;font-size:.9rem;color:var(--text)}
+.recateg-serv{font-size:.8rem;color:var(--muted);margin-left:6px}
+.chip-sug{background:var(--naranja)!important;color:white!important;border-color:var(--naranja)!important;cursor:default!important}
+.chip-actual{background:var(--azul)!important;color:white!important;border-color:var(--azul)!important;cursor:default!important}
+.btn-recateg{padding:6px 12px;border-radius:8px;border:none;font-size:.78rem;font-family:'Inter',sans-serif;cursor:pointer;font-weight:500;transition:opacity .15s}
+.btn-recateg.aplicar{background:var(--verde-ok);color:white}
+.btn-recateg.editar{background:var(--azul-claro);color:var(--azul);border:1px solid var(--azul-mid)}
+.btn-recateg.guardar{background:var(--azul);color:white}
 
 /* ── MENSAJES/CHAT ── */
 .chat-thread{background:white;border:1.5px solid var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden}
@@ -718,6 +729,7 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
           <button class="admin-tab" data-atab="proveedores">Proveedores</button>
           <button class="admin-tab" data-atab="usuarios">Usuarios</button>
           <button class="admin-tab" data-atab="estadisticas">📊 Estadísticas</button>
+          <button class="admin-tab" data-atab="recategorizar">🏷️ Rubros</button>
         </div>
         <div id="admin-tab-pendientes"><div id="pendientes-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div></div>
         <div id="admin-tab-recientes" style="display:none"><div id="aprobados-container"></div></div>
@@ -753,6 +765,14 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
             <div style="font-size:.85rem;font-weight:600;color:var(--azul);margin-bottom:10px">🔍 Términos más buscados</div>
             <div id="ranking-busquedas-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
           </div>
+        </div>
+        <div id="admin-tab-recategorizar" style="display:none">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+            <button class="btn-submit" id="btn-cargar-recateg" style="padding:10px 18px">🔄 Cargar proveedores</button>
+            <button class="btn-submit" id="btn-aplicar-todos-recateg" style="display:none;background:var(--verde-ok);padding:10px 18px">✅ Aplicar todos los cambios sugeridos</button>
+            <span id="recateg-resumen" style="font-size:.83rem;color:var(--muted)"></span>
+          </div>
+          <div id="recateg-container"><p style="color:var(--muted);font-size:.85rem">Presioná "Cargar proveedores" para ver todos los rubros asignados y las sugerencias del nuevo algoritmo.</p></div>
         </div>
       </div>
     </div>
@@ -1067,31 +1087,35 @@ const BARRIOS_CONFIG = [
 
 // ── CATEGORÍAS ───────────────────────────────────────────────────────────────
 const CATS = [
-  {emoji:'🔧',label:'Plomería',keys:['plomer','cañer','sanitari','desag','cloak','grifo','canilla']},
-  {emoji:'⚡',label:'Electricidad',keys:['electr','enchufe','tablero','instalac electric','luminaria']},
-  {emoji:'🏗️',label:'Construcción',keys:['albañil','construct','obra','refacci','remodel','mampost','hormigon','demolic','zanja','cerco','reja','herreria']},
+  {emoji:'🔧',label:'Plomería',keys:['plomer','cañer','sanitari','desag','destap','desatascad','cloak','grifo','canilla','calefon','termocalefon','bomba agua']},
+  {emoji:'⚡',label:'Electricidad',keys:['electr','enchufe','tablero','instalac electric','luminaria','automatiz','domotica','generador','electrodom']},
+  {emoji:'🏗️',label:'Construcción',keys:['albañil','construct','obra','refacci','remodel','mampost','hormigon','demolic','zanja','cerco','piso','ceramica','porcelanat','techo','cubierta','zingueria','canaleta','revestim']},
   {emoji:'🎨',label:'Pintura',keys:['pintor','empapel','revoque','estuco','membrana','impermeabil']},
-  {emoji:'🪟',label:'Carpintería',keys:['carpint','placard','aberturas','marcos','deck','pergola','revestim madera']},
+  {emoji:'🪟',label:'Carpintería',keys:['carpint','placard','aberturas','marcos','deck','pergola','revestim madera','aluminio']},
   {emoji:'🛋️',label:'Muebles',keys:['mueble','amoblam','cocina integr','fitted','placard medida','tapiceria','sillon','colchon']},
-  {emoji:'❄️',label:'Climatización',keys:['aire acondic','split','calefac','caldera','termot','gasfiter','radiador','losa radiante']},
-  {emoji:'🔥',label:'Gas',keys:['gas','garrafa','plomero gas','habilitacion gas','instalac gas']},
-  {emoji:'🏡',label:'Jardinería',keys:['jardin','pasto','poda','cesped','paisaj','plant','riego','arbol','desmalezado']},
-  {emoji:'🧹',label:'Limpieza',keys:['limpiez','aseo','domest','mucam','lavad','planchad','limpieza alfombra','limpieza colchon','lavado tapiz']},
-  {emoji:'🔒',label:'Seguridad',keys:['alarma','segur','camara','cerradu','cerraj','cctv','portero','intercomunicad']},
+  {emoji:'❄️',label:'Climatización',keys:['aire acondic','split','calefac','caldera','termot','radiador','losa radiante','ventilac']},
+  {emoji:'🔥',label:'Gas',keys:['gasist','gasfiter','garrafa','instalac gas','habilitac gas','plomero gas','service gas','conexion gas']},
+  {emoji:'🏡',label:'Jardinería',keys:['jardinero','jardineria','pasto','poda','cesped','paisaj','plant','riego','arbol','desmalezado','corte pasto','parque']},
+  {emoji:'🧹',label:'Limpieza',keys:['limpiez','aseo','domest','mucam','lavad','planchad','limpieza alfombra','limpieza colchon','lavado tapiz','hidrolavad','desinfec']},
+  {emoji:'🔒',label:'Seguridad',keys:['alarma','camara','cerradu','cerraj','cctv','portero electr','intercomunicad','control de acceso','monitoreo','seguridad']},
   {emoji:'🖥️',label:'Tecnología',keys:['tecno','comput','notebook','celular','internet','wifi','red inform','soporte tecn','programac','software']},
-  {emoji:'🚗',label:'Automotor',keys:['mecanic','taller mecan','chapa y pintura','gomeria','neumat','service auto','lavado auto','detailing','car wash']},
-  {emoji:'🐾',label:'Mascotas',keys:['mascot','perro','gato','veterin','paseador','peluquer canina','pet shop']},
-  {emoji:'🍕',label:'Gastronomía',keys:['comida','pizza','empanada','catering','chef','delivery','resto','vianda','pasteleria','panaderia']},
-  {emoji:'💆',label:'Bienestar',keys:['masaje','yoga','pilates','nutric','psicolog','kinesiol','reiki','meditac','terapeuta']},
-  {emoji:'📚',label:'Educación',keys:['clases','profesor','tutor','ingles','matem','apoyo escolar','idioma']},
-  {emoji:'🏊',label:'Pileta',keys:['pileta','piscina','pool','nataci','mantenimiento pileta']},
+  {emoji:'🚗',label:'Automotor',keys:['mecanic','taller mecan','chapa y pintura','gomeria','neumat','service auto','lavado auto','detailing','car wash','grua']},
+  {emoji:'🐾',label:'Mascotas',keys:['mascot','perro','gato','veterin','paseador','peluquer canin','pet shop','adiestr','guarderia canin']},
+  {emoji:'🍕',label:'Gastronomía',keys:['gastrono','comida','pizza','empanada','catering','chef','delivery','resto','vianda','pasteleria','panaderia','reposter','sushi','helad','food truck']},
+  {emoji:'💆',label:'Bienestar',keys:['masaje','yoga','pilates','nutric','psicolog','kinesiol','reiki','meditac','terapeuta','coaching','personal trainer','entrena','acupunt','odontolog']},
+  {emoji:'📚',label:'Educación',keys:['clases','profesor','tutor','ingles','matem','apoyo escolar','idioma','musica','piano','guitarra','dibujo','docente','nivel inicial','preescolar']},
+  {emoji:'🏊',label:'Pileta',keys:['pileta','piscina','pool','nataci','mantenimiento pileta','construccion pileta']},
   {emoji:'✈️',label:'Turismo',keys:['viaje','turismo','agencia de viaje','disney','universal','hotel','paquete turistico']},
+  {emoji:'🔨',label:'Herrería',keys:['herrero','herreria','soldad','metalurg','rejas','portones','estructura metal','chapa metal']},
+  {emoji:'🌿',label:'Fumigación',keys:['fumig','plaga','cucarach','hormiga','ratones','mosquit','control de plaga','desinfest']},
+  {emoji:'🚛',label:'Mudanzas',keys:['mudanz','flete','acarreo','camion de carga','traslado de mueble']},
   {emoji:'📦',label:'Varios',keys:[]},
 ];
 
 const norm = t => { if(!t)return ''; return String(t).toLowerCase().trim().replace(/á/g,'a').replace(/é/g,'e').replace(/í/g,'i').replace(/ó/g,'o').replace(/ú/g,'u').replace(/ü/g,'u'); };
 const esc  = t => { if(!t)return ''; return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); };
-const catDe = srv => { const s=norm(srv); const c=CATS.find(c=>c.keys.some(k=>s.includes(k))); return c?c.label:'Varios'; };
+const catsOf = srv => { const s=norm(srv); if(!s) return ['Varios']; const m=CATS.filter(c=>c.keys.length&&c.keys.some(k=>s.includes(k))).map(c=>c.label); return m.length?m:['Varios']; };
+const catDe  = srv => catsOf(srv)[0];
 const normBarrio = b => { const n=norm(b); if(n==='si'||n==='sí'||n==='s')return 'Sí'; if(n==='no')return 'No'; return b; };
 const slugify = t => norm(t).replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 const fmtFecha = iso => { if(!iso)return ''; try{ const d=new Date(iso); return d.toLocaleDateString('es-AR',{day:'numeric',month:'short',year:'numeric'}); }catch(e){return '';} };
@@ -1549,7 +1573,7 @@ function procesarDatos(filas){
   });
   proveedores=Object.values(mapa).map(p=>({
     ...p, score:p.destacado?{promedio:5,total:0,etiqueta:'Destacado',estrellas:5}:calcScore(p.resenas),
-    categorias: p.categorias?.length ? p.categorias : [catDe(p.servicio)],
+    categorias: p.categorias?.length ? p.categorias : catsOf(p.servicio),
   }));
   poblarRubros();
 }
@@ -1996,11 +2020,139 @@ document.querySelectorAll('.admin-tab[data-atab]').forEach(tab=>{
     document.getElementById('admin-tab-proveedores').style.display=tab.dataset.atab==='proveedores'?'block':'none';
     document.getElementById('admin-tab-usuarios').style.display=tab.dataset.atab==='usuarios'?'block':'none';
     document.getElementById('admin-tab-estadisticas').style.display=tab.dataset.atab==='estadisticas'?'block':'none';
+    document.getElementById('admin-tab-recategorizar').style.display=tab.dataset.atab==='recategorizar'?'block':'none';
     if(tab.dataset.atab==='pendientes'||tab.dataset.atab==='recientes') cargarPendientes();
     if(tab.dataset.atab==='usuarios') buscarUsuariosAdmin();
     if(tab.dataset.atab==='proveedores') buscarProveedoresAdmin();
     if(tab.dataset.atab==='estadisticas'){ cargarRanking('semana'); cargarRankingUsuarios('semana'); cargarMetricas(); }
   });
+});
+
+// ── RECATEGORIZAR RUBROS ──────────────────────────────────────────────────────
+let recategData = [];
+
+async function cargarRecategorizar() {
+  const cont = document.getElementById('recateg-container');
+  const resumen = document.getElementById('recateg-resumen');
+  const btnAll = document.getElementById('btn-aplicar-todos-recateg');
+  cont.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando...</div>';
+  resumen.textContent = '';
+  btnAll.style.display = 'none';
+  try {
+    const snap = await getDocs(collection(db, 'proveedores'));
+    const grupos = {};
+    snap.forEach(d => {
+      const p = d.data();
+      const tel = (p.telefono || '').replace(/\D/g, '').slice(-8);
+      const key = tel && tel.length >= 6 ? tel : d.id;
+      if (!grupos[key]) {
+        grupos[key] = { ids: [], nombre: p.nombre || '', servicio: p.servicio || '', categorias: p.categorias?.length ? [...p.categorias] : [] };
+      }
+      grupos[key].ids.push(d.id);
+      if (p.categorias?.length && !grupos[key].categorias.length) grupos[key].categorias = [...p.categorias];
+    });
+    recategData = Object.entries(grupos).map(([key, g]) => {
+      const sugeridas = catsOf(g.servicio);
+      const actual = g.categorias.length ? g.categorias : ['Varios'];
+      const igual = JSON.stringify([...actual].sort()) === JSON.stringify([...sugeridas].sort());
+      return { key, ...g, sugeridas, actual, igual, guardado: false };
+    });
+    recategData.sort((a, b) => (a.igual ? 1 : 0) - (b.igual ? 1 : 0));
+    const diferentes = recategData.filter(p => !p.igual).length;
+    resumen.textContent = `${recategData.length} proveedores · ${diferentes} con cambios sugeridos`;
+    if (diferentes > 0) btnAll.style.display = '';
+    renderRecategorizar();
+  } catch(e) {
+    cont.innerHTML = `<p style="color:var(--rojo)">Error: ${esc(e.message)}</p>`;
+  }
+}
+
+function renderRecategorizar() {
+  const cont = document.getElementById('recateg-container');
+  if (!recategData.length) { cont.innerHTML = '<p style="color:var(--muted);text-align:center;padding:20px">No hay proveedores.</p>'; return; }
+  cont.innerHTML = recategData.map((p, i) => `
+    <div class="recateg-row ${(p.igual || p.guardado) ? 'ok' : 'diff'}" id="recateg-row-${i}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
+        <div><span class="recateg-nombre">${esc(p.nombre)}</span><span class="recateg-serv">${esc(p.servicio)}</span></div>
+        <div style="display:flex;gap:6px;flex-shrink:0;align-items:center">
+          ${(p.igual || p.guardado)
+            ? '<span style="color:var(--verde-ok);font-size:.82rem;font-weight:600">✓ OK</span>'
+            : `<button class="btn-recateg aplicar" data-idx="${i}">✅ Aplicar</button>`}
+          <button class="btn-recateg editar" data-idx="${i}">✏️</button>
+        </div>
+      </div>
+      <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start">
+        <div>
+          <span style="font-size:.7rem;color:var(--muted);font-weight:600;display:block;margin-bottom:3px">ACTUAL</span>
+          <div style="display:flex;gap:4px;flex-wrap:wrap">${p.actual.map(c => `<span class="chip chip-actual" style="padding:3px 10px;font-size:.73rem">${c}</span>`).join('')}</div>
+        </div>
+        ${!(p.igual || p.guardado) ? `<div>
+          <span style="font-size:.7rem;color:var(--naranja);font-weight:600;display:block;margin-bottom:3px">SUGERIDO</span>
+          <div style="display:flex;gap:4px;flex-wrap:wrap">${p.sugeridas.map(c => `<span class="chip chip-sug" style="padding:3px 10px;font-size:.73rem">${c}</span>`).join('')}</div>
+        </div>` : ''}
+      </div>
+      <div id="recateg-edit-${i}" style="display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:12px">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:10px">
+          ${CATS.filter(c => c.label !== 'Varios').map(c => `
+            <label style="display:flex;align-items:center;gap:5px;font-size:.78rem;cursor:pointer;padding:3px 0">
+              <input type="checkbox" class="recateg-chk" data-cat="${c.label}" data-idx="${i}" ${p.actual.includes(c.label) ? 'checked' : ''}>
+              ${c.emoji} ${c.label}
+            </label>`).join('')}
+        </div>
+        <button class="btn-recateg guardar" data-idx="${i}">💾 Guardar selección</button>
+      </div>
+    </div>`).join('');
+
+  cont.querySelectorAll('.btn-recateg.aplicar').forEach(btn => {
+    btn.addEventListener('click', async () => await aplicarRecateg(+btn.dataset.idx, recategData[+btn.dataset.idx].sugeridas));
+  });
+  cont.querySelectorAll('.btn-recateg.editar').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const panel = document.getElementById(`recateg-edit-${btn.dataset.idx}`);
+      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    });
+  });
+  cont.querySelectorAll('.btn-recateg.guardar').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const i = +btn.dataset.idx;
+      const cats = [...cont.querySelectorAll(`.recateg-chk[data-idx="${i}"]:checked`)].map(c => c.dataset.cat);
+      await aplicarRecateg(i, cats.length ? cats : ['Varios']);
+    });
+  });
+}
+
+async function aplicarRecateg(idx, nuevasCats) {
+  const p = recategData[idx];
+  const row = document.getElementById(`recateg-row-${idx}`);
+  if (row) row.style.opacity = '0.5';
+  try {
+    const batch = p.ids.map(id => updateDoc(doc(db, 'proveedores', id), { categorias: nuevasCats }));
+    await Promise.all(batch);
+    recategData[idx].actual = nuevasCats;
+    recategData[idx].guardado = true;
+    recategData[idx].igual = JSON.stringify([...nuevasCats].sort()) === JSON.stringify([...recategData[idx].sugeridas].sort());
+    renderRecategorizar();
+    cargarProveedores();
+    const diferentes = recategData.filter(r => !r.igual && !r.guardado).length;
+    const resumen = document.getElementById('recateg-resumen');
+    if (resumen) resumen.textContent = `${recategData.length} proveedores · ${diferentes} con cambios pendientes`;
+    const btnAll = document.getElementById('btn-aplicar-todos-recateg');
+    if (btnAll) btnAll.style.display = diferentes > 0 ? '' : 'none';
+  } catch(e) {
+    if (row) row.style.opacity = '1';
+    alert('Error al guardar: ' + e.message);
+  }
+}
+
+document.getElementById('btn-cargar-recateg').addEventListener('click', cargarRecategorizar);
+document.getElementById('btn-aplicar-todos-recateg').addEventListener('click', async () => {
+  const diferentes = recategData.filter(p => !p.igual && !p.guardado);
+  if (!diferentes.length) return;
+  if (!confirm(`¿Aplicar categorías sugeridas a ${diferentes.length} proveedor(es)?`)) return;
+  const btnAll = document.getElementById('btn-aplicar-todos-recateg');
+  btnAll.disabled = true; btnAll.textContent = 'Guardando...';
+  for (const p of diferentes) await aplicarRecateg(recategData.indexOf(p), p.sugeridas);
+  btnAll.disabled = false; btnAll.textContent = '✅ Aplicar todos los cambios sugeridos';
 });
 
 // ── MÉTRICAS DIARIAS/SEMANALES/MENSUALES/ANUALES ───────────────────────────────
@@ -2155,7 +2307,7 @@ async function cargarPendientes(){
           if(r){
             document.getElementById('aprobar-prov-id').value=id;
             document.getElementById('aprobar-prov-nombre').textContent=r.nombre+(r.servicio?' — '+r.servicio:'');
-            const catsSug=[catDe(r.servicio)];
+            const catsSug=catsOf(r.servicio);
             document.getElementById('aprobar-prov-cats').innerHTML=CATS.filter(c=>c.label!=='Varios').map(c=>`
               <label style="display:flex;align-items:center;gap:5px;font-size:.8rem;cursor:pointer;padding:4px;border:1px solid var(--border);border-radius:6px">
                 <input type="checkbox" value="${c.label}" ${catsSug.includes(c.label)?'checked':''}>
@@ -2230,7 +2382,7 @@ async function accionPendiente(id, accion, btn){
         servicio:r.servicio,recomendacion:r.recomendacion,comentario:r.comentario||'',notas:r.notas||'',
         barrio:r.barrio||'',barrioOrigen:r.barrioOrigen||'',
         barriosServicio:r.barriosServicio||[],barrioVecino:r.barrioVecino||'',
-        categorias:r.categorias||[catDe(r.servicio)],
+        categorias:r.categorias?.length?r.categorias:catsOf(r.servicio),
         quienInforma:r.quienInforma||'',
         barrioVecino:r.barrioVecino||'',
         loteVecino:r.loteVecino||'',
@@ -2838,7 +2990,7 @@ document.getElementById('btn-confirmar-aprobar').addEventListener('click', async
         servicio:r.servicio,recomendacion:r.recomendacion,comentario:r.comentario||'',notas:r.notas||'',
         barrio:r.barrio||'',barrioOrigen:r.barrioOrigen||'',
         barriosServicio:r.barriosServicio||[],barrioVecino:r.barrioVecino||'',
-        categorias:cats.length?cats:[catDe(r.servicio)],
+        categorias:cats.length?cats:catsOf(r.servicio),
         quienInforma:r.quienInforma||'',
         barrioVecino:r.barrioVecino||'',
         loteVecino:r.loteVecino||'',
