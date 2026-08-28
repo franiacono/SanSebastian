@@ -770,6 +770,7 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px">
             <button class="btn-submit" id="btn-cargar-recateg" style="padding:10px 18px">🔄 Cargar proveedores</button>
             <button class="btn-submit" id="btn-aplicar-todos-recateg" style="display:none;background:var(--verde-ok);padding:10px 18px">✅ Aplicar todos los cambios sugeridos</button>
+            <button id="btn-filtro-varios" style="display:none;padding:10px 18px;background:white;color:var(--naranja);border:1.5px solid var(--naranja);border-radius:10px;font-size:.85rem;font-family:'Inter',sans-serif;cursor:pointer;font-weight:500">📦 Solo "Varios"</button>
             <span id="recateg-resumen" style="font-size:.83rem;color:var(--muted)"></span>
           </div>
           <div id="recateg-container"><p style="color:var(--muted);font-size:.85rem">Presioná "Cargar proveedores" para ver todos los rubros asignados y las sugerencias del nuevo algoritmo.</p></div>
@@ -2030,6 +2031,8 @@ document.querySelectorAll('.admin-tab[data-atab]').forEach(tab=>{
 
 // ── RECATEGORIZAR RUBROS ──────────────────────────────────────────────────────
 let recategData = [];
+let filtroSoloVarios = false;
+const catsSorted = () => [...CATS].sort((a,b)=>a.label==='Varios'?1:b.label==='Varios'?-1:a.label.localeCompare(b.label,'es'));
 
 async function cargarRecategorizar() {
   const cont = document.getElementById('recateg-container');
@@ -2061,6 +2064,10 @@ async function cargarRecategorizar() {
     const diferentes = recategData.filter(p => !p.igual).length;
     resumen.textContent = `${recategData.length} proveedores · ${diferentes} con cambios sugeridos`;
     if (diferentes > 0) btnAll.style.display = '';
+    const conVarios = recategData.filter(p => p.actual.includes('Varios')).length;
+    const btnV = document.getElementById('btn-filtro-varios');
+    if (btnV) { btnV.style.display = conVarios > 0 ? '' : 'none'; btnV.textContent = `📦 Solo "Varios" (${conVarios})`; }
+    filtroSoloVarios = false;
     renderRecategorizar();
   } catch(e) {
     cont.innerHTML = `<p style="color:var(--rojo)">Error: ${esc(e.message)}</p>`;
@@ -2070,7 +2077,15 @@ async function cargarRecategorizar() {
 function renderRecategorizar() {
   const cont = document.getElementById('recateg-container');
   if (!recategData.length) { cont.innerHTML = '<p style="color:var(--muted);text-align:center;padding:20px">No hay proveedores.</p>'; return; }
-  cont.innerHTML = recategData.map((p, i) => `
+  const rows = recategData
+    .map((p, i) => ({ p, i }))
+    .filter(({ p }) => !filtroSoloVarios || p.actual.includes('Varios'));
+  if (filtroSoloVarios && !rows.length) {
+    cont.innerHTML = '<p style="color:var(--muted);text-align:center;padding:20px">No hay proveedores con rubro "Varios".</p>';
+    return;
+  }
+  const cats = catsSorted();
+  cont.innerHTML = rows.map(({ p, i }) => `
     <div class="recateg-row ${(p.igual || p.guardado) ? 'ok' : 'diff'}" id="recateg-row-${i}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
         <div><span class="recateg-nombre">${esc(p.nombre)}</span><span class="recateg-serv">${esc(p.servicio)}</span></div>
@@ -2093,7 +2108,7 @@ function renderRecategorizar() {
       </div>
       <div id="recateg-edit-${i}" style="display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:12px">
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:10px">
-          ${CATS.filter(c => c.label !== 'Varios').map(c => `
+          ${cats.map(c => `
             <label style="display:flex;align-items:center;gap:5px;font-size:.78rem;cursor:pointer;padding:3px 0">
               <input type="checkbox" class="recateg-chk" data-cat="${c.label}" data-idx="${i}" ${p.actual.includes(c.label) ? 'checked' : ''}>
               ${c.emoji} ${c.label}
@@ -2145,6 +2160,15 @@ async function aplicarRecateg(idx, nuevasCats) {
 }
 
 document.getElementById('btn-cargar-recateg').addEventListener('click', cargarRecategorizar);
+document.getElementById('btn-filtro-varios').addEventListener('click', () => {
+  filtroSoloVarios = !filtroSoloVarios;
+  const btn = document.getElementById('btn-filtro-varios');
+  const conVarios = recategData.filter(p => p.actual.includes('Varios')).length;
+  btn.style.background = filtroSoloVarios ? 'var(--naranja)' : 'white';
+  btn.style.color = filtroSoloVarios ? 'white' : 'var(--naranja)';
+  btn.textContent = filtroSoloVarios ? `📦 Mostrando solo "Varios" (${conVarios})` : `📦 Solo "Varios" (${conVarios})`;
+  renderRecategorizar();
+});
 document.getElementById('btn-aplicar-todos-recateg').addEventListener('click', async () => {
   const diferentes = recategData.filter(p => !p.igual && !p.guardado);
   if (!diferentes.length) return;
@@ -2416,7 +2440,7 @@ async function cargarPendientes(){
             document.getElementById('aprobar-prov-id').value=id;
             document.getElementById('aprobar-prov-nombre').textContent=r.nombre+(r.servicio?' — '+r.servicio:'');
             const catsSug=catsOf(r.servicio);
-            document.getElementById('aprobar-prov-cats').innerHTML=CATS.filter(c=>c.label!=='Varios').map(c=>`
+            document.getElementById('aprobar-prov-cats').innerHTML=catsSorted().map(c=>`
               <label style="display:flex;align-items:center;gap:5px;font-size:.8rem;cursor:pointer;padding:4px;border:1px solid var(--border);border-radius:6px">
                 <input type="checkbox" value="${c.label}" ${catsSug.includes(c.label)?'checked':''}>
                 ${c.emoji} ${c.label}
@@ -3358,7 +3382,7 @@ async function abrirEditarProveedor(id, p){
     document.getElementById('edit-prov-comentario').value=fresh.comentario||p.comentario||'';
     document.getElementById('edit-prov-notas').value=fresh.notas||p.notas||'';
     const catsActuales=fresh.categorias||p.categorias||[];
-    document.getElementById('edit-prov-cats').innerHTML=CATS.filter(c=>c.label!=='Varios').map(c=>`
+    document.getElementById('edit-prov-cats').innerHTML=catsSorted().map(c=>`
       <label style="display:flex;align-items:center;gap:5px;font-size:.8rem;cursor:pointer">
         <input type="checkbox" value="${c.label}" ${catsActuales.includes(c.label)?'checked':''}>
         ${c.emoji} ${c.label}
