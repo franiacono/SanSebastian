@@ -2156,6 +2156,155 @@ document.getElementById('btn-aplicar-todos-recateg').addEventListener('click', a
 });
 
 // ── MÉTRICAS DIARIAS/SEMANALES/MENSUALES/ANUALES ───────────────────────────────
+// Consolida variantes de búsqueda con raíz común (ej: jardi, jardin, jardinero → jardinería)
+function consolidarTerminos(mapa) {
+  const items = Object.entries(mapa)
+    .map(([term, data]) => ({ term, tn: norm(term), count: data.count, ids: [...data.ids] }))
+    .sort((a, b) => b.count - a.count || b.tn.length - a.tn.length);
+  const grupos = [];
+  const asignados = new Set();
+  for (const item of items) {
+    if (asignados.has(item.term)) continue;
+    const g = { canonical: item.term, count: item.count, ids: [...item.ids], variantes: [] };
+    for (const other of items) {
+      if (other.term === item.term || asignados.has(other.term)) continue;
+      const a = item.tn, b = other.tn;
+      let pref = 0;
+      while (pref < a.length && pref < b.length && a[pref] === b[pref]) pref++;
+      const shorter = a.length <= b.length ? a : b;
+      const longer  = a.length <= b.length ? b : a;
+      const esPref = shorter.length >= 4 && longer.startsWith(shorter);
+      if (esPref || pref >= 5) {
+        g.variantes.push(other.term);
+        g.count += other.count;
+        g.ids = [...g.ids, ...other.ids];
+        asignados.add(other.term);
+      }
+    }
+    asignados.add(item.term);
+    grupos.push(g);
+  }
+  return grupos.sort((a, b) => b.count - a.count);
+}
+
+let terminosPorPeriodo = { dia:{}, semana:{}, mes:{}, anio:{}, total:{} };
+let periodoTerminosActivo = 'total';
+
+function renderTerminosBusquedas(periodo) {
+  periodoTerminosActivo = periodo;
+  const contTerminos = document.getElementById('ranking-busquedas-container');
+  if (!contTerminos) return;
+  const mapa = terminosPorPeriodo[periodo] || {};
+  const grupos = consolidarTerminos(mapa);
+  const etiq = {dia:'Hoy', semana:'Semana', mes:'Mes', anio:'Año', total:'Total'};
+
+  if (!grupos.length) {
+    contTerminos.innerHTML = `
+      ${renderTabsBusquedas(periodo)}
+      <div class="empty-state" style="padding:16px"><p>Sin búsquedas registradas en este período</p></div>`;
+    contTerminos.querySelectorAll('[data-tbusq]').forEach(t=>t.addEventListener('click',()=>renderTerminosBusquedas(t.dataset.tbusq)));
+    return;
+  }
+
+  const sinProv = grupos.filter(g=>{
+    const tn=norm(g.canonical);
+    return !(proveedores||[]).some(p=>
+      norm(p.nombre||'').includes(tn)||norm(p.servicio||'').includes(tn)||
+      norm(p.empresa||'').includes(tn)||(p.categorias||[]).some(c=>norm(c).includes(tn))
+    );
+  });
+  const msgTop = '🔍 Lo más buscado en EntreVecinos (' + etiq[periodo].toLowerCase() + '):\n' +
+    grupos.slice(0,10).map(g=>`• ${g.canonical}`).join('\n') +
+    '\n\n¿Conocés algún proveedor? Cargalo en entrevecinos.ar 🏘️';
+  const msgGaps = sinProv.length
+    ? '⚠️ Hay vecinos buscando estos servicios en EntreVecinos sin encontrar proveedores:\n' +
+      sinProv.slice(0,10).map(g=>`• ${g.canonical}`).join('\n') +
+      '\n\nSi tenés el dato de alguien, ¡cargalo en entrevecinos.ar! 🙌'
+    : '';
+
+  contTerminos.innerHTML = `
+    ${renderTabsBusquedas(periodo)}
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;align-items:center">
+      <button id="btn-limpiar-busquedas" style="padding:6px 14px;background:white;color:var(--rojo);border:1.5px solid var(--rojo);border-radius:8px;font-size:.78rem;font-family:'Inter',sans-serif;cursor:pointer;font-weight:500">🗑️ Limpiar ${etiq[periodo].toLowerCase()}</button>
+      <button id="btn-compartir-top" style="padding:6px 14px;background:var(--azul-claro);color:var(--azul);border:1.5px solid var(--azul-mid);border-radius:8px;font-size:.78rem;font-family:'Inter',sans-serif;cursor:pointer;font-weight:500">📤 Compartir top 10</button>
+      ${sinProv.length?`<button id="btn-toggle-gaps" style="padding:6px 14px;background:#fffbeb;color:var(--naranja);border:1.5px solid var(--naranja);border-radius:8px;font-size:.78rem;font-family:'Inter',sans-serif;cursor:pointer;font-weight:500">⚠️ ${sinProv.length} sin proveedores</button>`:''}
+      <span style="color:var(--muted);font-size:.78rem;margin-left:auto">${grupos.length} términos</span>
+    </div>
+    ${sinProv.length?`<div id="gaps-panel" style="display:none;background:#fffbeb;border:1.5px solid var(--naranja);border-radius:10px;padding:14px;margin-bottom:12px">
+      <div style="font-size:.82rem;font-weight:600;color:var(--naranja);margin-bottom:8px">⚠️ Búsquedas sin proveedores — podés reclutar en el grupo</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
+        ${sinProv.map(g=>`<span style="background:white;border:1px solid var(--naranja);padding:4px 10px;border-radius:20px;font-size:.8rem">${esc(g.canonical)}</span>`).join('')}
+      </div>
+      <button id="btn-copiar-gaps" style="padding:6px 14px;background:var(--naranja);color:white;border:none;border-radius:8px;font-size:.78rem;font-family:'Inter',sans-serif;cursor:pointer;font-weight:500">📋 Copiar mensaje para el grupo</button>
+    </div>`:''}
+    <div style="overflow-x:auto"><table class="tabla-metricas">
+      <thead><tr><th>#</th><th>Término buscado</th><th style="text-align:center">Búsquedas</th><th></th></tr></thead>
+      <tbody>${grupos.map((g,i)=>{
+        const sinP=sinProv.some(s=>s.canonical===g.canonical);
+        return `<tr>
+          <td style="font-weight:600;color:var(--muted)">${i+1}</td>
+          <td>
+            <span style="font-weight:500">${esc(g.canonical)}</span>${sinP?' <span title="Sin proveedores" style="color:var(--naranja)">⚠️</span>':''}
+            ${g.variantes.length?`<div style="font-size:.72rem;color:var(--muted);margin-top:2px">también: ${g.variantes.map(v=>esc(v)).join(', ')}</div>`:''}
+          </td>
+          <td class="total">${g.count}</td>
+          <td style="text-align:center"><button class="btn-del-termino" data-ids="${g.ids.join(',')}" data-label="${esc(g.canonical)}" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:.85rem;padding:2px 6px" title="Eliminar">✕</button></td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table></div>`;
+
+  contTerminos.querySelectorAll('[data-tbusq]').forEach(t=>t.addEventListener('click',()=>renderTerminosBusquedas(t.dataset.tbusq)));
+  contTerminos.querySelectorAll('.btn-del-termino').forEach(btn=>{
+    btn.addEventListener('click', async()=>{
+      if(!confirm(`¿Eliminar búsquedas de "${btn.dataset.label}" en ${etiq[periodo].toLowerCase()}?`)) return;
+      btn.disabled=true; btn.textContent='...';
+      const ids=btn.dataset.ids.split(',').filter(Boolean);
+      await Promise.all(ids.map(id=>deleteDoc(doc(db,'eventos',id)).catch(()=>{})));
+      // Reconstruir mapa local y re-renderizar sin recargar Firestore
+      ids.forEach(id=>{
+        Object.values(terminosPorPeriodo).forEach(m=>{
+          Object.values(m).forEach(v=>{ v.ids=v.ids.filter(i=>i!==id); if(v.ids.length===0) delete m[v]; });
+          // Simpler: reload
+        });
+      });
+      cargarMetricas();
+    });
+  });
+  document.getElementById('btn-limpiar-busquedas').addEventListener('click', async()=>{
+    if(!confirm(`¿Eliminar TODAS las búsquedas de ${etiq[periodo].toLowerCase()}?`)) return;
+    const allIds=grupos.flatMap(g=>g.ids);
+    const btn=document.getElementById('btn-limpiar-busquedas');
+    btn.disabled=true; btn.textContent='Eliminando...';
+    await Promise.all(allIds.map(id=>deleteDoc(doc(db,'eventos',id)).catch(()=>{})));
+    cargarMetricas();
+  });
+  document.getElementById('btn-compartir-top').addEventListener('click',()=>{
+    navigator.clipboard.writeText(msgTop).then(()=>{
+      const b=document.getElementById('btn-compartir-top');
+      const orig=b.textContent; b.textContent='✅ Copiado!';
+      setTimeout(()=>b.textContent=orig,2000);
+    });
+  });
+  if(sinProv.length){
+    document.getElementById('btn-toggle-gaps').addEventListener('click',()=>{
+      const p=document.getElementById('gaps-panel');
+      p.style.display=p.style.display==='none'?'block':'none';
+    });
+    document.getElementById('btn-copiar-gaps').addEventListener('click',()=>{
+      navigator.clipboard.writeText(msgGaps).then(()=>{
+        const b=document.getElementById('btn-copiar-gaps');
+        const orig=b.textContent; b.textContent='✅ Copiado!';
+        setTimeout(()=>b.textContent=orig,2000);
+      });
+    });
+  }
+}
+
+function renderTabsBusquedas(activo) {
+  const tabs=[['dia','Hoy'],['semana','Semana'],['mes','Mes'],['anio','Año'],['total','Total']];
+  return `<div class="admin-tabs" style="margin-bottom:14px">${tabs.map(([k,l])=>`<button class="admin-tab${activo===k?' active':''}" data-tbusq="${k}">${l}</button>`).join('')}</div>`;
+}
+
 async function cargarMetricas(){
   const cont = document.getElementById('metricas-container');
   cont.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando...</div>';
@@ -2197,7 +2346,7 @@ async function cargarMetricas(){
     const clicksContacto = {dia:0,semana:0,mes:0,anio:0,total:0};
     const clicksCompartir = {dia:0,semana:0,mes:0,anio:0,total:0};
     const busquedas = {dia:0,semana:0,mes:0,anio:0,total:0};
-    const terminosMap = {}; // para ranking de términos
+    terminosPorPeriodo = { dia:{}, semana:{}, mes:{}, anio:{}, total:{} };
     const snapEv = await getDocs(collection(db,'eventos'));
     snapEv.forEach(d=>{
       const e = d.data();
@@ -2208,9 +2357,12 @@ async function cargarMetricas(){
       if(e.tipo==='compartir'){ sumar(clicksCompartir,c); clicksCompartir.total++; }
       if(e.tipo==='busqueda' && e.termino){
         sumar(busquedas,c); busquedas.total++;
-        if(!terminosMap[e.termino]) terminosMap[e.termino]={count:0,ids:[]};
-        terminosMap[e.termino].count++;
-        terminosMap[e.termino].ids.push(d.id);
+        const periodos = ['total', ...(['dia','semana','mes','anio'].filter(p=>c[p]))];
+        periodos.forEach(p=>{
+          if(!terminosPorPeriodo[p][e.termino]) terminosPorPeriodo[p][e.termino]={count:0,ids:[]};
+          terminosPorPeriodo[p][e.termino].count++;
+          terminosPorPeriodo[p][e.termino].ids.push(d.id);
+        });
       }
     });
 
@@ -2222,9 +2374,6 @@ async function cargarMetricas(){
       {label:'🔗 Clicks compartir', d:clicksCompartir},
     ];
 
-    // Top términos buscados
-    const topTerminos = Object.entries(terminosMap)
-      .sort((a,b)=>b[1].count-a[1].count).slice(0,50);
     cont.innerHTML = `<div style="overflow-x:auto"><table class="tabla-metricas">
       <thead><tr>${['Métrica','Hoy','Semana','Mes','Año','Total'].map(h=>`<th>${h}</th>`).join('')}</tr></thead>
       <tbody>${filas.map(f=>`<tr>
@@ -2237,48 +2386,7 @@ async function cargarMetricas(){
       </tr>`).join('')}</tbody>
     </table></div>`;
 
-    // Ranking de términos en su propio contenedor
-    const contTerminos = document.getElementById('ranking-busquedas-container');
-    if(contTerminos){
-      if(!topTerminos.length){
-        contTerminos.innerHTML='<div class="empty-state" style="padding:16px"><p>Sin búsquedas registradas aún</p></div>';
-      } else {
-        contTerminos.innerHTML=`
-          <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
-            <button id="btn-limpiar-busquedas" style="padding:6px 14px;background:white;color:var(--rojo);border:1.5px solid var(--rojo);border-radius:8px;font-size:.78rem;font-family:'Inter',sans-serif;cursor:pointer;font-weight:500">🗑️ Limpiar todo</button>
-          </div>
-          <div style="overflow-x:auto"><table class="tabla-metricas">
-            <thead><tr><th>#</th><th>Término buscado</th><th style="text-align:center">Búsquedas</th><th></th></tr></thead>
-            <tbody>${topTerminos.map(([t,data],i)=>`<tr data-termino="${esc(t)}" data-ids="${data.ids.join(',')}">
-              <td style="font-weight:600;color:var(--muted)">${i+1}</td>
-              <td style="font-weight:500">${esc(t)}</td>
-              <td class="total">${data.count}</td>
-              <td style="text-align:center"><button class="btn-del-termino" data-termino="${esc(t)}" data-ids="${data.ids.join(',')}" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:.85rem;padding:2px 6px" title="Eliminar este término">✕</button></td>
-            </tr>`).join('')}</tbody>
-          </table></div>`;
-
-        // Eliminar término individual
-        contTerminos.querySelectorAll('.btn-del-termino').forEach(btn=>{
-          btn.addEventListener('click', async()=>{
-            if(!confirm(`¿Eliminar todas las búsquedas de "${btn.dataset.termino}"?`)) return;
-            btn.disabled=true; btn.textContent='...';
-            const ids=btn.dataset.ids.split(',').filter(Boolean);
-            await Promise.all(ids.map(id=>deleteDoc(doc(db,'eventos',id)).catch(()=>{})));
-            cargarMetricas();
-          });
-        });
-
-        // Limpiar todo
-        document.getElementById('btn-limpiar-busquedas').addEventListener('click', async()=>{
-          if(!confirm('¿Eliminar TODAS las búsquedas registradas? Esta acción no se puede deshacer.')) return;
-          const allIds=topTerminos.flatMap(([,data])=>data.ids);
-          const btn=document.getElementById('btn-limpiar-busquedas');
-          btn.disabled=true; btn.textContent='Eliminando...';
-          await Promise.all(allIds.map(id=>deleteDoc(doc(db,'eventos',id)).catch(()=>{})));
-          cargarMetricas();
-        });
-      }
-    }
+    renderTerminosBusquedas(periodoTerminosActivo);
   }catch(e){ console.log('Métricas error:',e); cont.innerHTML='<div class="empty-state"><div class="icon">⚠️</div><p>Error al cargar métricas</p></div>'; }
 }
 
