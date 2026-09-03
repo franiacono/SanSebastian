@@ -358,12 +358,25 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
 .legal-footer a{color:var(--muted);text-decoration:underline;text-decoration-style:dotted}
 
 /* ── AYUDA ── */
-.ayuda-section{margin-bottom:24px}
-.ayuda-section h4{font-family:'Fraunces',serif;font-size:1rem;color:var(--azul);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--crema2)}
+.ayuda-section{margin-bottom:28px}
+.ayuda-section h4{font-family:'Fraunces',serif;font-size:1rem;color:var(--azul);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--crema2)}
 .ayuda-step{display:flex;gap:12px;margin-bottom:10px;align-items:flex-start}
 .ayuda-step-num{width:24px;height:24px;background:var(--azul);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0}
 .ayuda-step-text{font-size:.87rem;color:var(--text);line-height:1.55}
 .ayuda-step-text strong{color:var(--azul2)}
+.ayuda-badge-row{display:flex;gap:10px;margin-bottom:8px;align-items:flex-start;background:var(--crema);border-radius:10px;padding:8px 12px}
+.ayuda-badge-icon{font-size:1.1rem;flex-shrink:0}
+.ayuda-badge-text{font-size:.83rem;color:var(--text);line-height:1.4}
+.ayuda-badge-text strong{display:block;font-weight:600;color:var(--azul2);margin-bottom:1px}
+.ayuda-plat{background:var(--crema2);border-radius:10px;padding:10px 14px;margin-bottom:8px}
+.ayuda-plat-title{font-weight:600;font-size:.85rem;margin-bottom:3px;color:var(--azul2)}
+.ayuda-plat-steps{font-size:.82rem;color:var(--text)}
+.ayuda-wa{display:flex;align-items:center;gap:14px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:16px;margin-top:6px;text-decoration:none;transition:background .15s}
+.ayuda-wa:hover{background:#dcfce7}
+.ayuda-wa-icon{font-size:2rem;flex-shrink:0}
+.ayuda-wa-text strong{display:block;font-size:.92rem;color:var(--text);font-weight:600;margin-bottom:2px}
+.ayuda-wa-text span{font-size:.82rem;color:var(--muted)}
+.ayuda-tip{font-size:.82rem;color:var(--muted);background:var(--crema2);border-left:3px solid var(--azul-mid);padding:8px 12px;border-radius:0 8px 8px 0;margin-top:8px;line-height:1.45}
 
 /* PROVEEDOR TIPO ── */
 .tipo-selector{display:flex;gap:10px;margin-bottom:18px}
@@ -684,24 +697,72 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
     <div class="page" id="page-ayuda">
       <div style="max-width:600px;margin:0 auto">
         <h2 style="font-family:'Fraunces',serif;color:var(--azul);font-size:1.4rem;margin-bottom:20px">ℹ️ Ayuda</h2>
+
+        <!-- BUSCAR Y FILTRAR -->
         <div class="ayuda-section">
-          <h4>¿Cómo usar la app?</h4>
-          <div class="ayuda-step"><div class="ayuda-step-num">1</div><div class="ayuda-step-text"><strong>Buscá</strong> un proveedor por nombre, servicio o teléfono en la sección Buscar.</div></div>
-          <div class="ayuda-step"><div class="ayuda-step-num">2</div><div class="ayuda-step-text"><strong>Filtrá</strong> por rubro, barrio o usa los chips para ver recomendados, destacados, etc.</div></div>
-          <div class="ayuda-step"><div class="ayuda-step-num">3</div><div class="ayuda-step-text"><strong>Recomendá</strong> un proveedor de confianza o compartí una mala experiencia.</div></div>
-          <div class="ayuda-step"><div class="ayuda-step-num">4</div><div class="ayuda-step-text"><strong>Contactá</strong> al administrador desde 💬 Consultas si tenés alguna pregunta.</div></div>
+          <h4>🔍 Buscar y filtrar proveedores</h4>
+          <div class="ayuda-step"><div class="ayuda-step-num">1</div><div class="ayuda-step-text"><strong>Buscá</strong> por nombre, servicio o teléfono usando la barra de búsqueda en la sección Buscar.</div></div>
+          <div class="ayuda-step"><div class="ayuda-step-num">2</div><div class="ayuda-step-text"><strong>Filtrá por rubro</strong> usando el menú desplegable (Plomería, Electricidad, Jardinería, etc.) para ver solo los del servicio que necesitás.</div></div>
+          <div class="ayuda-step"><div class="ayuda-step-num">3</div><div class="ayuda-step-text"><strong>Filtrá por barrio</strong> para ver proveedores que trabajen cerca de tu zona.</div></div>
+          <div class="ayuda-step"><div class="ayuda-step-num">4</div><div class="ayuda-step-text"><strong>Usá los chips</strong> de acceso rápido: ⭐ Muy recomendados, 🏅 Destacados, ☎️ Útiles, 📣 Publicidad.</div></div>
+          <div class="ayuda-tip">💡 Podés tocar el teléfono de un proveedor para llamar o abrir WhatsApp directamente. También podés compartir su info con el botón 🔗 de cada card.</div>
         </div>
+
+        <!-- RECOMENDAR -->
         <div class="ayuda-section">
-          <h4>Instalar como app</h4>
-          <div class="ayuda-platform">
-            <div class="ayuda-platform-title">📱 Android (Chrome)</div>
-            <div class="ayuda-platform-steps">Menú (⋮) → "Añadir a pantalla de inicio" → Instalar</div>
-          </div>
-          <div class="ayuda-platform">
-            <div class="ayuda-platform-title">🍎 iPhone (Safari)</div>
-            <div class="ayuda-platform-steps">Botón compartir → "Agregar a pantalla de inicio" → Agregar</div>
-          </div>
+          <h4>👍 Cómo recomendar un proveedor</h4>
+          <div class="ayuda-step"><div class="ayuda-step-num">1</div><div class="ayuda-step-text"><strong>Tocá "Recomendar"</strong> en la barra de navegación.</div></div>
+          <div class="ayuda-step"><div class="ayuda-step-num">2</div><div class="ayuda-step-text"><strong>Completá los datos</strong> del proveedor: nombre, teléfono, servicio y tu experiencia.</div></div>
+          <div class="ayuda-step"><div class="ayuda-step-num">3</div><div class="ayuda-step-text"><strong>Elegí una calificación</strong>: Muy Recomendable, Recomendable, Malas Experiencias o No Recomendable.</div></div>
+          <div class="ayuda-step"><div class="ayuda-step-num">4</div><div class="ayuda-step-text"><strong>El admin revisa</strong> la recomendación y la aprueba o rechaza. Te avisamos por notificación y email.</div></div>
+          <div class="ayuda-tip">💡 También podés reportar una mala experiencia — es igual de valioso para la comunidad saber qué proveedores evitar.</div>
         </div>
+
+        <!-- CALIFICACIONES -->
+        <div class="ayuda-section">
+          <h4>🏷️ ¿Qué significan las calificaciones?</h4>
+          <div class="ayuda-badge-row"><div class="ayuda-badge-icon">⭐</div><div class="ayuda-badge-text"><strong>Muy Recomendable</strong>5 o más reseñas positivas sin ninguna negativa. El top de la comunidad.</div></div>
+          <div class="ayuda-badge-row"><div class="ayuda-badge-icon">👍</div><div class="ayuda-badge-text"><strong>Recomendable</strong>Al menos una reseña positiva y menos del 30% de reseñas negativas.</div></div>
+          <div class="ayuda-badge-row"><div class="ayuda-badge-icon">⚠️</div><div class="ayuda-badge-text"><strong>Malas Experiencias</strong>Entre el 30% y el 50% de reseñas negativas. Proceder con cuidado.</div></div>
+          <div class="ayuda-badge-row"><div class="ayuda-badge-icon">🚫</div><div class="ayuda-badge-text"><strong>No Recomendable</strong>Más del 50% de reseñas negativas. La comunidad no lo recomienda.</div></div>
+        </div>
+
+        <!-- SOY PROVEEDOR -->
+        <div class="ayuda-section">
+          <h4>🛠️ Soy proveedor, ¿cómo registro mi servicio?</h4>
+          <div class="ayuda-step"><div class="ayuda-step-num">1</div><div class="ayuda-step-text"><strong>Creá tu cuenta</strong> eligiendo "Soy proveedor" durante el registro.</div></div>
+          <div class="ayuda-step"><div class="ayuda-step-num">2</div><div class="ayuda-step-text"><strong>Completá tu perfil</strong> con nombre, empresa, teléfono y descripción de tu servicio.</div></div>
+          <div class="ayuda-step"><div class="ayuda-step-num">3</div><div class="ayuda-step-text"><strong>Indicá los barrios</strong> donde trabajás desde la sección "Mi Servicio" en Configuración.</div></div>
+          <div class="ayuda-step"><div class="ayuda-step-num">4</div><div class="ayuda-step-text"><strong>El admin aprueba</strong> tu registro y aparecés en el directorio. Para cambios de datos, escribinos por Consultas.</div></div>
+        </div>
+
+        <!-- INSTALAR -->
+        <div class="ayuda-section">
+          <h4>📲 Instalar como app en tu celular</h4>
+          <div class="ayuda-plat">
+            <div class="ayuda-plat-title">📱 Android (Chrome)</div>
+            <div class="ayuda-plat-steps">Menú (⋮) → "Añadir a pantalla de inicio" → Instalar</div>
+          </div>
+          <div class="ayuda-plat">
+            <div class="ayuda-plat-title">🍎 iPhone (Safari)</div>
+            <div class="ayuda-plat-steps">Botón compartir <span style="font-size:.8rem">⬆️</span> → "Agregar a pantalla de inicio" → Agregar</div>
+          </div>
+          <div class="ayuda-tip">💡 Una vez instalada, EntreVecinos funciona como una app nativa: la encontrás en tu pantalla de inicio, carga más rápido y recibís notificaciones push.</div>
+        </div>
+
+        <!-- CONTACTO -->
+        <div class="ayuda-section">
+          <h4>💬 ¿Tenés alguna pregunta?</h4>
+          <p style="font-size:.87rem;color:var(--text);margin-bottom:12px">Podés escribirnos por <strong>Consultas</strong> dentro de la app, o contactarnos directamente por WhatsApp:</p>
+          <a class="ayuda-wa" href="https://wa.me/5491150241776" target="_blank" rel="noopener">
+            <div class="ayuda-wa-icon">💬</div>
+            <div class="ayuda-wa-text">
+              <strong>Escribinos al WhatsApp</strong>
+              <span>+54 9 11 5024-1776 · Administración EntreVecinos</span>
+            </div>
+          </a>
+        </div>
+
       </div>
     </div>
 
