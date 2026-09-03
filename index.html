@@ -717,8 +717,8 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
           <h2>Bienvenido a EntreVecinos</h2>
           <p class="tagline">El directorio de proveedores de confianza<br>recomendado por tus vecinos de barrio</p>
           <div class="bienvenido-btns">
-            <button class="bienvenido-btn primary" onclick="showPage('buscar')">🔍 Buscar proveedores</button>
-            <button class="bienvenido-btn secondary" onclick="showPage('recomendar')">👍 Recomendar</button>
+            <button class="bienvenido-btn primary" id="btn-bienvenido-buscar">🔍 Buscar proveedores</button>
+            <button class="bienvenido-btn secondary" id="btn-bienvenido-recomendar">👍 Recomendar</button>
           </div>
         </div>
 
@@ -1147,15 +1147,11 @@ const apiGet = async (p) => {
 
 // ── BARRIOS CONFIG ───────────────────────────────────────────────────────────
 const BARRIOS_CONFIG = [
-  { nombre: 'San Sebastián - Pilar', sectores: [
-    {num:'1',nombre:'Nuestra Señora del Pilar'},{num:'2',nombre:'Nuestra Señora del Rosario'},
-    {num:'3',nombre:'Nuestra Señora de las Mercedes'},{num:'4',nombre:'Nuestra Señora de los Dolores'},
-    {num:'5',nombre:'Nuestra Señora de Itatí'},{num:'6',nombre:'Nuestra Señora de Loreto'},
-    {num:'7',nombre:'Nuestra Señora de Luján'},{num:'8',nombre:'Nuestra Señora de Torreciudad'},
-    {num:'9',nombre:'Nuestra Señora de la Paz'},{num:'10',nombre:'Nuestra Señora de Fátima'},
-    {num:'11',nombre:'Nuestra Señora de Lourdes'},{num:'12',nombre:'Nuestra Señora de la Asunción'},
-    {num:'13',nombre:'Nuestra Señora del Carmen'}
-  ]},
+  { nombre: 'Altos del Pilar', sectores: [{num:'1',nombre:'Altos del Pilar'}] },
+  { nombre: 'Campo Chico', sectores: [{num:'1',nombre:'Campo Chico'}] },
+  { nombre: 'Campo Grande Club de Campo', sectores: [{num:'1',nombre:'Campo Grande Club de Campo'}] },
+  { nombre: 'Club Privado Loma Verde', sectores: [{num:'1',nombre:'Club Privado Loma Verde'}] },
+  { nombre: 'El Aromo', sectores: [{num:'1',nombre:'El Aromo'}] },
   { nombre: 'Haras Santa María', sectores: [
     {num:'1',nombre:'El Molino'},{num:'2',nombre:'El Molino Norte'},
     {num:'3',nombre:'El Atardecer'},{num:'4',nombre:'El Refugio'},
@@ -1164,9 +1160,9 @@ const BARRIOS_CONFIG = [
     {num:'9',nombre:'Las Caballerizas'},{num:'10',nombre:'Las Lomas'},
     {num:'11',nombre:'Los Álamos'},{num:'12',nombre:'El Rescate'}
   ]},
-  { nombre: 'Club Privado Loma Verde', sectores: [{num:'1',nombre:'Club Privado Loma Verde'}] },
-  { nombre: 'El Aromo', sectores: [{num:'1',nombre:'El Aromo'}] },
+  { nombre: 'La Lomada', sectores: [{num:'1',nombre:'La Lomada'}] },
   { nombre: 'Las Brisas Country Club', sectores: [{num:'1',nombre:'Las Brisas Country Club'}] },
+  { nombre: 'Los Lagartos', sectores: [{num:'1',nombre:'Los Lagartos'}] },
   { nombre: 'Pilar del Este', sectores: [
     {num:'1',nombre:'Los Jazmines'},{num:'2',nombre:'San Alfonso'},
     {num:'3',nombre:'Santa Guadalupe'},{num:'4',nombre:'San Ramiro'},
@@ -1176,11 +1172,15 @@ const BARRIOS_CONFIG = [
     {num:'11',nombre:'Santa Elisa'},{num:'12',nombre:'Casas del Este'},
     {num:'13',nombre:'Casas de Santa Guadalupe'}
   ]},
-  { nombre: 'Campo Grande Club de Campo', sectores: [{num:'1',nombre:'Campo Grande Club de Campo'}] },
-  { nombre: 'Altos del Pilar', sectores: [{num:'1',nombre:'Altos del Pilar'}] },
-  { nombre: 'Campo Chico', sectores: [{num:'1',nombre:'Campo Chico'}] },
-  { nombre: 'La Lomada', sectores: [{num:'1',nombre:'La Lomada'}] },
-  { nombre: 'Los Lagartos', sectores: [{num:'1',nombre:'Los Lagartos'}] }
+  { nombre: 'San Sebastián - Pilar', sectores: [
+    {num:'1',nombre:'Nuestra Señora del Pilar'},{num:'2',nombre:'Nuestra Señora del Rosario'},
+    {num:'3',nombre:'Nuestra Señora de las Mercedes'},{num:'4',nombre:'Nuestra Señora de los Dolores'},
+    {num:'5',nombre:'Nuestra Señora de Itatí'},{num:'6',nombre:'Nuestra Señora de Loreto'},
+    {num:'7',nombre:'Nuestra Señora de Luján'},{num:'8',nombre:'Nuestra Señora de Torreciudad'},
+    {num:'9',nombre:'Nuestra Señora de la Paz'},{num:'10',nombre:'Nuestra Señora de Fátima'},
+    {num:'11',nombre:'Nuestra Señora de Lourdes'},{num:'12',nombre:'Nuestra Señora de la Asunción'},
+    {num:'13',nombre:'Nuestra Señora del Carmen'}
+  ]}
 ];
 
 // ── CATEGORÍAS ───────────────────────────────────────────────────────────────
@@ -1583,6 +1583,8 @@ function showPage(pageId){
 }
 document.getElementById('nav-buscar').addEventListener('click',    ()=>showPage('buscar'));
 document.getElementById('nav-telefonos').addEventListener('click', ()=>showPage('telefonos'));
+document.getElementById('btn-bienvenido-buscar').addEventListener('click',    ()=>showPage('buscar'));
+document.getElementById('btn-bienvenido-recomendar').addEventListener('click', ()=>showPage('recomendar'));
 function resetFormRecomendar(){
   document.getElementById('form-success').style.display='none';
   document.getElementById('form-body').style.display='block';
