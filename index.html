@@ -754,11 +754,11 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
         <div class="ayuda-section">
           <h4>💬 ¿Tenés alguna pregunta?</h4>
           <p style="font-size:.87rem;color:var(--text);margin-bottom:12px">Podés escribirnos por <strong>Consultas</strong> dentro de la app, o contactarnos directamente por WhatsApp:</p>
-          <a class="ayuda-wa" href="https://wa.me/5491150241776" target="_blank" rel="noopener">
+          <a class="ayuda-wa" href="https://wa.me/5491150241776?text=Hola%2C%20tengo%20una%20consulta%20sobre%20EntreVecinos%20%F0%9F%8F%98%EF%B8%8F" target="_blank" rel="noopener">
             <div class="ayuda-wa-icon">💬</div>
             <div class="ayuda-wa-text">
-              <strong>Escribinos al WhatsApp</strong>
-              <span>+54 9 11 5024-1776 · Administración EntreVecinos</span>
+              <strong>Escribinos por WhatsApp</strong>
+              <span>Administración EntreVecinos</span>
             </div>
           </a>
         </div>
@@ -1507,6 +1507,12 @@ function entrarALaApp() {
     document.getElementById('modal-aviso-datos').classList.remove('open');
     document.getElementById('cfg-aviso-banner').style.display='none';
     sessionStorage.removeItem('avisoMostrado');
+  }
+  // Primera vez en la app → mostrar Ayuda
+  const _ayudaKey = 'ev_ayuda_' + (currentUser?.uid||'');
+  if (!localStorage.getItem(_ayudaKey)) {
+    localStorage.setItem(_ayudaKey, '1');
+    setTimeout(() => showPage('ayuda'), 150);
   }
   // FCM token
   setTimeout(()=>pedirPermisoNotificaciones(currentUser?.uid), 3000);
