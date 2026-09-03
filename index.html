@@ -358,6 +358,20 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
 .legal-footer a{color:var(--muted);text-decoration:underline;text-decoration-style:dotted}
 
 /* ── AYUDA ── */
+.bienvenido-hero{background:linear-gradient(135deg,var(--azul) 0%,var(--azul2) 100%);border-radius:18px;padding:28px 22px 24px;text-align:center;margin-bottom:28px;color:white}
+.bienvenido-hero-emoji{font-size:2.8rem;margin-bottom:10px;line-height:1}
+.bienvenido-hero h2{font-family:'Fraunces',serif;font-size:1.45rem;font-weight:700;color:white;margin-bottom:6px}
+.bienvenido-hero .tagline{font-size:.87rem;color:rgba(255,255,255,.78);margin-bottom:20px;line-height:1.5}
+.bienvenido-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.bienvenido-btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:10px;font-size:.84rem;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;text-decoration:none;border:none;transition:opacity .15s}
+.bienvenido-btn.primary{background:white;color:var(--azul)}
+.bienvenido-btn.secondary{background:rgba(255,255,255,.15);color:white;border:1.5px solid rgba(255,255,255,.35)}
+.bienvenido-btn:hover{opacity:.85}
+.bienvenido-features{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:28px}
+.bienvenido-feat{background:white;border:1.5px solid var(--border);border-radius:12px;padding:14px 10px;text-align:center}
+.bienvenido-feat-icon{font-size:1.4rem;margin-bottom:6px}
+.bienvenido-feat-title{font-size:.78rem;font-weight:600;color:var(--azul);margin-bottom:3px}
+.bienvenido-feat-text{font-size:.72rem;color:var(--muted);line-height:1.4}
 .ayuda-section{margin-bottom:28px}
 .ayuda-section h4{font-family:'Fraunces',serif;font-size:1rem;color:var(--azul);margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid var(--crema2)}
 .ayuda-step{display:flex;gap:12px;margin-bottom:10px;align-items:flex-start}
@@ -696,7 +710,24 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
     <!-- AYUDA -->
     <div class="page" id="page-ayuda">
       <div style="max-width:600px;margin:0 auto">
-        <h2 style="font-family:'Fraunces',serif;color:var(--azul);font-size:1.4rem;margin-bottom:20px">ℹ️ Ayuda</h2>
+
+        <!-- HERO BIENVENIDA -->
+        <div class="bienvenido-hero">
+          <div class="bienvenido-hero-emoji">🏘️</div>
+          <h2>Bienvenido a EntreVecinos</h2>
+          <p class="tagline">El directorio de proveedores de confianza<br>recomendado por tus vecinos de barrio</p>
+          <div class="bienvenido-btns">
+            <button class="bienvenido-btn primary" onclick="showPage('buscar')">🔍 Buscar proveedores</button>
+            <button class="bienvenido-btn secondary" onclick="showPage('recomendar')">👍 Recomendar</button>
+          </div>
+        </div>
+
+        <!-- 3 FEATURES -->
+        <div class="bienvenido-features">
+          <div class="bienvenido-feat"><div class="bienvenido-feat-icon">🔍</div><div class="bienvenido-feat-title">Buscá</div><div class="bienvenido-feat-text">Por rubro, barrio o nombre del proveedor</div></div>
+          <div class="bienvenido-feat"><div class="bienvenido-feat-icon">⭐</div><div class="bienvenido-feat-title">Calificaciones</div><div class="bienvenido-feat-text">Calificados y verificados por la comunidad</div></div>
+          <div class="bienvenido-feat"><div class="bienvenido-feat-icon">👍</div><div class="bienvenido-feat-title">Recomendá</div><div class="bienvenido-feat-text">Compartí tus experiencias con el barrio</div></div>
+        </div>
 
         <!-- BUSCAR Y FILTRAR -->
         <div class="ayuda-section">
@@ -1144,7 +1175,12 @@ const BARRIOS_CONFIG = [
     {num:'9',nombre:'Santa Sofía'},{num:'10',nombre:'Santa Lucía'},
     {num:'11',nombre:'Santa Elisa'},{num:'12',nombre:'Casas del Este'},
     {num:'13',nombre:'Casas de Santa Guadalupe'}
-  ]}
+  ]},
+  { nombre: 'Campo Grande Club de Campo', sectores: [{num:'1',nombre:'Campo Grande Club de Campo'}] },
+  { nombre: 'Altos del Pilar', sectores: [{num:'1',nombre:'Altos del Pilar'}] },
+  { nombre: 'Campo Chico', sectores: [{num:'1',nombre:'Campo Chico'}] },
+  { nombre: 'La Lomada', sectores: [{num:'1',nombre:'La Lomada'}] },
+  { nombre: 'Los Lagartos', sectores: [{num:'1',nombre:'Los Lagartos'}] }
 ];
 
 // ── CATEGORÍAS ───────────────────────────────────────────────────────────────
