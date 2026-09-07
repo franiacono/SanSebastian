@@ -487,11 +487,12 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
     <div id="prf-campos-vecino">
       <div class="auth-row"><label>Barrio *</label>
         <select class="auth-select" id="prf-barrio"><option value="">— Seleccioná tu barrio —</option></select>
+        <input class="auth-input" id="prf-barrio-otro" placeholder="¿Cuál es tu barrio?" style="display:none;margin-top:6px">
       </div>
-      <div class="auth-row"><label>Sector / Área *</label>
+      <div class="auth-row" id="prf-area-row"><label>Sector / Área *</label>
         <select class="auth-select" id="prf-area"><option value="">— Seleccioná tu sector —</option></select>
       </div>
-      <div class="auth-row"><label>Lote *</label><input class="auth-input" type="text" id="prf-lote" placeholder="Ej: 42"></div>
+      <div class="auth-row" id="prf-lote-row"><label>Lote *</label><input class="auth-input" type="text" id="prf-lote" placeholder="Ej: 42"></div>
     </div>
     <div id="prf-campos-proveedor" style="display:none">
       <div class="auth-row"><label>Empresa / emprendimiento *</label><input class="auth-input" type="text" id="prf-empresa" placeholder="Nombre comercial"></div>
@@ -1258,7 +1259,8 @@ function poblarSelectBarrios(selectId, incluirVacio=true, options={}) {
   if(!sel) return;
   const placeholder = options?.placeholder ?? '— Seleccioná tu barrio —';
   sel.innerHTML = (incluirVacio ? `<option value="">${placeholder}</option>` : '') +
-    BARRIOS_CONFIG.map(b=>`<option value="${b.nombre}">${b.nombre}</option>`).join('');
+    BARRIOS_CONFIG.map(b=>`<option value="${b.nombre}">${b.nombre}</option>`).join('') +
+    '<option value="Otro...">Otro...</option>';
 }
 function poblarSelectSectores(selectId, barrioNombre, incluirVacio=true) {
   const sel = document.getElementById(selectId);
@@ -1313,7 +1315,13 @@ document.querySelectorAll('input[name="f-barrio-prov-opt"]').forEach(r=>{
 });
 
 // Eventos cambio barrio en perfil
-document.getElementById('prf-barrio').addEventListener('change', e => poblarSelectSectores('prf-area', e.target.value));
+document.getElementById('prf-barrio').addEventListener('change', e => {
+  const esOtro = e.target.value === 'Otro...';
+  document.getElementById('prf-barrio-otro').style.display = esOtro ? 'block' : 'none';
+  document.getElementById('prf-area-row').style.display  = esOtro ? 'none'  : '';
+  document.getElementById('prf-lote-row').style.display  = esOtro ? 'none'  : '';
+  if (!esOtro) poblarSelectSectores('prf-area', e.target.value);
+});
 document.getElementById('cfg-barrio').addEventListener('change', e => poblarSelectSectores('cfg-area', e.target.value));
 
 // ── TIPO USUARIO EN PERFIL ────────────────────────────────────────────────────
@@ -1489,10 +1497,13 @@ document.getElementById('btn-guardar-perfil').addEventListener('click', async ()
     } catch(e){ showErr('prf-error','Error al guardar.'); btn.disabled=false; btn.textContent='Guardar y continuar'; }
 
   } else {
-    const barrio = document.getElementById('prf-barrio').value;
-    const area   = document.getElementById('prf-area').value;
-    const lote   = document.getElementById('prf-lote').value.trim();
-    if(!nombre||!barrio||!tel||!area||!lote){ showErr('prf-error','Completá todos los campos'); return; }
+    const barrioSel = document.getElementById('prf-barrio').value;
+    const esOtroBarrio = barrioSel === 'Otro...';
+    const barrio = esOtroBarrio ? document.getElementById('prf-barrio-otro').value.trim() : barrioSel;
+    const area   = esOtroBarrio ? 'Otro' : document.getElementById('prf-area').value;
+    const lote   = esOtroBarrio ? '' : document.getElementById('prf-lote').value.trim();
+    if(!nombre||!barrio||!tel){ showErr('prf-error','Completá todos los campos'); return; }
+    if(!esOtroBarrio&&(!area||!lote)){ showErr('prf-error','Completá todos los campos'); return; }
     btn.disabled=true; btn.textContent='Guardando...';
     try {
       // Verificar via Apps Script
@@ -1913,7 +1924,7 @@ function cardHTML(p,isDest){
     </div>
     ${p.barriosServicio&&p.barriosServicio.length?`
       <div class="barrio-srv-label">📍 Barrios donde presta servicios</div>
-      <div class="barrios-servicio-badges">${p.barriosServicio.map(b=>`<span class="barrio-srv-badge">${b==='Consultar'?'🔍 Consultar por otros barrios':b==='Toda la zona'?'🌐 Toda la zona':esc(b)}</span>`).join('')}</div>`:''}
+      <div class="barrios-servicio-badges">${(p.barriosServicio.includes('Toda la zona')?p.barriosServicio.filter(b=>b==='Toda la zona'||b==='Consultar'):p.barriosServicio).map(b=>`<span class="barrio-srv-badge">${b==='Consultar'?'🔍 Consultar por otros barrios':b==='Toda la zona'?'🌐 Toda la zona':esc(b)}</span>`).join('')}</div>`:''}
     ${p.resenas.length?`<div class="card-resenas-toggle"><span class="toggle-label">Ver reseñas (${p.resenas.length}) ▾</span></div><div class="card-detail" style="display:none"><div class="resenas-title">Reseñas</div>${resHtml}</div>`:''}
     <div class="card-footer-actions">
       <button class="btn-recomendar-card" data-p='${pData.replace(/'/g,"&apos;")}'>✍️ Recomendar</button>
@@ -2576,7 +2587,7 @@ function adminCardHTML(r){
       <div>
         <div class="admin-nombre">${r.nombre||'Sin nombre'}</div>
         <div class="admin-meta"><span>⚙️ ${r.servicio||'—'}</span>${r.telefono?`<span>📞 ${r.telefono}</span>`:''}</div>
-        ${r.barriosServicio&&r.barriosServicio.length?`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">${r.barriosServicio.map(b=>`<span class="barrio-srv-badge" style="font-size:.68rem">${b==='Consultar'?'🔍 Consultar':b==='Toda la zona'?'🌐 Toda la zona':b}</span>`).join('')}</div>`:''}
+        ${r.barriosServicio&&r.barriosServicio.length?`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">${(r.barriosServicio.includes('Toda la zona')?r.barriosServicio.filter(b=>b==='Toda la zona'||b==='Consultar'):r.barriosServicio).map(b=>`<span class="barrio-srv-badge" style="font-size:.68rem">${b==='Consultar'?'🔍 Consultar':b==='Toda la zona'?'🌐 Toda la zona':b}</span>`).join('')}</div>`:''}
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           <span class="badge ${r.recomendacion?r.recomendacion.toLowerCase().replace(/ /g,'-'):'sin-datos'}" style="font-size:.7rem">${r.recomendacion||'—'}</span>
           <span class="admin-badge ${bc}">${r.estado||'Pendiente'}</span>
