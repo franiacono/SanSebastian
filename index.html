@@ -1667,10 +1667,10 @@ async function cargarProveedores(){
 
 function navegarAParams(){
   const params = new URLSearchParams(window.location.search);
-  const tel = params.get('tel');
-  if(!tel) return;
+  const q = params.get('p') || params.get('tel');
+  if(!q) return;
   const input = document.getElementById('search-input');
-  if(input){ input.value=tel; renderResults(); }
+  if(input){ input.value=q; renderResults(); }
 }
 
 function procesarDatos(filas){
@@ -1875,15 +1875,15 @@ function renderResults(){
     btn.addEventListener('click', async e=>{
       e.stopPropagation();
       trackEvento('compartir',btn.dataset.id,btn.dataset.nombre,btn.dataset.empresa);
-      const url='https://entrevecinos.ar/?tel='+encodeURIComponent(btn.dataset.tel);
-      const texto=`👀 Mirá lo que encontré en EntreVecinos: ${btn.dataset.nombre} (${btn.dataset.srv})`;
+      const url='https://entrevecinos.ar/?p='+encodeURIComponent(btn.dataset.nombre);
+      const texto=`👀 Encontré a *${btn.dataset.nombre}* en EntreVecinos — ${btn.dataset.srv}.\nEntrá a ver los datos de contacto: ${url}`;
       if(navigator.share){ try{ await navigator.share({title:btn.dataset.nombre,text:texto,url}); }catch(ex){} }
-      else{ try{ await navigator.clipboard.writeText(url); const o=btn.textContent; btn.textContent='✅'; setTimeout(()=>btn.textContent=o,2000); }catch(ex){} }
+      else{ try{ await navigator.clipboard.writeText(texto+'\n'+url); const o=btn.textContent; btn.textContent='✅'; setTimeout(()=>btn.textContent=o,2000); }catch(ex){} }
     });
   });
 }
 
-function badgeCls(r){ const m={' Muy Recomendable':'muy-recomendable','Recomendable':'recomendable','Sin datos':'sin-datos','Malas Experiencias':'malas-experiencias','No Recomendable':'no-recomendable','Destacado':'destacado-badge-lbl'}; return m[r]||'sin-datos'; }
+function badgeCls(r){ const m={'Muy Recomendable':'muy-recomendable','Recomendable':'recomendable','Sin datos':'sin-datos','Malas Experiencias':'malas-experiencias','No Recomendable':'no-recomendable','Destacado':'destacado-badge-lbl'}; return m[r]||'sin-datos'; }
 
 function cardHTML(p,isDest){
   const sc=p.score;
@@ -1918,7 +1918,7 @@ function cardHTML(p,isDest){
     </div>
     ${p.descripcionPropia?`<div class="card-descripcion-propia">💬 <strong>${esc(p.descripcionPropia)}</strong></div>`:''}
     <div class="card-contacto">
-      ${telOk?(p.soloLlamada?`<a class="contacto-item tel btn-llamar" data-id="${esc(p.firestoreId||'')}" data-nombre="${esc(p.nombre)}" data-empresa="${esc(p.empresa||'')}" href="tel:${p.telefono.replace(/\s/g,'')}" style="text-decoration:none">📞 ${esc(p.telefono)}</a>`:`<button class="contacto-item tel btn-wa" data-num="${numWA}" data-srv="${esc(p.servicio)}" data-id="${esc(p.firestoreId||'')}" data-nombre="${esc(p.nombre)}" data-empresa="${esc(p.empresa||'')}"><svg viewBox="0 0 24 24" width="13" height="13" fill="#25D366" style="vertical-align:middle;margin-right:2px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> ${esc(p.telefono)}</button>`):''}
+      ${telOk?(p.soloLlamada?`<a class="contacto-item tel btn-llamar" data-id="${esc(p.firestoreId||'')}" data-nombre="${esc(p.nombre)}" data-empresa="${esc(p.empresa||'')}" href="tel:${p.telefono.replace(/\s/g,'')}" style="text-decoration:none">📞 Llamar</a>`:`<button class="contacto-item tel btn-wa" data-num="${numWA}" data-srv="${esc(p.servicio)}" data-id="${esc(p.firestoreId||'')}" data-nombre="${esc(p.nombre)}" data-empresa="${esc(p.empresa||'')}"><svg viewBox="0 0 24 24" width="13" height="13" fill="#25D366" style="vertical-align:middle;margin-right:2px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> WhatsApp</button>`):''}
       ${empOk?`<span class="contacto-item">🏢 ${esc(p.empresa)}</span>`:''}
       ${p.barrioOrigen?`<span class="contacto-item" style="color:var(--azul2);border-color:var(--azul-mid);background:var(--azul-claro)">🏘️ ${esc(p.barrioOrigen)}</span>`:''}
     </div>
@@ -3433,9 +3433,18 @@ async function buscarProveedoresAdmin(){
         <td style="padding:7px 8px">
           <button class="btn-marcar-datos" style="font-size:.72rem;color:var(--azul);border-color:var(--azul)" data-edit-id="${p.id}">✏️ Editar</button>
           <button class="btn-marcar-datos" style="font-size:.72rem;color:var(--naranja);border-color:var(--naranja);margin-top:4px" data-volver-id="${p.id}" data-volver-nombre="${(p.nombre||'').replace(/"/g,'')}" data-volver-tel="${p.telefono||''}">↩️ Pendiente</button>
+          <button class="btn-marcar-datos btn-admin-wa-share" style="font-size:.72rem;color:#059669;border-color:#059669;margin-top:4px" data-wa-nombre="${(p.nombre||'').replace(/"/g,'')}" data-wa-srv="${(p.servicio||'').replace(/"/g,'')}" data-wa-recom="${p.recomendacion||''}">📤 WA</button>
         </td>
       </tr>`).join('')}</tbody></table></div>`;
     res.querySelectorAll('[data-edit-id]').forEach(btn=>btn.addEventListener('click',()=>abrirEditarProveedor(btn.dataset.editId, found.find(p=>p.id===btn.dataset.editId))));
+    res.querySelectorAll('.btn-admin-wa-share').forEach(btn=>btn.addEventListener('click', async ()=>{
+      const nombre=btn.dataset.waNombre, srv=btn.dataset.waSrv, recom=btn.dataset.waRecom;
+      const emoji = recom==='Muy Recomendable'?'⭐':recom==='Recomendable'?'👍':recom==='Malas Experiencias'?'⚠️':'🔧';
+      const recomLabel = recom==='Muy Recomendable'?'Muy recomendable por la comunidad ⭐':recom==='Recomendable'?'Recomendado por vecinos 👍':'Nuevo en el directorio';
+      const url='https://entrevecinos.ar/?p='+encodeURIComponent(nombre);
+      const msg=`🏘️ *Nuevo en EntreVecinos*\n\n${emoji} *${nombre}*\n🔧 ${srv}\n\n${recomLabel}\n\n👉 Encontralo y contactalo en:\n${url}`;
+      try{ await navigator.clipboard.writeText(msg); btn.textContent='✅ Copiado'; setTimeout(()=>btn.textContent='📤 WA',2500); }catch(e){ alert(msg); }
+    }));
     res.querySelectorAll('[data-volver-id]').forEach(btn=>btn.addEventListener('click', async()=>{
       if(!confirm(`¿Volver "${btn.dataset.volverNombre}" a revisión pendiente?`)) return;
       btn.disabled=true; btn.textContent='...';
