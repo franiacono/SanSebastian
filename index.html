@@ -3323,6 +3323,8 @@ async function cargarRanking(periodo){
     const conteo = {}; // proveedorId -> {nombre, llamada, whatsapp, compartir}
     snap.forEach(d=>{
       const e = d.data();
+      if(!['llamada','whatsapp','compartir'].includes(e.tipo)) return;
+      if(!e.proveedorId) return;
       if(!conteo[e.proveedorId]) conteo[e.proveedorId]={nombre:e.proveedorNombre||'(sin nombre)',empresa:e.proveedorEmpresa||'',llamada:0,whatsapp:0,compartir:0};
       if(e.tipo==='llamada')   conteo[e.proveedorId].llamada++;
       if(e.tipo==='whatsapp')  conteo[e.proveedorId].whatsapp++;
@@ -3372,6 +3374,7 @@ async function cargarRankingUsuarios(periodo){
     const conteo = {}; // uid -> {nombre, llamada, whatsapp, compartir}
     snap.forEach(d=>{
       const e = d.data();
+      if(!['llamada','whatsapp','compartir'].includes(e.tipo)) return;
       if(!e.uid || e.uid==='anon') return;
       if(!conteo[e.uid]) conteo[e.uid]={nombre:e.userName||e.uid,llamada:0,whatsapp:0,compartir:0};
       if(e.tipo==='llamada')   conteo[e.uid].llamada++;
