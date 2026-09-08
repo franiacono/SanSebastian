@@ -3439,10 +3439,9 @@ async function buscarProveedoresAdmin(){
     res.querySelectorAll('[data-edit-id]').forEach(btn=>btn.addEventListener('click',()=>abrirEditarProveedor(btn.dataset.editId, found.find(p=>p.id===btn.dataset.editId))));
     res.querySelectorAll('.btn-admin-wa-share').forEach(btn=>btn.addEventListener('click', async ()=>{
       const nombre=btn.dataset.waNombre, srv=btn.dataset.waSrv, recom=btn.dataset.waRecom;
-      const emoji = recom==='Muy Recomendable'?'⭐':recom==='Recomendable'?'👍':recom==='Malas Experiencias'?'⚠️':'🔧';
-      const recomLabel = recom==='Muy Recomendable'?'Muy recomendable por la comunidad ⭐':recom==='Recomendable'?'Recomendado por vecinos 👍':'Nuevo en el directorio';
+      const recomLabel = recom==='Muy Recomendable'?'⭐ Muy recomendable por la comunidad':recom==='Recomendable'?'👍 Recomendado por vecinos':'🆕 Nuevo en el directorio';
       const url='https://entrevecinos.ar/?p='+encodeURIComponent(nombre);
-      const msg=`🏘️ *Nuevo en EntreVecinos*\n\n${emoji} *${nombre}*\n🔧 ${srv}\n\n${recomLabel}\n\n👉 Encontralo y contactalo en:\n${url}`;
+      const msg=`🏘️ *Nuevo en EntreVecinos*\n\n⭐ *${nombre}*\n✨ ${srv}\n\n${recomLabel}\n\n👉 Encontralo y contactalo en:\n${url}`;
       try{ await navigator.clipboard.writeText(msg); btn.textContent='✅ Copiado'; setTimeout(()=>btn.textContent='📤 WA',2500); }catch(e){ alert(msg); }
     }));
     res.querySelectorAll('[data-volver-id]').forEach(btn=>btn.addEventListener('click', async()=>{
