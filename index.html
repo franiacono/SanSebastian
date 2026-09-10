@@ -633,6 +633,11 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
           <h2>✍️ Recomendá un proveedor</h2>
           <p style="opacity:.85;font-size:.88rem">Compartí tu experiencia con la comunidad</p>
         </div>
+        <div id="form-proveedor-block" style="display:none;padding:20px;text-align:center">
+          <div style="font-size:2rem;margin-bottom:12px">🛠️</div>
+          <p style="font-weight:600;color:var(--azul);margin-bottom:8px">Esta sección es para vecinos</p>
+          <p style="font-size:.87rem;color:var(--muted);line-height:1.55">Como proveedor, no podés enviar recomendaciones de otros proveedores ni recomendarte a vos mismo.<br>Si querés actualizar tus datos o agregar un servicio, hacelo desde <strong>Configuración → Mi Servicio</strong>.</p>
+        </div>
         <div class="form-body">
           <div id="form-body">
             <div class="form-row"><label>Nombre del proveedor *</label><input class="form-input" type="text" id="f-nombre" placeholder="Juan García"></div>
@@ -834,8 +839,11 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
           <div id="admin-resultados-proveedor"></div>
         </div>
         <div id="admin-tab-usuarios" style="display:none">
-          <div style="display:flex;gap:8px;margin-bottom:12px">
-            <input type="text" id="admin-buscar-usuario" class="form-input" placeholder="Buscar por nombre o email..." style="flex:1">
+          <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+            <input type="text" id="admin-buscar-usuario" class="form-input" placeholder="Buscar por nombre o email..." style="flex:2;min-width:180px">
+            <select id="admin-filtro-barrio" class="form-input" style="flex:1;min-width:140px"><option value="">— Todos los barrios —</option></select>
+            <select id="admin-filtro-area" class="form-input" style="flex:1;min-width:100px"><option value="">— Todos los sectores —</option></select>
+            <input type="text" id="admin-filtro-lote" class="form-input" placeholder="Lote..." style="flex:0 0 90px">
             <button class="btn-submit" id="btn-admin-buscar" style="padding:10px 18px">Buscar</button>
           </div>
           <div id="admin-resultados-usuario"></div>
@@ -1619,9 +1627,14 @@ document.getElementById('btn-recomendar-otro').addEventListener('click', resetFo
 // Resetear formulario al volver a la pantalla de recomendar desde nav
 document.getElementById('nav-recomendar').addEventListener('click',()=>{
   showPage('recomendar');
-  poblarCheckboxBarrios('f-barrios-servicio');
-  poblarSelectBarrios('f-barrio-cual', true, {placeholder: '— Seleccioná el barrio del proveedor —'});
-  resetFormRecomendar();
+  const esProveedor = perfilUsuario?.tipoUsuario === 'proveedor';
+  document.getElementById('form-proveedor-block').style.display = esProveedor ? 'block' : 'none';
+  document.getElementById('form-body').style.display = esProveedor ? 'none' : 'block';
+  if(!esProveedor){
+    poblarCheckboxBarrios('f-barrios-servicio');
+    poblarSelectBarrios('f-barrio-cual', true, {placeholder: '— Seleccioná el barrio del proveedor —'});
+    resetFormRecomendar();
+  }
 });
 document.getElementById('nav-consultas').addEventListener('click', ()=>showPage('consultas'));
 document.getElementById('nav-admin').addEventListener('click', ()=>{
@@ -2020,6 +2033,18 @@ document.getElementById('btn-form-submit').addEventListener('click', async ()=>{
   console.log('Barrios seleccionados:', barriosServicio, document.getElementById('f-barrios-servicio')?.innerHTML?.length);
   const msg=document.getElementById('form-msg');
   msg.style.display='none';
+  // Bloquear si es proveedor
+  if(perfilUsuario?.tipoUsuario === 'proveedor'){
+    msg.textContent='⚠️ Los proveedores no pueden enviar recomendaciones.';
+    msg.style.color='var(--rojo)'; msg.style.display='block'; return;
+  }
+  // Bloquear auto-recomendación por teléfono
+  const telPropio = (perfilUsuario?.telefono||'').replace(/\D/g,'').slice(-8);
+  const telIngresado = telefono.replace(/\D/g,'').slice(-8);
+  if(telPropio && telIngresado && telPropio === telIngresado){
+    msg.textContent='⚠️ No podés recomendarte a vos mismo.';
+    msg.style.color='var(--rojo)'; msg.style.display='block'; return;
+  }
   // Verificar email
   if(!currentUser.emailVerified && currentUser.providerData[0]?.providerId==='password'){
     msg.textContent='⚠️ Debés verificar tu email antes de enviar recomendaciones. Revisá tu bandeja de entrada.';
@@ -2033,7 +2058,11 @@ document.getElementById('btn-form-submit').addEventListener('click', async ()=>{
     const dup=await getDocs(q2);
     let duplicado=false;
     dup.forEach(d=>{ if(norm(d.data().nombre)===norm(nombre)) duplicado=true; });
-    if(duplicado){msg.textContent='⚠️ Ya enviaste una recomendación para este proveedor.';msg.style.color='var(--rojo)';msg.style.display='block';btn.disabled=false;btn.textContent='Enviar recomendación';return;}
+    if(duplicado){msg.textContent='⚠️ Este proveedor ya tiene una recomendación pendiente de aprobación.';msg.style.color='var(--rojo)';msg.style.display='block';btn.disabled=false;btn.textContent='Enviar recomendación';return;}
+    // Check si ya existe en proveedores aprobados
+    const qProv=query(collection(db,'proveedores'),where('telefono','==',telefono));
+    const dupProv=await getDocs(qProv);
+    if(!dupProv.empty){msg.textContent='⚠️ Este proveedor ya está registrado en EntreVecinos.';msg.style.color='var(--rojo)';msg.style.display='block';btn.disabled=false;btn.textContent='Enviar recomendación';return;}
     await addDoc(collection(db,'pendientes'),{
       nombre,empresa,dni,telefono,servicio,
       recomendacion:recomen,
@@ -3661,27 +3690,61 @@ document.getElementById('btn-guardar-usr').addEventListener('click', async()=>{
   btn.disabled=false; btn.textContent='💾 Guardar cambios';
 });
 
+const fmtFechaCorta = iso => { if(!iso)return ''; try{ const d=new Date(iso); const dd=String(d.getDate()).padStart(2,'0'); const mm=String(d.getMonth()+1).padStart(2,'0'); const yy=String(d.getFullYear()).slice(2); return `${dd}/${mm}/${yy}`; }catch(e){return '';} };
+
 async function buscarUsuariosAdmin(){
   const q2=document.getElementById('admin-buscar-usuario').value.trim().toLowerCase();
+  const filtroBarrio=document.getElementById('admin-filtro-barrio').value;
+  const filtroArea=document.getElementById('admin-filtro-area').value;
+  const filtroLote=norm(document.getElementById('admin-filtro-lote').value.trim());
   const res=document.getElementById('admin-resultados-usuario');
   res.innerHTML='<div class="loading"><div class="spinner"></div>Cargando...</div>';
   try{
     const snap=await getDocs(collection(db,'usuarios'));
-    const found=[];
-    snap.forEach(d=>{const u=d.data();if(!q2||norm(u.nombre||'').includes(q2)||norm(u.email||'').includes(q2))found.push({...u,id:d.id});});
-    found.sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||'','es'));
-    if(!found.length){res.innerHTML='<p style="color:var(--muted);font-size:.82rem">No se encontraron usuarios.</p>';return;}
+    const todos=[];
+    snap.forEach(d=>{const u=d.data();todos.push({...u,id:d.id});});
+    // Poblar selects de barrio (primera vez o si están vacíos)
+    const selBarrio=document.getElementById('admin-filtro-barrio');
+    const selArea=document.getElementById('admin-filtro-area');
+    if(selBarrio.options.length<=1){
+      const barrios=[...new Set(todos.map(u=>u.barrio||'').filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
+      barrios.forEach(b=>{const o=document.createElement('option');o.value=b;o.textContent=b;selBarrio.appendChild(o);});
+    }
+    // Poblar áreas según barrio seleccionado
+    const barrioPoblar=filtroBarrio||null;
+    const areasDisp=[...new Set(todos.filter(u=>!barrioPoblar||u.barrio===barrioPoblar).map(u=>u.area||'').filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
+    selArea.innerHTML='<option value="">— Todos los sectores —</option>';
+    areasDisp.forEach(a=>{const o=document.createElement('option');o.value=a;o.textContent='Sector '+a;selArea.appendChild(o);});
+    if(filtroArea) selArea.value=filtroArea;
+    const found=todos.filter(u=>{
+      if(q2 && !norm(u.nombre||'').includes(q2) && !norm(u.email||'').includes(q2)) return false;
+      if(filtroBarrio && u.barrio!==filtroBarrio) return false;
+      if(filtroArea && u.area!==filtroArea) return false;
+      if(filtroLote && !norm(u.lote||'').includes(filtroLote)) return false;
+      return true;
+    });
+    found.sort((a,b)=>{
+      const fa=a.fechaRegistro?.toDate?a.fechaRegistro.toDate().getTime():(a.fechaRegistro||0);
+      const fb=b.fechaRegistro?.toDate?b.fechaRegistro.toDate().getTime():(b.fechaRegistro||0);
+      return fb-fa;
+    });
+    if(!found.length){res.innerHTML='<p style="color:var(--muted);font-size:.82rem">No se encontraron usuarios con esos filtros.</p>';return;}
+    const cols=['Registro','Nombre','Email','Barrio','Sector','Lote','Verificado','Último acceso',''];
+    const colW=['90px','','','110px','60px','70px','90px','90px','72px'];
     res.innerHTML=`<p style="font-size:.78rem;color:var(--muted);margin-bottom:8px">${found.length} usuario${found.length!==1?'s':''}</p>
-    <div style="overflow-x:auto"><table style="width:100%;font-size:.77rem;border-collapse:collapse">
-      <thead><tr style="background:var(--crema2)">${['Nombre','Email','Barrio','Sector','Verificado','Último acceso',''].map(h=>`<th style="padding:7px 8px;text-align:left;border-bottom:1px solid var(--border);font-weight:600">${h}</th>`).join('')}</tr></thead>
+    <div style="overflow-x:auto"><table style="width:100%;font-size:.77rem;border-collapse:collapse;table-layout:fixed">
+      <colgroup>${colW.map(w=>`<col${w?` style="width:${w}"`:''}>`).join('')}</colgroup>
+      <thead><tr style="background:var(--crema2)">${cols.map(h=>`<th style="padding:7px 8px;text-align:left;border-bottom:1px solid var(--border);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${h}</th>`).join('')}</tr></thead>
       <tbody>${found.map(u=>`<tr style="border-bottom:1px solid var(--crema2)">
-        <td style="padding:7px 8px">${u.nombre||'—'}</td>
-        <td style="padding:7px 8px;color:var(--muted)">${u.email||'—'}</td>
-        <td style="padding:7px 8px">${u.barrio||'—'}</td>
-        <td style="padding:7px 8px">${u.area||'—'}</td>
-        <td style="padding:7px 8px"><span class="admin-badge ${u.verificado==='Si'?'verificado':'no-verificado'}">${u.verificado==='Si'?'✅':'⚠️'} ${u.verificado||'No'}</span></td>
-        <td style="padding:7px 8px;color:var(--muted)">${u.ultimoAcceso?.toDate?fmtFecha(u.ultimoAcceso.toDate().toISOString()):'—'}</td>
-        <td style="padding:7px 8px"><button class="btn-marcar-datos" style="font-size:.72rem" data-marcar-uid="${u.uid||u.id}" data-marcar-email="${u.email||''}">🚩</button>
+        <td style="padding:6px 8px;color:var(--muted);white-space:nowrap">${u.fechaRegistro?.toDate?fmtFechaCorta(u.fechaRegistro.toDate().toISOString()):'—'}</td>
+        <td style="padding:6px 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${u.nombre||''}">${u.nombre||'—'}</td>
+        <td style="padding:6px 8px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${u.email||''}">${u.email||'—'}</td>
+        <td style="padding:6px 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${u.barrio||''}">${u.barrio||'—'}</td>
+        <td style="padding:6px 8px;text-align:center">${u.area||'—'}</td>
+        <td style="padding:6px 8px;text-align:center">${u.lote||'—'}</td>
+        <td style="padding:6px 8px"><span class="admin-badge ${u.verificado==='Si'?'verificado':'no-verificado'}" style="white-space:nowrap">${u.verificado==='Si'?'✅ Sí':'⚠️ No'}</span></td>
+        <td style="padding:6px 8px;color:var(--muted);white-space:nowrap">${u.ultimoAcceso?.toDate?fmtFechaCorta(u.ultimoAcceso.toDate().toISOString()):'—'}</td>
+        <td style="padding:6px 8px;white-space:nowrap"><button class="btn-marcar-datos" style="font-size:.72rem" data-marcar-uid="${u.uid||u.id}" data-marcar-email="${u.email||''}">🚩</button>
         <button class="btn-marcar-datos" style="font-size:.72rem;color:var(--azul);border-color:var(--azul);margin-left:4px" data-edit-usr-id="${u.uid||u.id}">✏️</button></td>
       </tr>`).join('')}</tbody></table></div>`;
     res.querySelectorAll('[data-marcar-uid]').forEach(btn=>btn.addEventListener('click',()=>marcarDatosIncorrectos(btn)));
@@ -3693,6 +3756,8 @@ async function buscarUsuariosAdmin(){
 }
 document.getElementById('btn-admin-buscar').addEventListener('click', ()=>buscarUsuariosAdmin());
 document.getElementById('admin-buscar-usuario').addEventListener('keydown', e=>{ if(e.key==='Enter') buscarUsuariosAdmin(); });
+document.getElementById('admin-filtro-barrio').addEventListener('change', ()=>buscarUsuariosAdmin());
+document.getElementById('admin-filtro-area').addEventListener('change', ()=>buscarUsuariosAdmin());
 
 </script>
 </body>
