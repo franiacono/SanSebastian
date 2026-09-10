@@ -633,6 +633,11 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
           <h2>✍️ Recomendá un proveedor</h2>
           <p style="opacity:.85;font-size:.88rem">Compartí tu experiencia con la comunidad</p>
         </div>
+        <div id="form-proveedor-block" style="display:none;padding:20px;text-align:center">
+          <div style="font-size:2rem;margin-bottom:12px">🛠️</div>
+          <p style="font-weight:600;color:var(--azul);margin-bottom:8px">Esta sección es para vecinos</p>
+          <p style="font-size:.87rem;color:var(--muted);line-height:1.55">Como proveedor, no podés enviar recomendaciones de otros proveedores ni recomendarte a vos mismo.<br>Si querés actualizar tus datos o agregar un servicio, hacelo desde <strong>Configuración → Mi Servicio</strong>.</p>
+        </div>
         <div class="form-body">
           <div id="form-body">
             <div class="form-row"><label>Nombre del proveedor *</label><input class="form-input" type="text" id="f-nombre" placeholder="Juan García"></div>
@@ -1619,9 +1624,14 @@ document.getElementById('btn-recomendar-otro').addEventListener('click', resetFo
 // Resetear formulario al volver a la pantalla de recomendar desde nav
 document.getElementById('nav-recomendar').addEventListener('click',()=>{
   showPage('recomendar');
-  poblarCheckboxBarrios('f-barrios-servicio');
-  poblarSelectBarrios('f-barrio-cual', true, {placeholder: '— Seleccioná el barrio del proveedor —'});
-  resetFormRecomendar();
+  const esProveedor = perfilUsuario?.tipoUsuario === 'proveedor';
+  document.getElementById('form-proveedor-block').style.display = esProveedor ? 'block' : 'none';
+  document.getElementById('form-body').style.display = esProveedor ? 'none' : 'block';
+  if(!esProveedor){
+    poblarCheckboxBarrios('f-barrios-servicio');
+    poblarSelectBarrios('f-barrio-cual', true, {placeholder: '— Seleccioná el barrio del proveedor —'});
+    resetFormRecomendar();
+  }
 });
 document.getElementById('nav-consultas').addEventListener('click', ()=>showPage('consultas'));
 document.getElementById('nav-admin').addEventListener('click', ()=>{
@@ -2020,6 +2030,18 @@ document.getElementById('btn-form-submit').addEventListener('click', async ()=>{
   console.log('Barrios seleccionados:', barriosServicio, document.getElementById('f-barrios-servicio')?.innerHTML?.length);
   const msg=document.getElementById('form-msg');
   msg.style.display='none';
+  // Bloquear si es proveedor
+  if(perfilUsuario?.tipoUsuario === 'proveedor'){
+    msg.textContent='⚠️ Los proveedores no pueden enviar recomendaciones.';
+    msg.style.color='var(--rojo)'; msg.style.display='block'; return;
+  }
+  // Bloquear auto-recomendación por teléfono
+  const telPropio = (perfilUsuario?.telefono||'').replace(/\D/g,'').slice(-8);
+  const telIngresado = telefono.replace(/\D/g,'').slice(-8);
+  if(telPropio && telIngresado && telPropio === telIngresado){
+    msg.textContent='⚠️ No podés recomendarte a vos mismo.';
+    msg.style.color='var(--rojo)'; msg.style.display='block'; return;
+  }
   // Verificar email
   if(!currentUser.emailVerified && currentUser.providerData[0]?.providerId==='password'){
     msg.textContent='⚠️ Debés verificar tu email antes de enviar recomendaciones. Revisá tu bandeja de entrada.';
@@ -2033,7 +2055,11 @@ document.getElementById('btn-form-submit').addEventListener('click', async ()=>{
     const dup=await getDocs(q2);
     let duplicado=false;
     dup.forEach(d=>{ if(norm(d.data().nombre)===norm(nombre)) duplicado=true; });
-    if(duplicado){msg.textContent='⚠️ Ya enviaste una recomendación para este proveedor.';msg.style.color='var(--rojo)';msg.style.display='block';btn.disabled=false;btn.textContent='Enviar recomendación';return;}
+    if(duplicado){msg.textContent='⚠️ Este proveedor ya tiene una recomendación pendiente de aprobación.';msg.style.color='var(--rojo)';msg.style.display='block';btn.disabled=false;btn.textContent='Enviar recomendación';return;}
+    // Check si ya existe en proveedores aprobados
+    const qProv=query(collection(db,'proveedores'),where('telefono','==',telefono));
+    const dupProv=await getDocs(qProv);
+    if(!dupProv.empty){msg.textContent='⚠️ Este proveedor ya está registrado en EntreVecinos.';msg.style.color='var(--rojo)';msg.style.display='block';btn.disabled=false;btn.textContent='Enviar recomendación';return;}
     await addDoc(collection(db,'pendientes'),{
       nombre,empresa,dni,telefono,servicio,
       recomendacion:recomen,
@@ -3669,12 +3695,17 @@ async function buscarUsuariosAdmin(){
     const snap=await getDocs(collection(db,'usuarios'));
     const found=[];
     snap.forEach(d=>{const u=d.data();if(!q2||norm(u.nombre||'').includes(q2)||norm(u.email||'').includes(q2))found.push({...u,id:d.id});});
-    found.sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||'','es'));
+    found.sort((a,b)=>{
+      const fa=a.fechaRegistro?.toDate?a.fechaRegistro.toDate().getTime():(a.fechaRegistro||0);
+      const fb=b.fechaRegistro?.toDate?b.fechaRegistro.toDate().getTime():(b.fechaRegistro||0);
+      return fb-fa;
+    });
     if(!found.length){res.innerHTML='<p style="color:var(--muted);font-size:.82rem">No se encontraron usuarios.</p>';return;}
     res.innerHTML=`<p style="font-size:.78rem;color:var(--muted);margin-bottom:8px">${found.length} usuario${found.length!==1?'s':''}</p>
     <div style="overflow-x:auto"><table style="width:100%;font-size:.77rem;border-collapse:collapse">
-      <thead><tr style="background:var(--crema2)">${['Nombre','Email','Barrio','Sector','Verificado','Último acceso',''].map(h=>`<th style="padding:7px 8px;text-align:left;border-bottom:1px solid var(--border);font-weight:600">${h}</th>`).join('')}</tr></thead>
+      <thead><tr style="background:var(--crema2)">${['Registro','Nombre','Email','Barrio','Sector','Verificado','Último acceso',''].map(h=>`<th style="padding:7px 8px;text-align:left;border-bottom:1px solid var(--border);font-weight:600">${h}</th>`).join('')}</tr></thead>
       <tbody>${found.map(u=>`<tr style="border-bottom:1px solid var(--crema2)">
+        <td style="padding:7px 8px;color:var(--muted);white-space:nowrap">${u.fechaRegistro?.toDate?fmtFecha(u.fechaRegistro.toDate().toISOString()):'—'}</td>
         <td style="padding:7px 8px">${u.nombre||'—'}</td>
         <td style="padding:7px 8px;color:var(--muted)">${u.email||'—'}</td>
         <td style="padding:7px 8px">${u.barrio||'—'}</td>
