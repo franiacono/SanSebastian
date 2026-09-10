@@ -2070,12 +2070,14 @@ document.getElementById('btn-form-submit').addEventListener('click', async ()=>{
     const q2=query(collection(db,'pendientes'),where('telefono','==',telefono),where('estado','==','Pendiente'));
     const dup=await getDocs(q2);
     let duplicado=false;
-    dup.forEach(d=>{ if(norm(d.data().nombre)===norm(nombre)) duplicado=true; });
-    if(duplicado){msg.textContent='⚠️ Este proveedor ya tiene una recomendación pendiente de aprobación.';msg.style.color='var(--rojo)';msg.style.display='block';btn.disabled=false;btn.textContent='Enviar recomendación';return;}
-    // Check si ya existe en proveedores aprobados
-    const qProv=query(collection(db,'proveedores'),where('telefono','==',telefono));
-    const dupProv=await getDocs(qProv);
-    if(!dupProv.empty){msg.textContent='⚠️ Este proveedor ya está registrado en EntreVecinos.';msg.style.color='var(--rojo)';msg.style.display='block';btn.disabled=false;btn.textContent='Enviar recomendación';return;}
+    dup.forEach(d=>{
+      const d2=d.data();
+      if(norm(d2.nombre)!==norm(nombre)) return;
+      // Solo bloquear si es el mismo vecino quien ya lo recomendó
+      const quienInforma=d2.quienInforma||'';
+      if(quienInforma.includes(currentUser.uid)) duplicado=true;
+    });
+    if(duplicado){msg.textContent='⚠️ Ya enviaste una recomendación para este proveedor (pendiente de aprobación).';msg.style.color='var(--rojo)';msg.style.display='block';btn.disabled=false;btn.textContent='Enviar recomendación';return;}
     await addDoc(collection(db,'pendientes'),{
       nombre,empresa,dni,telefono,servicio,
       recomendacion:recomen,
