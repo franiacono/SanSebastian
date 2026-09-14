@@ -2233,7 +2233,7 @@ document.querySelectorAll('.admin-tab[data-atab]').forEach(tab=>{
     if(tab.dataset.atab==='usuarios') buscarUsuariosAdmin();
     if(tab.dataset.atab==='proveedores') buscarProveedoresAdmin();
     if(tab.dataset.atab==='estadisticas'){ cargarRanking('semana'); cargarRankingUsuarios('semana'); cargarMetricas(); }
-    if(tab.dataset.atab==='recategorizar') renderCatsChips();
+    if(tab.dataset.atab==='recategorizar') cargarCatsCustom();
   });
 });
 
