@@ -868,6 +868,24 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
           </div>
         </div>
         <div id="admin-tab-recategorizar" style="display:none">
+          <!-- Gestión de categorías -->
+          <div style="background:white;border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+              <span style="font-size:.88rem;font-weight:600;color:var(--azul)">🏷️ Categorías disponibles</span>
+              <button id="btn-toggle-nueva-cat" style="padding:6px 14px;background:var(--azul);color:white;border:none;border-radius:8px;font-size:.78rem;font-family:'Inter',sans-serif;cursor:pointer;font-weight:500">➕ Nueva categoría</button>
+            </div>
+            <div id="cats-chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px"></div>
+            <div id="nueva-cat-form" style="display:none;margin-top:12px;background:var(--crema);border-radius:8px;padding:12px">
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
+                <div><label style="font-size:.75rem;font-weight:600;display:block;margin-bottom:4px">Emoji</label><input type="text" id="nueva-cat-emoji" class="form-input" placeholder="🎉" style="width:60px;text-align:center"></div>
+                <div style="flex:1;min-width:120px"><label style="font-size:.75rem;font-weight:600;display:block;margin-bottom:4px">Nombre *</label><input type="text" id="nueva-cat-label" class="form-input" placeholder="Ej: Deportes"></div>
+                <div style="flex:2;min-width:180px"><label style="font-size:.75rem;font-weight:600;display:block;margin-bottom:4px">Palabras clave (separadas por coma)</label><input type="text" id="nueva-cat-keys" class="form-input" placeholder="deporte, gimnasio, fútbol..."></div>
+                <button id="btn-guardar-nueva-cat" class="btn-submit" style="padding:9px 16px;white-space:nowrap">💾 Guardar</button>
+              </div>
+              <p id="nueva-cat-msg" style="font-size:.78rem;margin-top:6px;display:none"></p>
+            </div>
+          </div>
+          <!-- Recategorizar -->
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px">
             <button class="btn-submit" id="btn-cargar-recateg" style="padding:10px 18px">🔄 Cargar proveedores</button>
             <button class="btn-submit" id="btn-aplicar-todos-recateg" style="display:none;background:var(--verde-ok);padding:10px 18px">✅ Aplicar todos los cambios sugeridos</button>
@@ -1229,8 +1247,10 @@ const CATS = [
   {emoji:'🔨',label:'Herrería',keys:['herrero','herreria','soldad','metalurg','rejas','portones','estructura metal','chapa metal']},
   {emoji:'🌿',label:'Fumigación',keys:['fumig','plaga','cucarach','hormiga','ratones','mosquit','control de plaga','desinfest']},
   {emoji:'🚛',label:'Mudanzas',keys:['mudanz','flete','acarreo','camion de carga','traslado de mueble']},
+  {emoji:'🎉',label:'Eventos',keys:['evento','dj','animacion','sonido','iluminacion','fotografia','video boda','banquet','salon de fiest','show','cumpleanos','casamiento','boda','decoracion fiesta','catering evento']},
   {emoji:'📦',label:'Varios',keys:[]},
 ];
+const CATS_BASE = CATS.map(c=>({...c})); // snapshot inmutable de las categorías incorporadas
 
 const norm = t => { if(!t)return ''; return String(t).toLowerCase().trim().replace(/á/g,'a').replace(/é/g,'e').replace(/í/g,'i').replace(/ó/g,'o').replace(/ú/g,'u').replace(/ü/g,'u'); };
 const esc  = t => { if(!t)return ''; return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); };
@@ -1565,6 +1585,7 @@ function entrarALaApp() {
   }
   cargarProveedores();
   cargarTelefonos();
+  cargarCatsCustom();
   setTimeout(fixMobileLabels, 100);
   // Aviso datos incorrectos - solo mostrar si avisoAdmin === 'Si' y no se mostró en esta sesión
   if(perfilUsuario?.avisoAdmin === 'Si' && !sessionStorage.getItem('avisoMostrado')){
@@ -2022,6 +2043,9 @@ function recomendarDesdeCard(pDataStr){
     // Poblar checkboxes
     poblarCheckboxBarrios('f-barrios-servicio');
     poblarSelectBarrios('f-barrio-cual', true, {placeholder: '— Seleccioná el barrio del proveedor —'});
+    // Rehabilitar botón por si quedó deshabilitado de una recomendación previa
+    const btnS=document.getElementById('btn-form-submit');
+    if(btnS){btnS.disabled=false;btnS.textContent='Enviar recomendación';}
     showPage('recomendar');
     window.scrollTo(0,0);
   }catch(e){}
@@ -2075,7 +2099,7 @@ document.getElementById('btn-form-submit').addEventListener('click', async ()=>{
       if(norm(d2.nombre)!==norm(nombre)) return;
       // Solo bloquear si es el mismo vecino quien ya lo recomendó
       const quienInforma=d2.quienInforma||'';
-      if(quienInforma.includes(currentUser.uid)) duplicado=true;
+      if(currentUser.uid && quienInforma.includes(currentUser.uid)) duplicado=true;
     });
     if(duplicado){msg.textContent='⚠️ Ya enviaste una recomendación para este proveedor (pendiente de aprobación).';msg.style.color='var(--rojo)';msg.style.display='block';btn.disabled=false;btn.textContent='Enviar recomendación';return;}
     await addDoc(collection(db,'pendientes'),{
@@ -2186,6 +2210,7 @@ document.querySelectorAll('.admin-tab[data-atab]').forEach(tab=>{
     if(tab.dataset.atab==='usuarios') buscarUsuariosAdmin();
     if(tab.dataset.atab==='proveedores') buscarProveedoresAdmin();
     if(tab.dataset.atab==='estadisticas'){ cargarRanking('semana'); cargarRankingUsuarios('semana'); cargarMetricas(); }
+    if(tab.dataset.atab==='recategorizar') renderCatsChips();
   });
 });
 
@@ -2318,6 +2343,69 @@ async function aplicarRecateg(idx, nuevasCats) {
     alert('Error al guardar: ' + e.message);
   }
 }
+
+// ── GESTIÓN DE CATEGORÍAS ─────────────────────────────────────────────────────
+function renderCatsChips(){
+  const cont=document.getElementById('cats-chips');
+  if(!cont) return;
+  cont.innerHTML=catsSorted().map(c=>{
+    const esCustom=!CATS_BASE.find(b=>b.label===c.label);
+    return `<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:var(--crema2);border-radius:20px;font-size:.76rem;font-weight:500">
+      ${c.emoji} ${c.label}
+      ${esCustom?`<button data-del-cat="${c.label}" title="Eliminar" style="background:none;border:none;color:var(--rojo);cursor:pointer;font-size:.8rem;padding:0 0 0 2px;line-height:1">✕</button>`:''}
+    </span>`;
+  }).join('');
+  cont.querySelectorAll('[data-del-cat]').forEach(btn=>btn.addEventListener('click',async()=>{
+    const label=btn.dataset.delCat;
+    if(!confirm(`¿Eliminar la categoría "${label}"?`)) return;
+    const idx=CATS.findIndex(c=>c.label===label);
+    if(idx>-1) CATS.splice(idx,1);
+    await guardarCatsCustom();
+    renderCatsChips();
+  }));
+}
+
+async function guardarCatsCustom(){
+  const custom=CATS.filter(c=>!CATS_BASE.find(b=>b.label===c.label));
+  try{ await setDoc(doc(db,'config','categorias'),{custom},{merge:false}); }catch(e){ console.log('Error guardando cats:',e); }
+}
+
+async function cargarCatsCustom(){
+  try{
+    const snap=await getDoc(doc(db,'config','categorias'));
+    if(snap.exists()){
+      (snap.data().custom||[]).forEach(c=>{
+        if(c.label && !CATS.find(x=>x.label===c.label)) CATS.push(c);
+      });
+    }
+  }catch(e){}
+}
+
+document.getElementById('btn-toggle-nueva-cat').addEventListener('click',()=>{
+  const f=document.getElementById('nueva-cat-form');
+  f.style.display=f.style.display==='none'?'block':'none';
+});
+document.getElementById('btn-guardar-nueva-cat').addEventListener('click',async()=>{
+  const emoji=(document.getElementById('nueva-cat-emoji').value.trim()||'📦');
+  const label=document.getElementById('nueva-cat-label').value.trim();
+  const keysRaw=document.getElementById('nueva-cat-keys').value;
+  const keys=keysRaw.split(',').map(s=>norm(s.trim())).filter(Boolean);
+  const msg=document.getElementById('nueva-cat-msg');
+  if(!label){msg.textContent='⚠️ El nombre es obligatorio.';msg.style.color='var(--rojo)';msg.style.display='block';return;}
+  if(CATS.find(c=>norm(c.label)===norm(label))){msg.textContent='⚠️ Esa categoría ya existe.';msg.style.color='var(--rojo)';msg.style.display='block';return;}
+  // Insertar antes de Varios
+  const idxVarios=CATS.findIndex(c=>c.label==='Varios');
+  const newCat={emoji,label,keys};
+  if(idxVarios>-1) CATS.splice(idxVarios,0,newCat); else CATS.push(newCat);
+  await guardarCatsCustom();
+  document.getElementById('nueva-cat-emoji').value='';
+  document.getElementById('nueva-cat-label').value='';
+  document.getElementById('nueva-cat-keys').value='';
+  document.getElementById('nueva-cat-form').style.display='none';
+  msg.textContent='✅ Categoría agregada.';msg.style.color='var(--verde-ok)';msg.style.display='block';
+  setTimeout(()=>msg.style.display='none',2500);
+  renderCatsChips();
+});
 
 document.getElementById('btn-cargar-recateg').addEventListener('click', cargarRecategorizar);
 document.getElementById('btn-filtro-varios').addEventListener('click', () => {
@@ -3765,21 +3853,19 @@ async function buscarUsuariosAdmin(){
       return fb-fa;
     });
     if(!found.length){res.innerHTML='<p style="color:var(--muted);font-size:.82rem">No se encontraron usuarios con esos filtros.</p>';return;}
-    const cols=['Registro','Nombre','Email','Barrio','Sector','Lote','Verificado','Último acceso',''];
-    const colW=['90px','','','110px','60px','70px','90px','90px','72px'];
+    const cols=['Registro','Nombre','Email','Barrio','Sec.','Lote','Verif.','Últ. acceso',''];
     res.innerHTML=`<p style="font-size:.78rem;color:var(--muted);margin-bottom:8px">${found.length} usuario${found.length!==1?'s':''}</p>
-    <div style="overflow-x:auto"><table style="width:100%;font-size:.77rem;border-collapse:collapse;table-layout:fixed">
-      <colgroup>${colW.map(w=>`<col${w?` style="width:${w}"`:''}>`).join('')}</colgroup>
-      <thead><tr style="background:var(--crema2)">${cols.map(h=>`<th style="padding:7px 8px;text-align:left;border-bottom:1px solid var(--border);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${h}</th>`).join('')}</tr></thead>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table style="font-size:.77rem;border-collapse:collapse;white-space:nowrap">
+      <thead><tr style="background:var(--crema2)">${cols.map(h=>`<th style="padding:7px 8px;text-align:left;border-bottom:1px solid var(--border);font-weight:600">${h}</th>`).join('')}</tr></thead>
       <tbody>${found.map(u=>`<tr style="border-bottom:1px solid var(--crema2)">
-        <td style="padding:6px 8px;color:var(--muted);white-space:nowrap">${u.fechaRegistro?.toDate?fmtFechaCorta(u.fechaRegistro.toDate().toISOString()):'—'}</td>
-        <td style="padding:6px 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${u.nombre||''}">${u.nombre||'—'}</td>
-        <td style="padding:6px 8px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${u.email||''}">${u.email||'—'}</td>
-        <td style="padding:6px 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${u.barrio||''}">${u.barrio||'—'}</td>
+        <td style="padding:6px 8px;color:var(--muted)">${u.fechaRegistro?.toDate?fmtFechaCorta(u.fechaRegistro.toDate().toISOString()):'—'}</td>
+        <td style="padding:6px 8px;min-width:130px;max-width:200px;overflow:hidden;text-overflow:ellipsis" title="${u.nombre||''}">${u.nombre||'—'}</td>
+        <td style="padding:6px 8px;color:var(--muted);max-width:180px;overflow:hidden;text-overflow:ellipsis" title="${u.email||''}">${u.email||'—'}</td>
+        <td style="padding:6px 8px">${u.barrio||'—'}</td>
         <td style="padding:6px 8px;text-align:center">${u.area||'—'}</td>
         <td style="padding:6px 8px;text-align:center">${u.lote||'—'}</td>
-        <td style="padding:6px 8px"><span class="admin-badge ${u.verificado==='Si'?'verificado':'no-verificado'}" style="white-space:nowrap">${u.verificado==='Si'?'✅ Sí':'⚠️ No'}</span></td>
-        <td style="padding:6px 8px;color:var(--muted);white-space:nowrap">${u.ultimoAcceso?.toDate?fmtFechaCorta(u.ultimoAcceso.toDate().toISOString()):'—'}</td>
+        <td style="padding:6px 8px"><span class="admin-badge ${u.verificado==='Si'?'verificado':'no-verificado'}">${u.verificado==='Si'?'✅':'⚠️'}</span></td>
+        <td style="padding:6px 8px;color:var(--muted)">${u.ultimoAcceso?.toDate?fmtFechaCorta(u.ultimoAcceso.toDate().toISOString()):'—'}</td>
         <td style="padding:6px 8px;white-space:nowrap"><button class="btn-marcar-datos" style="font-size:.72rem" data-marcar-uid="${u.uid||u.id}" data-marcar-email="${u.email||''}">🚩</button>
         <button class="btn-marcar-datos" style="font-size:.72rem;color:var(--azul);border-color:var(--azul);margin-left:4px" data-edit-usr-id="${u.uid||u.id}">✏️</button></td>
       </tr>`).join('')}</tbody></table></div>`;
