@@ -876,13 +876,21 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
             </div>
             <div id="cats-chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px"></div>
             <div id="nueva-cat-form" style="display:none;margin-top:12px;background:var(--crema);border-radius:8px;padding:12px">
-              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">
-                <div><label style="font-size:.75rem;font-weight:600;display:block;margin-bottom:4px">Emoji</label><input type="text" id="nueva-cat-emoji" class="form-input" placeholder="🎉" style="width:60px;text-align:center"></div>
+              <input type="hidden" id="nueva-cat-edit-label">
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px">
+                <div>
+                  <label style="font-size:.75rem;font-weight:600;display:block;margin-bottom:4px">Emoji</label>
+                  <input type="text" id="nueva-cat-emoji" class="form-input" placeholder="🎉" style="width:60px;text-align:center;font-size:1.2rem">
+                </div>
                 <div style="flex:1;min-width:120px"><label style="font-size:.75rem;font-weight:600;display:block;margin-bottom:4px">Nombre *</label><input type="text" id="nueva-cat-label" class="form-input" placeholder="Ej: Deportes"></div>
-                <div style="flex:2;min-width:180px"><label style="font-size:.75rem;font-weight:600;display:block;margin-bottom:4px">Palabras clave (separadas por coma)</label><input type="text" id="nueva-cat-keys" class="form-input" placeholder="deporte, gimnasio, fútbol..."></div>
+                <div style="flex:2;min-width:180px"><label style="font-size:.75rem;font-weight:600;display:block;margin-bottom:4px">Palabras clave (coma separadas)</label><input type="text" id="nueva-cat-keys" class="form-input" placeholder="deporte, gimnasio, fútbol..."></div>
                 <button id="btn-guardar-nueva-cat" class="btn-submit" style="padding:9px 16px;white-space:nowrap">💾 Guardar</button>
               </div>
-              <p id="nueva-cat-msg" style="font-size:.78rem;margin-top:6px;display:none"></p>
+              <div style="font-size:.72rem;color:var(--muted);margin-bottom:5px">Elegí un emoji:</div>
+              <div style="display:flex;flex-wrap:wrap;gap:4px">
+                ${['🔧','⚡','🏗️','🎨','🪟','🛋️','❄️','🔥','🏡','🧹','🔒','🖥️','🚗','🐾','🍕','💆','📚','🏊','✈️','🔨','🌿','🚛','🎉','🎵','🏋️','💅','🧱','🌸','🏥','⚽','🎭','📷','🧑‍🍳','🛠️','🧰','🪴','🏠','🎓','💡','🚿'].map(e=>`<button class="emoji-pick-btn" data-emoji="${e}" style="padding:5px 7px;background:white;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:1.1rem;line-height:1">${e}</button>`).join('')}
+              </div>
+              <p id="nueva-cat-msg" style="font-size:.78rem;margin-top:8px;display:none"></p>
             </div>
           </div>
           <!-- Recategorizar -->
@@ -1132,6 +1140,21 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
       <button id="aprobar-wa-cerrar" style="background:none;border:none;color:var(--muted);font-size:.8rem;cursor:pointer;text-decoration:underline;margin-top:4px">Cerrar sin avisar</button>
     </div>
     <p id="aprobar-prov-msg" style="font-size:.82rem;margin-top:8px;display:none;text-align:center"></p>
+  </div>
+</div>
+  <div class="modal-overlay" id="modal-rechazar-pend">
+  <div class="modal-box" style="max-width:400px">
+    <button class="modal-close" id="rechazar-pend-close">✕</button>
+    <h3 style="font-family:'Fraunces',serif;color:var(--rojo);margin-bottom:6px">❌ Rechazar recomendación</h3>
+    <p id="rechazar-pend-nombre" style="font-size:.85rem;color:var(--muted);margin-bottom:14px"></p>
+    <input type="hidden" id="rechazar-pend-id">
+    <label style="font-size:.82rem;font-weight:600;color:var(--text);display:block;margin-bottom:6px">Motivo del rechazo <span style="color:var(--muted);font-weight:400">(se enviará al vecino)</span></label>
+    <textarea id="rechazar-pend-motivo" class="form-input" placeholder="Ej: Los datos de contacto no son válidos..." style="height:90px;resize:vertical;margin-bottom:14px"></textarea>
+    <div style="display:flex;gap:8px">
+      <button class="btn-rechazar" id="btn-confirmar-rechazar" style="flex:1">❌ Confirmar rechazo</button>
+      <button class="btn-secondary" id="rechazar-pend-cancelar" style="flex:1;font-size:.83rem">Cancelar</button>
+    </div>
+    <p id="rechazar-pend-msg" style="font-size:.82rem;margin-top:8px;display:none;text-align:center"></p>
   </div>
 </div>
   <div class="aviso-datos-overlay" id="modal-aviso-datos">
@@ -2350,11 +2373,23 @@ function renderCatsChips(){
   if(!cont) return;
   cont.innerHTML=catsSorted().map(c=>{
     const esCustom=!CATS_BASE.find(b=>b.label===c.label);
-    return `<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;background:var(--crema2);border-radius:20px;font-size:.76rem;font-weight:500">
+    return `<span style="display:inline-flex;align-items:center;gap:3px;padding:4px 10px;background:var(--crema2);border-radius:20px;font-size:.76rem;font-weight:500">
       ${c.emoji} ${c.label}
-      ${esCustom?`<button data-del-cat="${c.label}" title="Eliminar" style="background:none;border:none;color:var(--rojo);cursor:pointer;font-size:.8rem;padding:0 0 0 2px;line-height:1">✕</button>`:''}
+      ${esCustom?`<button data-edit-cat="${c.label}" title="Editar" style="background:none;border:none;color:var(--azul2);cursor:pointer;font-size:.75rem;padding:0 0 0 3px;line-height:1">✏️</button><button data-del-cat="${c.label}" title="Eliminar" style="background:none;border:none;color:var(--rojo);cursor:pointer;font-size:.75rem;padding:0;line-height:1">✕</button>`:''}
     </span>`;
   }).join('');
+  cont.querySelectorAll('[data-edit-cat]').forEach(btn=>btn.addEventListener('click',()=>{
+    const label=btn.dataset.editCat;
+    const cat=CATS.find(c=>c.label===label);
+    if(!cat) return;
+    document.getElementById('nueva-cat-edit-label').value=label;
+    document.getElementById('nueva-cat-emoji').value=cat.emoji||'';
+    document.getElementById('nueva-cat-label').value=cat.label;
+    document.getElementById('nueva-cat-keys').value=(cat.keys||[]).join(', ');
+    document.getElementById('btn-guardar-nueva-cat').textContent='💾 Actualizar';
+    document.getElementById('nueva-cat-form').style.display='block';
+    document.getElementById('nueva-cat-msg').style.display='none';
+  }));
   cont.querySelectorAll('[data-del-cat]').forEach(btn=>btn.addEventListener('click',async()=>{
     const label=btn.dataset.delCat;
     if(!confirm(`¿Eliminar la categoría "${label}"?`)) return;
@@ -2383,7 +2418,20 @@ async function cargarCatsCustom(){
 
 document.getElementById('btn-toggle-nueva-cat').addEventListener('click',()=>{
   const f=document.getElementById('nueva-cat-form');
-  f.style.display=f.style.display==='none'?'block':'none';
+  const abriendo=f.style.display==='none';
+  f.style.display=abriendo?'block':'none';
+  if(abriendo){
+    document.getElementById('nueva-cat-edit-label').value='';
+    document.getElementById('nueva-cat-emoji').value='';
+    document.getElementById('nueva-cat-label').value='';
+    document.getElementById('nueva-cat-keys').value='';
+    document.getElementById('btn-guardar-nueva-cat').textContent='💾 Guardar';
+    document.getElementById('nueva-cat-msg').style.display='none';
+  }
+});
+document.getElementById('nueva-cat-form').addEventListener('click',e=>{
+  const epb=e.target.closest('.emoji-pick-btn');
+  if(epb) document.getElementById('nueva-cat-emoji').value=epb.dataset.emoji;
 });
 document.getElementById('btn-guardar-nueva-cat').addEventListener('click',async()=>{
   const emoji=(document.getElementById('nueva-cat-emoji').value.trim()||'📦');
@@ -2391,18 +2439,26 @@ document.getElementById('btn-guardar-nueva-cat').addEventListener('click',async(
   const keysRaw=document.getElementById('nueva-cat-keys').value;
   const keys=keysRaw.split(',').map(s=>norm(s.trim())).filter(Boolean);
   const msg=document.getElementById('nueva-cat-msg');
+  const editLabel=document.getElementById('nueva-cat-edit-label').value;
   if(!label){msg.textContent='⚠️ El nombre es obligatorio.';msg.style.color='var(--rojo)';msg.style.display='block';return;}
-  if(CATS.find(c=>norm(c.label)===norm(label))){msg.textContent='⚠️ Esa categoría ya existe.';msg.style.color='var(--rojo)';msg.style.display='block';return;}
-  // Insertar antes de Varios
-  const idxVarios=CATS.findIndex(c=>c.label==='Varios');
-  const newCat={emoji,label,keys};
-  if(idxVarios>-1) CATS.splice(idxVarios,0,newCat); else CATS.push(newCat);
+  if(!editLabel && CATS.find(c=>norm(c.label)===norm(label))){msg.textContent='⚠️ Esa categoría ya existe.';msg.style.color='var(--rojo)';msg.style.display='block';return;}
+  if(editLabel){
+    // Modo edición: reemplazar entrada existente
+    const idx=CATS.findIndex(c=>c.label===editLabel);
+    if(idx>-1) CATS.splice(idx,1,{emoji,label,keys});
+  } else {
+    // Modo creación: insertar antes de Varios
+    const idxVarios=CATS.findIndex(c=>c.label==='Varios');
+    if(idxVarios>-1) CATS.splice(idxVarios,0,{emoji,label,keys}); else CATS.push({emoji,label,keys});
+  }
   await guardarCatsCustom();
+  document.getElementById('nueva-cat-edit-label').value='';
   document.getElementById('nueva-cat-emoji').value='';
   document.getElementById('nueva-cat-label').value='';
   document.getElementById('nueva-cat-keys').value='';
   document.getElementById('nueva-cat-form').style.display='none';
-  msg.textContent='✅ Categoría agregada.';msg.style.color='var(--verde-ok)';msg.style.display='block';
+  document.getElementById('btn-guardar-nueva-cat').textContent='💾 Guardar';
+  msg.textContent=editLabel?'✅ Categoría actualizada.':'✅ Categoría agregada.';msg.style.color='var(--verde-ok)';msg.style.display='block';
   setTimeout(()=>msg.style.display='none',2500);
   renderCatsChips();
 });
@@ -2705,7 +2761,19 @@ async function cargarPendientes(){
           }
           return;
         }
-        const brec=e.target.closest('[data-rechazar]'); if(brec) await accionPendiente(brec.dataset.rechazar,'Rechazado',brec);
+        const brec=e.target.closest('[data-rechazar]');
+        if(brec){
+          const rId=brec.dataset.rechazar;
+          const rData=pendientesData?.find(p=>p.id===rId);
+          document.getElementById('rechazar-pend-id').value=rId;
+          document.getElementById('rechazar-pend-nombre').textContent=(rData?.nombre||'')+(rData?.servicio?' — '+rData.servicio:'');
+          document.getElementById('rechazar-pend-motivo').value='';
+          document.getElementById('rechazar-pend-msg').style.display='none';
+          document.getElementById('btn-confirmar-rechazar').disabled=false;
+          document.getElementById('btn-confirmar-rechazar').textContent='❌ Confirmar rechazo';
+          document.getElementById('modal-rechazar-pend').classList.add('open');
+          return;
+        }
         const bmd=e.target.closest('[data-marcar-uid]'); if(bmd) await marcarDatosIncorrectos(bmd);
         const bms=e.target.closest('[data-msg-uid]'); if(bms) abrirNuevoMsgAdmin(bms.dataset.msgUid,bms.dataset.msgEmail,bms.dataset.msgNombre);
       });
@@ -2735,6 +2803,7 @@ function adminCardHTML(r){
     </div>
     ${(r.comentario||r.notas)?`<div style="font-size:.82rem;color:var(--text);margin-top:8px;font-style:italic">💬 "${r.comentario||r.notas}"</div>`:''}
     ${r.comentario&&r.notas?`<div style="font-size:.82rem;color:var(--muted);margin-top:4px;font-style:italic">📝 "${r.notas}"</div>`:''}
+    ${r.motivoRechazo?`<div style="font-size:.8rem;background:#fee2e2;color:#991b1b;border-radius:6px;padding:6px 10px;margin-top:6px">❌ Motivo de rechazo: <em>${esc(r.motivoRechazo)}</em></div>`:''}
     ${vecinoNombre||vecinoEmail?`<div class="admin-vecino">
       <div style="font-weight:600;font-size:.83rem">${vecinoNombre}</div>
       ${r.barrioVecino?`<span class="admin-badge" style="background:var(--azul-claro);color:var(--azul2);font-size:.72rem">📍 ${r.barrioVecino}</span>`:''}
@@ -3361,6 +3430,32 @@ const _cerrarAprobar=()=>document.getElementById('modal-aprobar-prov').classList
 document.getElementById('aprobar-prov-close').addEventListener('click',_cerrarAprobar);
 document.getElementById('modal-aprobar-prov').addEventListener('click',e=>{if(e.target===e.currentTarget)_cerrarAprobar();});
 document.getElementById('aprobar-wa-cerrar').addEventListener('click',_cerrarAprobar);
+
+// ── MODAL RECHAZO ─────────────────────────────────────────────────────────────
+const _cerrarRechazar=()=>document.getElementById('modal-rechazar-pend').classList.remove('open');
+document.getElementById('rechazar-pend-close').addEventListener('click',_cerrarRechazar);
+document.getElementById('rechazar-pend-cancelar').addEventListener('click',_cerrarRechazar);
+document.getElementById('modal-rechazar-pend').addEventListener('click',e=>{if(e.target===e.currentTarget)_cerrarRechazar();});
+document.getElementById('btn-confirmar-rechazar').addEventListener('click',async()=>{
+  const id=document.getElementById('rechazar-pend-id').value;
+  const motivo=document.getElementById('rechazar-pend-motivo').value.trim();
+  const btn=document.getElementById('btn-confirmar-rechazar');
+  const msg=document.getElementById('rechazar-pend-msg');
+  if(!id) return;
+  btn.disabled=true; btn.textContent='Rechazando...';
+  try{
+    await updateDoc(doc(db,'pendientes',id),{estado:'Rechazado',motivoRechazo:motivo||'',fecha:serverTimestamp()});
+    const snap=await getDoc(doc(db,'pendientes',id));
+    const r=snap.data()||{};
+    const uidMatch=(r.quienInforma||'').match(/uid:([^\s|]+)/);
+    const uid=uidMatch?uidMatch[1]:'';
+    const emailMatch=(r.quienInforma||'').match(/[\w.-]+@[\w.-]+\.\w+/);
+    const emailVecino=emailMatch?emailMatch[0]:'';
+    apiGet({action:'procesarPendiente',accion:'Rechazado',uid,nombre:r.nombre||'',emailVecino,motivoRechazo:motivo||''}).catch(()=>{});
+    _cerrarRechazar();
+    cargarPendientes(); cargarEstadisticasAdmin();
+  }catch(e){msg.textContent='❌ Error: '+e.message;msg.style.color='var(--rojo)';msg.style.display='block';btn.disabled=false;btn.textContent='❌ Confirmar rechazo';}
+});
 
 document.getElementById('btn-confirmar-aprobar').addEventListener('click', async()=>{
   const id=document.getElementById('aprobar-prov-id').value;
