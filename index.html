@@ -1200,7 +1200,7 @@ const FB_CONFIG = {
 const ADMIN_EMAILS = ['francisco.iacono@gmail.com','adminproveedoressansebastian@gmail.com','entrevecinos.ar@gmail.com'];
 const VAPID_KEY    = 'BBNWLH5KZLq7Zdj7ARf3hE1zRQxR1Sbk1k7Xk2-5Hf9t9L5rKaYcNSFu5WrGWJmyh-QKrok5jNZBTgpUXxjLS30';
 // Apps Script solo para emails y push (sigue igual)
-const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbwP9OdUHCx1ZKNOKYzj4406HTwjHfxpJFGSjHpU9I4jmU4LtK97ICjHre7Iza-bH4hrqw/exec';
+const SCRIPT_URL   = 'https://script.google.com/macros/s/AKfycbzFn3uLHfjfeaplxN_tKjXpnFJa80GAmX_GukNiE7RJcvX9nmBsowNpdcwwpbKE3RRj2Q/exec';
 // Las passwords NO viven en el cliente — el Apps Script valida via Firebase ID Token
 const apiGet = async (p) => {
   const user = currentUser;
@@ -2372,10 +2372,12 @@ function renderCatsChips(){
   const cont=document.getElementById('cats-chips');
   if(!cont) return;
   cont.innerHTML=catsSorted().map(c=>{
-    const esCustom=!CATS_BASE.find(b=>b.label===c.label);
-    return `<span style="display:inline-flex;align-items:center;gap:3px;padding:4px 10px;background:var(--crema2);border-radius:20px;font-size:.76rem;font-weight:500">
-      ${c.emoji} ${c.label}
-      ${esCustom?`<button data-edit-cat="${c.label}" title="Editar" style="background:none;border:none;color:var(--azul2);cursor:pointer;font-size:.75rem;padding:0 0 0 3px;line-height:1">✏️</button><button data-del-cat="${c.label}" title="Eliminar" style="background:none;border:none;color:var(--rojo);cursor:pointer;font-size:.75rem;padding:0;line-height:1">✕</button>`:''}
+    const esBase=!!CATS_BASE.find(b=>b.label===c.label);
+    const modificada=esBase&&(()=>{const b=CATS_BASE.find(x=>x.label===c.label);return b.emoji!==c.emoji||JSON.stringify(b.keys)!==JSON.stringify(c.keys);})();
+    return `<span style="display:inline-flex;align-items:center;gap:3px;padding:4px 10px;background:${modificada?'#e0f2fe':'var(--crema2)'};border-radius:20px;font-size:.76rem;font-weight:500">
+      ${c.emoji} ${c.label}${modificada?' <span title="Modificada" style="font-size:.65rem;color:var(--azul2)">✎</span>':''}
+      <button data-edit-cat="${c.label}" title="Editar" style="background:none;border:none;color:var(--azul2);cursor:pointer;font-size:.75rem;padding:0 0 0 3px;line-height:1">✏️</button>
+      ${!esBase?`<button data-del-cat="${c.label}" title="Eliminar" style="background:none;border:none;color:var(--rojo);cursor:pointer;font-size:.75rem;padding:0;line-height:1">✕</button>`:''}
     </span>`;
   }).join('');
   cont.querySelectorAll('[data-edit-cat]').forEach(btn=>btn.addEventListener('click',()=>{
@@ -2401,7 +2403,12 @@ function renderCatsChips(){
 }
 
 async function guardarCatsCustom(){
-  const custom=CATS.filter(c=>!CATS_BASE.find(b=>b.label===c.label));
+  // Guardar: nuevas categorías + categorías base que fueron modificadas
+  const custom=CATS.filter(c=>{
+    const base=CATS_BASE.find(b=>b.label===c.label);
+    if(!base) return true; // nueva, guardar siempre
+    return base.emoji!==c.emoji||JSON.stringify(base.keys)!==JSON.stringify(c.keys); // base modificada
+  });
   try{ await setDoc(doc(db,'config','categorias'),{custom},{merge:false}); }catch(e){ console.log('Error guardando cats:',e); }
 }
 
@@ -2410,7 +2417,10 @@ async function cargarCatsCustom(){
     const snap=await getDoc(doc(db,'config','categorias'));
     if(snap.exists()){
       (snap.data().custom||[]).forEach(c=>{
-        if(c.label && !CATS.find(x=>x.label===c.label)) CATS.push(c);
+        if(!c.label) return;
+        const idx=CATS.findIndex(x=>x.label===c.label);
+        if(idx>-1) CATS.splice(idx,1,c); // reemplazar (base modificada o categoría existente actualizada)
+        else CATS.push(c); // nueva categoría custom
       });
     }
   }catch(e){}
