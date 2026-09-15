@@ -252,6 +252,8 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
 .btn-rechazar:hover{background:#b91c1c}
 .btn-marcar-datos{padding:6px 14px;background:white;color:var(--rojo);border:1.5px solid var(--rojo);border-radius:8px;font-size:.78rem;font-family:'Inter',sans-serif;cursor:pointer;font-weight:500;transition:all .2s}
 .btn-marcar-datos:hover{background:var(--rojo);color:white}
+.btn-wa-prov{padding:8px 16px;background:#25D366;color:white;border:none;border-radius:8px;font-size:.82rem;font-family:'Inter',sans-serif;cursor:pointer;font-weight:500}
+.btn-wa-prov:hover{background:#1ebe5c}
 .btn-marcar-datos.marcado{background:#fee2e2;color:var(--rojo)}
 .admin-empty{text-align:center;padding:48px 20px;color:var(--muted)}
 .admin-stat-card{background:white;border:1.5px solid var(--border);border-radius:12px;padding:16px;text-align:center}
@@ -2747,6 +2749,17 @@ async function cargarPendientes(){
       const nv=c.cloneNode(false); nv.innerHTML=c.innerHTML; c.parentNode.replaceChild(nv,c);
       nv.addEventListener('click',async e=>{
         const ba=e.target.closest('[data-send-admin]'); if(ba&&!ba.disabled){enviarRespuestaAdmin(ba.dataset.sendAdmin,ba);return;}
+        const bwa=e.target.closest('[data-wa-tel]');
+        if(bwa){
+          const telRaw=(bwa.dataset.waTel||'').replace(/\D/g,'');
+          const numWA=telRaw.startsWith('54')?telRaw:telRaw.startsWith('0')?'54'+telRaw.slice(1):'54'+telRaw;
+          const nombre=bwa.dataset.waNombre||'';
+          const srv=bwa.dataset.waSrv||'';
+          const url='https://entrevecinos.ar/?p='+encodeURIComponent(nombre);
+          const waMsg=`Hola ${nombre}! 👋\n\nTu servicio de *${srv}* ya está publicado en EntreVecinos.\n\nPodés compartir tu perfil con tus clientes:\n${url}\n\n_El equipo de EntreVecinos_ 🏘️`;
+          window.open('https://wa.me/'+numWA+'?text='+encodeURIComponent(waMsg),'_blank');
+          return;
+        }
         const bap=e.target.closest('[data-aprobar]');
         if(bap){
           const id=bap.dataset.aprobar;
@@ -2810,7 +2823,12 @@ function adminCardHTML(r){
           ${r.autoregistrado?'<span class="badge-autoregistrado">🏪 Auto-registro</span>':''}
         </div>
       </div>
-      ${r.estado==='Pendiente'?`<div class="admin-actions"><button class="btn-aprobar" data-aprobar="${r.id}">✅ Aprobar</button><button class="btn-rechazar" data-rechazar="${r.id}">❌ Rechazar</button></div>`:''}
+      ${r.estado==='Pendiente'
+        ?`<div class="admin-actions"><button class="btn-aprobar" data-aprobar="${r.id}">✅ Aprobar</button><button class="btn-rechazar" data-rechazar="${r.id}">❌ Rechazar</button></div>`
+        :r.estado==='Aprobado'&&r.telefono
+          ?`<div class="admin-actions"><button class="btn-wa-prov" data-wa-tel="${r.telefono}" data-wa-nombre="${esc(r.nombre||'')}" data-wa-srv="${esc(r.servicio||'')}">💬 Avisar por WA</button></div>`
+          :''
+      }
     </div>
     ${(r.comentario||r.notas)?`<div style="font-size:.82rem;color:var(--text);margin-top:8px;font-style:italic">💬 "${r.comentario||r.notas}"</div>`:''}
     ${r.comentario&&r.notas?`<div style="font-size:.82rem;color:var(--muted);margin-top:4px;font-style:italic">📝 "${r.notas}"</div>`:''}
