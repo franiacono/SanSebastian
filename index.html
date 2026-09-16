@@ -1878,7 +1878,7 @@ function renderResults(){
       if(!coincide && !esGeneral) return false;
     }
     if(q){
-      const hay=norm(p.nombre).includes(q)||norm(p.servicio).includes(q)||norm(p.empresa).includes(q)||norm(p.telefono).includes(q)||norm(p.dni).includes(q);
+      const hay=norm(p.nombre).includes(q)||norm(p.servicio).includes(q)||norm(p.empresa).includes(q)||norm(p.telefono).includes(q)||norm(p.dni).includes(q)||norm(p.descripcionPropia||'').includes(q);
       if(!hay) return false;
     }
     // Filtro por barrio del usuario (admin ve todo)
