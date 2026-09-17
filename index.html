@@ -2311,7 +2311,7 @@ document.querySelectorAll('.admin-tab[data-atab]').forEach(tab=>{
     return {
       nombre:g(0), empresa:g(1), dni:g(2), telefono:g(3),
       servicio:g(4), recomendacion:normRecom(g(5)),
-      descripcionPropia:g(6), notas:g(6),
+      comentario:g(6), notas:g(6),
       barrioOrigen, barriosServicio:parseBarriosStr(g(9)),
       categorias,
       _ok: !!g(0)&&!!g(3),
@@ -2368,7 +2368,7 @@ document.querySelectorAll('.admin-tab[data-atab]').forEach(tab=>{
         await addDoc(collection(db,'proveedores'),{
           nombre:r.nombre, empresa:r.empresa||'', dni:r.dni||'',
           telefono:r.telefono, servicio:r.servicio||'', recomendacion:r.recomendacion,
-          notas:r.notas||'', descripcionPropia:r.descripcionPropia||'',
+          comentario:r.comentario||'', notas:r.notas||'', descripcionPropia:'',
           barrioOrigen:r.barrioOrigen||'', barriosServicio:r.barriosServicio||[],
           categorias:r.categorias||[], autoregistrado:false, destacado:false,
           verificado:'Si', quienInforma:'Admin - Carga masiva',
