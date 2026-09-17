@@ -2425,7 +2425,7 @@ async function cargarCatsCustom(){
         else CATS.push(c); // nueva categoría custom
       });
     }
-  }catch(e){}
+  }catch(e){ console.warn('cargarCatsCustom error:',e); }
   renderCatsChips();
 }
 
@@ -2769,6 +2769,7 @@ async function cargarPendientes(){
             document.getElementById('aprobar-prov-tel').value=r.telefono||'';
             document.getElementById('aprobar-prov-nombre').textContent=r.nombre+(r.servicio?' — '+r.servicio:'');
             const catsSug=catsOf(r.servicio);
+            await cargarCatsCustom();
             document.getElementById('aprobar-prov-cats').innerHTML=catsSorted().map(c=>`
               <label style="display:flex;align-items:center;gap:5px;font-size:.8rem;cursor:pointer;padding:4px;border:1px solid var(--border);border-radius:6px">
                 <input type="checkbox" value="${c.label}" ${catsSug.includes(c.label)?'checked':''}>
@@ -3786,7 +3787,11 @@ async function abrirEditarProveedor(id, p){
     document.getElementById('edit-prov-comentario').value=fresh.comentario||p.comentario||'';
     document.getElementById('edit-prov-notas').value=fresh.notas||p.notas||'';
     const catsActuales=fresh.categorias||p.categorias||[];
-    document.getElementById('edit-prov-cats').innerHTML=catsSorted().map(c=>`
+    await cargarCatsCustom();
+    const catsList=[...catsSorted()];
+    // Incluir cualquier cat ya asignada al proveedor aunque no esté en CATS (cats huérfanas)
+    catsActuales.forEach(cat=>{if(!catsList.find(c=>c.label===cat))catsList.push({emoji:'🏷️',label:cat});});
+    document.getElementById('edit-prov-cats').innerHTML=catsList.map(c=>`
       <label style="display:flex;align-items:center;gap:5px;font-size:.8rem;cursor:pointer">
         <input type="checkbox" value="${c.label}" ${catsActuales.includes(c.label)?'checked':''}>
         ${c.emoji} ${c.label}
