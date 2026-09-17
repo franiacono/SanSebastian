@@ -830,6 +830,7 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
           <button class="admin-tab" data-atab="usuarios">Usuarios</button>
           <button class="admin-tab" data-atab="estadisticas">📊 Estadísticas</button>
           <button class="admin-tab" data-atab="recategorizar">🏷️ Rubros</button>
+          <button class="admin-tab" data-atab="masiva">📥 Masiva</button>
         </div>
         <div id="admin-tab-pendientes"><div id="pendientes-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div></div>
         <div id="admin-tab-recientes" style="display:none"><div id="aprobados-container"></div></div>
@@ -905,6 +906,47 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
           <div id="recateg-container"><p style="color:var(--muted);font-size:.85rem">Presioná "Cargar proveedores" para ver todos los rubros asignados y las sugerencias del nuevo algoritmo.</p></div>
         </div>
       </div>
+        <div id="admin-tab-masiva" style="display:none">
+          <div style="background:white;border:1.5px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px">
+            <div style="font-size:.88rem;font-weight:600;color:var(--azul);margin-bottom:8px">📥 Carga masiva de proveedores</div>
+            <div style="font-size:.78rem;color:var(--muted);background:var(--crema);border-radius:8px;padding:10px 12px;margin-bottom:12px;line-height:1.7">
+              Copiá y pegá filas desde tu Excel. Las columnas deben estar en este orden (separadas por Tab):<br>
+              <strong>Nombre | Empresa | DNI | Teléfono | Tipo de Servicio | Experiencia | Comentario | ¿Es del barrio? | ¿Qué barrio? | ¿Qué barrios llega? | Rubro (opcional)</strong><br>
+              <em>Experiencia: Muy recomendable / Recomendable / Con referencias / Malas experiencias</em><br>
+              <em>¿Es del barrio?: Si / No / No se — ¿Qué barrios llega?: separados por coma</em>
+            </div>
+            <textarea id="masiva-input" style="width:100%;min-height:160px;padding:10px;font-size:.78rem;font-family:monospace;border:1.5px solid var(--border);border-radius:8px;resize:vertical" placeholder="Pegá aquí las filas del Excel..."></textarea>
+            <div style="display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap">
+              <button class="btn-submit" id="btn-masiva-preview" style="padding:9px 20px">🔍 Previsualizar</button>
+              <span id="masiva-preview-msg" style="font-size:.82rem;color:var(--muted)"></span>
+            </div>
+          </div>
+          <div id="masiva-preview-box" style="display:none">
+            <div style="overflow-x:auto;margin-bottom:12px">
+              <table id="masiva-preview-table" style="width:100%;border-collapse:collapse;font-size:.75rem">
+                <thead>
+                  <tr style="background:var(--crema2);text-align:left">
+                    <th style="padding:6px 8px;border:1px solid var(--border)">#</th>
+                    <th style="padding:6px 8px;border:1px solid var(--border)">Nombre</th>
+                    <th style="padding:6px 8px;border:1px solid var(--border)">Empresa</th>
+                    <th style="padding:6px 8px;border:1px solid var(--border)">Tel</th>
+                    <th style="padding:6px 8px;border:1px solid var(--border)">Servicio</th>
+                    <th style="padding:6px 8px;border:1px solid var(--border)">Experiencia</th>
+                    <th style="padding:6px 8px;border:1px solid var(--border)">Barrio origen</th>
+                    <th style="padding:6px 8px;border:1px solid var(--border)">Barrios servicio</th>
+                    <th style="padding:6px 8px;border:1px solid var(--border)">Rubro</th>
+                    <th style="padding:6px 8px;border:1px solid var(--border)">Estado</th>
+                  </tr>
+                </thead>
+                <tbody id="masiva-preview-tbody"></tbody>
+              </table>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+              <button class="btn-aprobar" id="btn-masiva-importar" style="padding:10px 24px">✅ Importar</button>
+              <span id="masiva-import-msg" style="font-size:.82rem"></span>
+            </div>
+          </div>
+        </div>
     </div>
 
     <!-- MENSAJES ADMIN -->
@@ -2231,6 +2273,7 @@ document.querySelectorAll('.admin-tab[data-atab]').forEach(tab=>{
     document.getElementById('admin-tab-usuarios').style.display=tab.dataset.atab==='usuarios'?'block':'none';
     document.getElementById('admin-tab-estadisticas').style.display=tab.dataset.atab==='estadisticas'?'block':'none';
     document.getElementById('admin-tab-recategorizar').style.display=tab.dataset.atab==='recategorizar'?'block':'none';
+    document.getElementById('admin-tab-masiva').style.display=tab.dataset.atab==='masiva'?'block':'none';
     if(tab.dataset.atab==='pendientes'||tab.dataset.atab==='recientes') cargarPendientes();
     if(tab.dataset.atab==='usuarios') buscarUsuariosAdmin();
     if(tab.dataset.atab==='proveedores') buscarProveedoresAdmin();
@@ -2238,6 +2281,117 @@ document.querySelectorAll('.admin-tab[data-atab]').forEach(tab=>{
     if(tab.dataset.atab==='recategorizar') cargarCatsCustom();
   });
 });
+
+// ── CARGA MASIVA ──────────────────────────────────────────────────────────────
+(function(){
+  const RECOM_MAP={
+    'muy recomendable':'Muy recomendable','mr':'Muy recomendable','muy':'Muy recomendable',
+    'recomendable':'Recomendable','r':'Recomendable',
+    'con referencias':'Con referencias','cr':'Con referencias','referencias':'Con referencias',
+    'malas experiencias':'Malas experiencias','me':'Malas experiencias','malas':'Malas experiencias',
+    'telefono util':'Utiles','tel util':'Utiles','util':'Utiles','utiles':'Utiles',
+  };
+  function normRecom(s){
+    if(!s) return 'Recomendable';
+    const n=norm(s.trim());
+    return RECOM_MAP[n]||'Recomendable';
+  }
+  function parseBarriosStr(s){
+    if(!s||!s.trim()) return [];
+    const n=norm(s.trim());
+    if(n==='todos'||n.includes('toda la zona')||n.includes('toda')) return ['Toda la zona'];
+    return s.split(/[,;]/).map(b=>b.trim()).filter(Boolean);
+  }
+  function parseRow(cols){
+    const g=(i)=>(cols[i]||'').trim();
+    const esDelBarrio=norm(g(7)).startsWith('si');
+    const barrioOrigen=esDelBarrio?g(8):'';
+    const rubroBruto=g(10);
+    const categorias=rubroBruto?rubroBruto.split(/[,;]/).map(r=>r.trim()).filter(Boolean):[];
+    return {
+      nombre:g(0), empresa:g(1), dni:g(2), telefono:g(3),
+      servicio:g(4), recomendacion:normRecom(g(5)),
+      descripcionPropia:g(6), notas:g(6),
+      barrioOrigen, barriosServicio:parseBarriosStr(g(9)),
+      categorias,
+      _ok: !!g(0)&&!!g(3),
+    };
+  }
+  function parseMasiva(texto){
+    return texto.split('\n')
+      .map(l=>l.replace(/\r$/,''))
+      .filter(l=>l.trim())
+      .map(l=>parseRow(l.split('\t')));
+  }
+  let masivaRows=[];
+
+  document.getElementById('btn-masiva-preview').addEventListener('click',()=>{
+    const texto=document.getElementById('masiva-input').value;
+    const msg=document.getElementById('masiva-preview-msg');
+    if(!texto.trim()){msg.textContent='Pegá datos primero.';return;}
+    masivaRows=parseMasiva(texto);
+    if(!masivaRows.length){msg.textContent='No se detectaron filas.';return;}
+    const tbody=document.getElementById('masiva-preview-tbody');
+    tbody.innerHTML=masivaRows.map((r,i)=>{
+      const ok=r._ok;
+      const bg=ok?'':'#fff7f0';
+      const borrar=ok?'✅':'⚠️ Sin nombre/tel';
+      return `<tr style="background:${bg}">
+        <td style="padding:5px 7px;border:1px solid var(--border)">${i+1}</td>
+        <td style="padding:5px 7px;border:1px solid var(--border)">${esc(r.nombre)}</td>
+        <td style="padding:5px 7px;border:1px solid var(--border)">${esc(r.empresa)}</td>
+        <td style="padding:5px 7px;border:1px solid var(--border)">${esc(r.telefono)}</td>
+        <td style="padding:5px 7px;border:1px solid var(--border)">${esc(r.servicio)}</td>
+        <td style="padding:5px 7px;border:1px solid var(--border)">${esc(r.recomendacion)}</td>
+        <td style="padding:5px 7px;border:1px solid var(--border)">${esc(r.barrioOrigen)}</td>
+        <td style="padding:5px 7px;border:1px solid var(--border)">${esc((r.barriosServicio||[]).join(', '))}</td>
+        <td style="padding:5px 7px;border:1px solid var(--border)">${esc((r.categorias||[]).join(', '))}</td>
+        <td style="padding:5px 7px;border:1px solid var(--border)">${borrar}</td>
+      </tr>`;
+    }).join('');
+    const validos=masivaRows.filter(r=>r._ok).length;
+    const invalidos=masivaRows.length-validos;
+    msg.textContent=`${masivaRows.length} filas detectadas — ${validos} válidas${invalidos?', '+invalidos+' sin nombre/teléfono (se omitirán)':''}`;
+    document.getElementById('masiva-preview-box').style.display='block';
+    document.getElementById('btn-masiva-importar').textContent=`✅ Importar ${validos} proveedores`;
+  });
+
+  document.getElementById('btn-masiva-importar').addEventListener('click', async()=>{
+    const btn=document.getElementById('btn-masiva-importar');
+    const msg=document.getElementById('masiva-import-msg');
+    const validos=masivaRows.filter(r=>r._ok);
+    if(!validos.length){msg.textContent='No hay filas válidas.';return;}
+    btn.disabled=true; btn.textContent='Importando...'; msg.style.color='var(--muted)'; msg.textContent='';
+    let ok=0,err=0;
+    for(const r of validos){
+      try{
+        await addDoc(collection(db,'proveedores'),{
+          nombre:r.nombre, empresa:r.empresa||'', dni:r.dni||'',
+          telefono:r.telefono, servicio:r.servicio||'', recomendacion:r.recomendacion,
+          notas:r.notas||'', descripcionPropia:r.descripcionPropia||'',
+          barrioOrigen:r.barrioOrigen||'', barriosServicio:r.barriosServicio||[],
+          categorias:r.categorias||[], autoregistrado:false, destacado:false,
+          verificado:'Si', quienInforma:'Admin - Carga masiva',
+          estado:'Aprobado', fecha:serverTimestamp(), fechaAprobacion:serverTimestamp(),
+        });
+        ok++;
+      }catch(e){ err++; console.error('Error importando fila:',r,e); }
+    }
+    btn.disabled=false;
+    if(err){
+      msg.style.color='var(--rojo)';
+      msg.textContent=`${ok} importados, ${err} fallaron (ver consola).`;
+    } else {
+      msg.style.color='var(--verde-ok)';
+      msg.textContent=`✅ ${ok} proveedores importados correctamente.`;
+      btn.textContent='✅ Importar';
+      document.getElementById('masiva-input').value='';
+      document.getElementById('masiva-preview-box').style.display='none';
+      masivaRows=[];
+      cargarProveedores();
+    }
+  });
+})();
 
 // ── RECATEGORIZAR RUBROS ──────────────────────────────────────────────────────
 let recategData = [];
