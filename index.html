@@ -2425,7 +2425,14 @@ async function cargarCatsCustom(){
         else CATS.push(c); // nueva categoría custom
       });
     }
-  }catch(e){ console.warn('cargarCatsCustom error:',e); }
+  }catch(e){
+    console.warn('cargarCatsCustom error:',e);
+    // Fallback: derivar cats de datos de proveedores cuando Firestore no es accesible
+    const catLabels=new Set(proveedores.flatMap(p=>p.categorias||[]));
+    catLabels.forEach(label=>{
+      if(!CATS.find(c=>c.label===label)) CATS.push({emoji:'🏷️',label,keys:[]});
+    });
+  }
   renderCatsChips();
 }
 
