@@ -2050,8 +2050,11 @@ function cardHTML(p,isDest){
 
 function abrirWA(num,servicio){
   const msg='Hola! Te contacto porque vi tu servicio de '+servicio+' en EntreVecinos (entrevecinos.ar). ';
-  const url='whatsapp://send?phone='+num+'&text='+encodeURIComponent(msg);
-  const a=document.createElement('a'); a.href=url; document.body.appendChild(a); a.click(); setTimeout(()=>document.body.removeChild(a),200);
+  const esMobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const url=esMobile
+    ?'https://wa.me/'+num+'?text='+encodeURIComponent(msg)
+    :'https://web.whatsapp.com/send?phone='+num+'&text='+encodeURIComponent(msg);
+  window.open(url,'_blank');
 }
 
 // ── TRACKING DE EVENTOS (clicks de contacto y compartir) ──────────────────────
