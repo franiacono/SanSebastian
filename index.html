@@ -676,6 +676,7 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
                 <select class="form-select" id="f-barrio-cual">
                   <option value="">— Seleccioná —</option>
                 </select>
+                <input type="text" id="f-lote-prov" class="form-input" placeholder="Lote del proveedor (opcional, ej: 205)" style="margin-top:8px;font-size:.85rem">
               </div>
             </div>
             <div class="form-row">
@@ -2136,6 +2137,7 @@ document.getElementById('btn-form-submit').addEventListener('click', async ()=>{
   const barrioPrvCual = barrioPrvOpt==='Si' ? (document.getElementById('f-barrio-cual').value||'') : '';
   const barrioProv = barrioPrvOpt==='Si' ? barrioPrvCual : barrioPrvOpt;
   const barrioOrigen = barrioPrvOpt==='Si' ? barrioPrvCual : '';
+  const loteProv = (document.getElementById('f-lote-prov')?.value||'').trim();
   const barriosServicio = getCheckboxBarrios('f-barrios-servicio');
   console.log('Barrios seleccionados:', barriosServicio, document.getElementById('f-barrios-servicio')?.innerHTML?.length);
   const msg=document.getElementById('form-msg');
@@ -2151,6 +2153,15 @@ document.getElementById('btn-form-submit').addEventListener('click', async ()=>{
   if(telPropio && telIngresado && telPropio === telIngresado){
     msg.textContent='⚠️ No podés recomendarte a vos mismo.';
     msg.style.color='var(--rojo)'; msg.style.display='block'; return;
+  }
+  // Bloquear mismo domicilio (mismo barrio + mismo lote)
+  if(barrioPrvOpt==='Si' && barrioPrvCual && loteProv && perfilUsuario?.barrio && perfilUsuario?.lote){
+    const mismoBarrio=norm(barrioPrvCual)===norm(perfilUsuario.barrio);
+    const mismoLote=norm(loteProv)===norm(String(perfilUsuario.lote));
+    if(mismoBarrio && mismoLote){
+      msg.textContent='💛 Gracias por tu buena onda, pero las recomendaciones deben venir de personas externas al hogar. Si este proveedor trabaja de manera independiente y tiene sus propios clientes en el barrio, ¡pedile a uno de ellos que lo recomiende!';
+      msg.style.color='var(--azul2)'; msg.style.display='block'; return;
+    }
   }
   // Verificar email
   if(!currentUser.emailVerified && currentUser.providerData[0]?.providerId==='password'){
@@ -2179,7 +2190,10 @@ document.getElementById('btn-form-submit').addEventListener('click', async ()=>{
       notas,
       quienInforma:(perfilUsuario?.nombre||'')+(perfilUsuario?.nombre?' | ':'')+'uid:'+currentUser.uid+' | '+currentUser.email,
       barrioVecino: perfilUsuario?.barrio||'',
+      areaVecino: perfilUsuario?.area||'',
       loteVecino: perfilUsuario?.lote||'',
+      fechaRegistroVecino: perfilUsuario?.fechaRegistro||null,
+      loteProvForm: loteProv||'',
       barrio: barrioProv,
       barrioOrigen: barrioOrigen,
       barriosServicio: barriosServicio,
@@ -2999,7 +3013,10 @@ function adminCardHTML(r){
     ${vecinoNombre||vecinoEmail?`<div class="admin-vecino">
       <div style="font-weight:600;font-size:.83rem">${vecinoNombre}</div>
       ${r.barrioVecino?`<span class="admin-badge" style="background:var(--azul-claro);color:var(--azul2);font-size:.72rem">📍 ${r.barrioVecino}</span>`:''}
+      ${r.areaVecino?`<span class="admin-badge" style="background:var(--azul-claro);color:var(--azul2);font-size:.72rem">🗺️ ${r.areaVecino}</span>`:''}
       ${r.loteVecino?`<span class="admin-badge" style="background:var(--azul-claro);color:var(--azul2);font-size:.72rem">🏠 Lote ${r.loteVecino}</span>`:''}
+      ${r.fechaRegistroVecino?`<span class="admin-badge" style="background:#f0fdf4;color:#166534;font-size:.72rem" title="Fecha de registro del vecino">📅 Registro: ${fmtFechaCorta(r.fechaRegistroVecino)}</span>`:''}
+      ${r.loteProvForm?`<span class="admin-badge" style="background:#fef9c3;color:#854d0e;font-size:.72rem">🏡 Lote prov: ${r.loteProvForm}</span>`:''}
       <span class="admin-badge ${r.verificado==='Si'?'verificado':'no-verificado'}" style="margin-left:4px">${r.verificado==='Si'?'✅ Verificado':'⚠️ No verificado'}</span>
       <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
         ${vecinoUid||vecinoEmail?`<button class="btn-marcar-datos" data-marcar-uid="${vecinoUid}" data-marcar-email="${vecinoEmail}">🚩 Marcar datos incorrectos</button>
