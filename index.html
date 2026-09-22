@@ -1111,6 +1111,10 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
         <option value="Utiles">📞 Teléfono útil</option>
       </select>
     </div>
+    <div class="auth-row" id="edit-prov-orden-row" style="display:none">
+      <label style="font-size:.85rem">Orden entre destacados <span style="font-size:.75rem;color:var(--muted)">(1 = primero, 2 = segundo…)</span></label>
+      <input type="number" id="edit-prov-orden" class="auth-input" min="1" max="99" placeholder="Ej: 1" style="width:100px;margin-top:4px">
+    </div>
     <div class="auth-row" id="edit-prov-solo-llamada-row">
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.88rem">
         <input type="checkbox" id="edit-prov-solo-llamada">
@@ -1793,9 +1797,10 @@ function procesarDatos(filas){
   filas.forEach((f,idx)=>{
     if(norm(f.recomendacion)==='utiles') return;
     const key=genKey(f);
-    if(!mapa[key]) mapa[key]={nombre:f.nombre,empresa:f.empresa||"",dni:f.dni||"",telefono:f.telefono,servicio:f.servicio,barrio:"",destacado:false,resenas:[],idxOriginal:idx,autoregistrado:f.autoregistrado===true,barriosServicio:[],firestoreId:f.id||"",categorias:f.categorias||[],soloLlamada:false,descripcionPropia:''};
+    if(!mapa[key]) mapa[key]={nombre:f.nombre,empresa:f.empresa||"",dni:f.dni||"",telefono:f.telefono,servicio:f.servicio,barrio:"",destacado:false,resenas:[],idxOriginal:idx,autoregistrado:f.autoregistrado===true,barriosServicio:[],firestoreId:f.id||"",categorias:f.categorias||[],soloLlamada:false,descripcionPropia:'',ordenDestacado:null};
     if(f.soloLlamada===true) mapa[key].soloLlamada=true;
     if(f.descripcionPropia) mapa[key].descripcionPropia=f.descripcionPropia;
+    if(f.ordenDestacado!=null) mapa[key].ordenDestacado=f.ordenDestacado;
     else if(f.autoregistrado===true && f.comentario) mapa[key].descripcionPropia=f.comentario;
     if(!mapa[key].barrio && f.barrio && f.barrio.trim()!=='') mapa[key].barrio=normBarrio(f.barrio);
     if(!mapa[key].barrioOrigen && f.barrioOrigen) mapa[key].barrioOrigen=f.barrioOrigen;
@@ -1959,7 +1964,7 @@ function renderResults(){
 
   if(!fil.length){ cont.innerHTML='<div class="empty-state"><div class="icon">🔍</div><p>No encontramos resultados</p></div>'; return; }
 
-  const dest = fil.filter(p=>p.destacado);
+  const dest = fil.filter(p=>p.destacado).sort((a,b)=>(a.ordenDestacado??999)-(b.ordenDestacado??999));
   const rest = fil.filter(p=>!p.destacado);
   let html='';
   if(dest.length){
@@ -3961,6 +3966,9 @@ async function abrirEditarProveedor(id, p){
     // Determinar valor del select según tipo y recomendacion
     const tipoVal = fresh.tipo==='util' ? 'Utiles' : fresh.tipo==='publicidad' ? 'Publicidad' : (fresh.recomendacion||'Recomendable');
     document.getElementById('edit-prov-recomendacion').value=tipoVal;
+    const esDestacado=tipoVal==='Publicidad';
+    document.getElementById('edit-prov-orden-row').style.display=esDestacado?'block':'none';
+    document.getElementById('edit-prov-orden').value=fresh.ordenDestacado??'';
     document.getElementById('edit-prov-solo-llamada').checked=fresh.soloLlamada===true;
     document.getElementById('edit-prov-descripcion').value=fresh.descripcionPropia||p.descripcionPropia||'';
     document.getElementById('edit-prov-comentario').value=fresh.comentario||p.comentario||'';
@@ -3988,7 +3996,9 @@ document.querySelectorAll('input[name="edit-prov-barrio-opt"]').forEach(r=>{
     document.getElementById('edit-prov-barrio-cual-box').style.display=r.value==='si'?'block':'none';
   });
 });
-document.getElementById('edit-prov-recomendacion').addEventListener('change',function(){});
+document.getElementById('edit-prov-recomendacion').addEventListener('change',function(){
+  document.getElementById('edit-prov-orden-row').style.display=this.value==='Publicidad'?'block':'none';
+});
 poblarSelectBarrios('edit-prov-barrio-cual');
 document.getElementById('editar-prov-close').addEventListener('click',()=>document.getElementById('modal-editar-proveedor').classList.remove('open'));
 document.getElementById('modal-editar-proveedor').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.classList.remove('open');});
@@ -4017,6 +4027,7 @@ document.getElementById('btn-guardar-prov').addEventListener('click', async()=>{
       categorias:[...document.querySelectorAll('#edit-prov-cats input:checked')].map(i=>i.value),
       tipo: rec==='Utiles' ? 'util' : rec==='Publicidad' ? 'publicidad' : 'proveedor',
       soloLlamada: document.getElementById('edit-prov-solo-llamada').checked,
+      ordenDestacado: rec==='Publicidad' ? (parseInt(document.getElementById('edit-prov-orden').value)||null) : null,
     };
     await updateDoc(doc(db,'proveedores',id), datos);
     // Actualizar barriosServicio y categorias en TODOS los docs del mismo proveedor
