@@ -2387,7 +2387,7 @@ document.querySelectorAll('.admin-tab[data-atab]').forEach(tab=>{
     let ok=0,err=0;
     for(const r of validos){
       try{
-        await addDoc(collection(db,'proveedores'),{
+        const docData={
           nombre:r.nombre, empresa:r.empresa||'', dni:r.dni||'',
           telefono:r.telefono, servicio:r.servicio||'', recomendacion:r.recomendacion,
           comentario:r.comentario||'', notas:r.notas||'', descripcionPropia:'',
@@ -2395,7 +2395,10 @@ document.querySelectorAll('.admin-tab[data-atab]').forEach(tab=>{
           categorias:r.categorias||[], autoregistrado:false, destacado:false,
           verificado:'Si', quienInforma:'Admin - Carga masiva',
           estado:'Aprobado', fecha:serverTimestamp(), fechaAprobacion:serverTimestamp(),
-        });
+        };
+        await addDoc(collection(db,'proveedores'),docData);
+        // Crear pendiente aprobado para que aparezca en Recientes con botón WA
+        await addDoc(collection(db,'pendientes'),{...docData, barrio:r.barrioOrigen||''});
         ok++;
       }catch(e){ err++; console.error('Error importando fila:',r,e); }
     }
