@@ -601,6 +601,18 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
         <span>🏪 ¿Sos proveedor? Registrá tu servicio.</span>
         <button id="btn-ir-miservicio" style="padding:7px 14px;background:var(--azul);color:white;border:none;border-radius:8px;font-size:.8rem;font-family:'Inter',sans-serif;cursor:pointer;white-space:nowrap">Registrá tu servicio →</button>
       </div>
+      <!-- Banner Starlink -->
+      <div id="starlink-banner" style="margin-bottom:14px;border-radius:14px;overflow:hidden;background:linear-gradient(135deg,#0a0a1a 0%,#0d1b3e 50%,#0a0a1a 100%);border:1px solid #1a3a6e">
+        <a href="https://starlink.com/?referral=RC-4328316-83661-66&app_source=share" target="_blank" rel="noopener sponsored" style="text-decoration:none;display:flex;align-items:center;gap:14px;padding:14px 16px">
+          <div style="font-size:2rem;flex-shrink:0">🛰️</div>
+          <div>
+            <div style="font-size:.65rem;font-weight:700;letter-spacing:2px;color:#6b9bd2;text-transform:uppercase;margin-bottom:2px">PUBLICIDAD</div>
+            <div style="font-weight:800;font-size:1rem;color:white;letter-spacing:1px;margin-bottom:3px">STARLINK</div>
+            <div style="font-size:.8rem;color:#cbd5e1;line-height:1.4">Internet satelital — <strong style="color:#38bdf8">$60.000 de bonificación</strong> usando este link 🏘️</div>
+          </div>
+          <div style="margin-left:auto;flex-shrink:0;background:#0ea5e9;color:white;border-radius:8px;padding:8px 14px;font-size:.78rem;font-weight:700;white-space:nowrap">Ver oferta →</div>
+        </a>
+      </div>
       <div class="search-bar">
         <span style="color:var(--muted)">🔍</span>
         <input type="text" id="search-input" placeholder="Nombre, servicio, teléfono...">
@@ -615,19 +627,6 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
         </select>
       </div>
       <div class="chip-row" id="chip-row"></div>
-      <!-- Banner Starlink -->
-      <div id="starlink-banner" style="display:none;margin-bottom:14px;border-radius:14px;overflow:hidden;background:linear-gradient(135deg,#0a0a1a 0%,#0d1b3e 50%,#0a0a1a 100%);border:1px solid #1a3a6e;position:relative">
-        <button id="starlink-close" style="position:absolute;top:8px;right:10px;background:rgba(255,255,255,.15);border:none;color:white;cursor:pointer;font-size:.8rem;border-radius:4px;padding:2px 7px;line-height:1.4">✕</button>
-        <a href="https://starlink.com/?referral=RC-4328316-83661-66&app_source=share" target="_blank" rel="noopener sponsored" style="text-decoration:none;display:flex;align-items:center;gap:14px;padding:14px 40px 14px 16px">
-          <div style="font-size:2rem;flex-shrink:0">🛰️</div>
-          <div>
-            <div style="font-size:.65rem;font-weight:700;letter-spacing:2px;color:#6b9bd2;text-transform:uppercase;margin-bottom:2px">PUBLICIDAD</div>
-            <div style="font-weight:800;font-size:1rem;color:white;letter-spacing:1px;margin-bottom:3px">STARLINK</div>
-            <div style="font-size:.8rem;color:#cbd5e1;line-height:1.4">Internet satelital de alta velocidad — <strong style="color:#38bdf8">$60.000 de bonificación</strong> usando este link de vecinos 🏘️</div>
-          </div>
-          <div style="margin-left:auto;flex-shrink:0;background:#0ea5e9;color:white;border-radius:8px;padding:8px 14px;font-size:.78rem;font-weight:700;white-space:nowrap">Ver oferta →</div>
-        </a>
-      </div>
       <div class="results-header">
         <span class="results-count" id="results-count"></span>
         <button id="btn-limpiar-filtros" style="display:none;padding:5px 12px;background:transparent;border:1.5px solid var(--rojo);color:var(--rojo);border-radius:8px;font-size:.75rem;font-family:'Inter',sans-serif;cursor:pointer">✕ Limpiar filtros</button>
@@ -1062,7 +1061,10 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
         <div class="auth-row"><label>Empresa / emprendimiento</label><input class="auth-input" type="text" id="sv-empresa" placeholder="Nombre comercial (opcional)"></div>
         <div class="auth-row"><label>Teléfono de contacto *</label><input class="auth-input" type="tel" id="sv-telefono" placeholder="11 2345-6789"></div>
         <div class="auth-row"><label>Tipo de servicio *</label><input class="auth-input" type="text" id="sv-servicio" placeholder="Ej: Plomería, Limpieza..."></div>
-        <div class="auth-row"><label>Descripción *</label><textarea class="auth-input" id="sv-descripcion" placeholder="Contá qué ofrecés..." style="height:80px;resize:vertical"></textarea></div>
+        <div class="auth-row">
+          <label>Descripción de tu servicio * <span style="font-size:.75rem;color:var(--muted);font-weight:400">(aparece en negrita en tu tarjeta)</span></label>
+          <textarea class="auth-input" id="sv-descripcion" placeholder="Contá qué ofrecés, tus especialidades, zonas que cubrís..." style="height:80px;resize:vertical"></textarea>
+        </div>
         <div class="auth-row">
           <label>¿A qué barrios llegás? *</label>
           <div id="sv-barrios-servicio" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px"></div>
@@ -1611,7 +1613,7 @@ document.getElementById('btn-guardar-perfil').addEventListener('click', async ()
       });
       await addDoc(collection(db,'pendientes'), {
         nombre, empresa, telefono:tel, servicio,
-        recomendacion:'Recomendable', notas:descripcion,
+        recomendacion:'Recomendable', notas:descripcion, descripcionPropia:descripcion,
         barrio:'No', barriosServicio:barriosServ,
         quienInforma:nombre+' (auto-registro) | uid:'+currentUser.uid+' | '+currentUser.email,
         estado:'Pendiente', autoregistrado:true, fecha:serverTimestamp()
@@ -1669,14 +1671,6 @@ function entrarALaApp() {
     document.getElementById('fab-contacto').style.display='flex';
     document.getElementById('nav-consultas').style.display='inline-flex';
   }
-  // Banner Starlink
-  if(!localStorage.getItem('starlink_cerrado')){
-    document.getElementById('starlink-banner').style.display='block';
-  }
-  document.getElementById('starlink-close').addEventListener('click',()=>{
-    localStorage.setItem('starlink_cerrado','1');
-    document.getElementById('starlink-banner').style.display='none';
-  });
   cargarProveedores();
   cargarTelefonos();
   cargarCatsCustom();
@@ -3605,7 +3599,7 @@ document.getElementById('btn-registrar-servicio').addEventListener('click', asyn
   try{
     await addDoc(collection(db,'pendientes'),{
       nombre,empresa,telefono,servicio,
-      recomendacion:'Recomendable',notas:descripcion,barrio:'No',
+      recomendacion:'Recomendable',notas:descripcion,descripcionPropia:descripcion,barrio:'No',
       barriosServicio:barriosServ,
       quienInforma:nombre+' (auto-registro) | uid:'+currentUser.uid+' | '+currentUser.email,
       estado:'Pendiente',autoregistrado:true,fecha:serverTimestamp()
