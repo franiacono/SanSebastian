@@ -879,6 +879,10 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
             <div id="ranking-usuarios-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
           </div>
           <div style="margin-top:24px">
+            <div style="font-size:.85rem;font-weight:600;color:var(--azul);margin-bottom:10px">🛰️ Clicks en Starlink — por usuario</div>
+            <div id="starlink-usuarios-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
+          </div>
+          <div style="margin-top:24px">
             <div style="font-size:.85rem;font-weight:600;color:var(--azul);margin-bottom:10px">🔍 Términos más buscados</div>
             <div id="ranking-busquedas-container"><div class="loading"><div class="spinner"></div>Cargando...</div></div>
           </div>
@@ -1674,6 +1678,17 @@ function entrarALaApp() {
   cargarProveedores();
   cargarTelefonos();
   cargarCatsCustom();
+  // Tracking click Starlink banner
+  document.querySelector('#starlink-banner a')?.addEventListener('click', ()=>{
+    addDoc(collection(db,'eventos'),{
+      tipo:'starlink',
+      uid:currentUser?.uid||'anon',
+      userName:perfilUsuario?.nombre||currentUser?.email||'Anónimo',
+      barrio:perfilUsuario?.barrio||'',
+      area:perfilUsuario?.area||'',
+      fecha:serverTimestamp()
+    }).catch(()=>{});
+  });
   setTimeout(fixMobileLabels, 100);
   // Aviso datos incorrectos - solo mostrar si avisoAdmin === 'Si' y no se mostró en esta sesión
   if(perfilUsuario?.avisoAdmin === 'Si' && !sessionStorage.getItem('avisoMostrado')){
@@ -2317,7 +2332,7 @@ document.querySelectorAll('.admin-tab[data-atab]').forEach(tab=>{
     if(tab.dataset.atab==='pendientes'||tab.dataset.atab==='recientes') cargarPendientes();
     if(tab.dataset.atab==='usuarios') buscarUsuariosAdmin();
     if(tab.dataset.atab==='proveedores') buscarProveedoresAdmin();
-    if(tab.dataset.atab==='estadisticas'){ cargarRanking('semana'); cargarRankingUsuarios('semana'); cargarMetricas(); }
+    if(tab.dataset.atab==='estadisticas'){ cargarRanking('semana'); cargarRankingUsuarios('semana'); cargarStarlinkClicks('semana'); cargarMetricas(); }
     if(tab.dataset.atab==='recategorizar') cargarCatsCustom();
   });
 });
@@ -2888,6 +2903,7 @@ async function cargarMetricas(){
     // Clicks de contacto (llamada+whatsapp) y compartir, desde eventos
     const clicksContacto = {dia:0,semana:0,mes:0,anio:0,total:0};
     const clicksCompartir = {dia:0,semana:0,mes:0,anio:0,total:0};
+    const clicksStarlink = {dia:0,semana:0,mes:0,anio:0,total:0};
     const busquedas = {dia:0,semana:0,mes:0,anio:0,total:0};
     terminosPorPeriodo = { dia:{}, semana:{}, mes:{}, anio:{}, total:{} };
     const snapEv = await getDocs(collection(db,'eventos'));
@@ -2898,6 +2914,7 @@ async function cargarMetricas(){
       const c = contarDesde(f);
       if(e.tipo==='llamada'||e.tipo==='whatsapp'){ sumar(clicksContacto,c); clicksContacto.total++; }
       if(e.tipo==='compartir'){ sumar(clicksCompartir,c); clicksCompartir.total++; }
+      if(e.tipo==='starlink'){ sumar(clicksStarlink,c); clicksStarlink.total++; }
       if(e.tipo==='busqueda' && e.termino){
         sumar(busquedas,c); busquedas.total++;
         const periodos = ['total', ...(['dia','semana','mes','anio'].filter(p=>c[p]))];
@@ -2915,6 +2932,7 @@ async function cargarMetricas(){
       {label:'🔍 Búsquedas realizadas', d:busquedas},
       {label:'📞 Clicks contactar', d:clicksContacto},
       {label:'🔗 Clicks compartir', d:clicksCompartir},
+      {label:'🛰️ Clicks Starlink', d:clicksStarlink},
     ];
 
     cont.innerHTML = `<div style="overflow-x:auto"><table class="tabla-metricas">
@@ -3839,6 +3857,7 @@ document.querySelectorAll('[data-rank]').forEach(btn=>{
     btn.classList.add('active');
     cargarRanking(btn.dataset.rank);
     cargarRankingUsuarios(btn.dataset.rank);
+    cargarStarlinkClicks(btn.dataset.rank);
   });
 });
 
@@ -3880,6 +3899,39 @@ async function cargarRankingUsuarios(periodo){
       </tr>`).join('')}</tbody>
     </table></div>`;
   }catch(e){ console.log('RankingUsuarios error:',e); cont.innerHTML='<div class="empty-state"><div class="icon">⚠️</div><p>Error al cargar</p></div>'; }
+}
+
+async function cargarStarlinkClicks(periodo){
+  const cont = document.getElementById('starlink-usuarios-container');
+  if(!cont) return;
+  cont.innerHTML = '<div class="loading"><div class="spinner"></div>Cargando...</div>';
+  try{
+    const ahora = new Date();
+    let desde = null;
+    if(periodo==='dia'){ desde=new Date(ahora); desde.setHours(0,0,0,0); }
+    else if(periodo==='semana'){ desde=new Date(ahora); const d=desde.getDay(); desde.setDate(desde.getDate()-(d===0?6:d-1)); desde.setHours(0,0,0,0); }
+    else if(periodo==='mes'){ desde=new Date(ahora.getFullYear(),ahora.getMonth(),1); }
+    else if(periodo==='anio'){ desde=new Date(ahora.getFullYear(),0,1); }
+    const q2 = desde ? query(collection(db,'eventos'),where('fecha','>=',desde)) : collection(db,'eventos');
+    const snap = await getDocs(q2);
+    const clicks = [];
+    snap.forEach(d=>{
+      const e = d.data();
+      if(e.tipo!=='starlink') return;
+      clicks.push({nombre:e.userName||e.uid||'Anónimo',barrio:e.barrio||'',area:e.area||'',fecha:e.fecha?.toDate?.()});
+    });
+    clicks.sort((a,b)=>(b.fecha||0)-(a.fecha||0));
+    if(!clicks.length){ cont.innerHTML='<div class="empty-state" style="padding:16px"><div class="icon">🛰️</div><p>Sin clicks en este período</p></div>'; return; }
+    cont.innerHTML = `<div style="overflow-x:auto"><table class="tabla-metricas">
+      <thead><tr>${['#','Usuario','Barrio / Área','Fecha'].map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+      <tbody>${clicks.map((c,i)=>`<tr>
+        <td style="font-weight:600;color:var(--muted)">${i+1}</td>
+        <td style="font-weight:500">${esc(c.nombre)}</td>
+        <td style="font-size:.78rem;color:var(--muted)">${esc(c.barrio)}${c.area?' · '+esc(c.area):''}</td>
+        <td class="num" style="font-size:.75rem">${c.fecha?fmtFechaCorta(c.fecha):''}</td>
+      </tr>`).join('')}</tbody>
+    </table></div>`;
+  }catch(e){ cont.innerHTML='<div class="empty-state" style="padding:16px"><div class="icon">⚠️</div><p>Error al cargar</p></div>'; }
 }
 
 // ── EMAIL A PROVEEDOR AL AUTO-REGISTRARSE ─────────────────────────────────────
