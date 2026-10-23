@@ -669,6 +669,7 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
               </select>
             </div>
             <div class="form-row"><label>Comentario *</label><textarea class="form-textarea" id="f-recomen" placeholder="Contá tu experiencia..."></textarea></div>
+            <div class="form-row"><label>Sitio web del proveedor <span style="font-size:.75rem;color:var(--muted);font-weight:400">(opcional — aparece como botón en la tarjeta)</span></label><input class="form-input" type="url" id="f-sitioweb" placeholder="https://..."></div>
             <div class="form-row"><label>Notas para el administrador</label><textarea class="form-textarea" id="f-notas" placeholder="Info adicional que quieras que vea el admin (no se publica)" style="min-height:60px"></textarea></div>
             <div class="form-row">
               <label>¿El proveedor es de algún barrio privado?</label>
@@ -1069,6 +1070,7 @@ main{max-width:1200px;margin:0 auto;padding:20px 16px}
           <label>Descripción de tu servicio * <span style="font-size:.75rem;color:var(--muted);font-weight:400">(aparece en negrita en tu tarjeta)</span></label>
           <textarea class="auth-input" id="sv-descripcion" placeholder="Contá qué ofrecés, tus especialidades, zonas que cubrís..." style="height:80px;resize:vertical"></textarea>
         </div>
+        <div class="auth-row"><label>Sitio web <span style="font-size:.75rem;color:var(--muted);font-weight:400">(opcional — aparece como botón 🌐 en tu tarjeta)</span></label><input class="auth-input" type="url" id="sv-sitioweb" placeholder="https://..."></div>
         <div class="auth-row">
           <label>¿A qué barrios llegás? *</label>
           <div id="sv-barrios-servicio" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px"></div>
@@ -2023,6 +2025,7 @@ function renderResults(){
   cont.querySelectorAll('.btn-recomendar-card').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();recomendarDesdeCard(btn.dataset.p);}));
   cont.querySelectorAll('.btn-wa').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();abrirWA(btn.dataset.num,btn.dataset.srv);trackEvento('whatsapp',btn.dataset.id,btn.dataset.nombre,btn.dataset.empresa);}));
   cont.querySelectorAll('.btn-llamar').forEach(btn=>btn.addEventListener('click',e=>{e.stopPropagation();trackEvento('llamada',btn.dataset.id,btn.dataset.nombre,btn.dataset.empresa);}));
+  cont.querySelectorAll('.btn-web').forEach(btn=>btn.addEventListener('click',()=>{trackEvento('web',btn.dataset.id,btn.dataset.nombre,btn.dataset.empresa);}));
   cont.querySelectorAll('.btn-compartir-card').forEach(btn=>{
     btn.addEventListener('click', async e=>{
       e.stopPropagation();
@@ -2071,7 +2074,7 @@ function cardHTML(p,isDest){
     ${p.descripcionPropia?`<div class="card-descripcion-propia">💬 <strong>${esc(p.descripcionPropia)}</strong></div>`:''}
     <div class="card-contacto">
       ${telOk?(p.soloLlamada?`<a class="contacto-item tel btn-llamar" data-id="${esc(p.firestoreId||'')}" data-nombre="${esc(p.nombre)}" data-empresa="${esc(p.empresa||'')}" href="tel:${p.telefono.replace(/\s/g,'')}" style="text-decoration:none">📞 Llamar</a>`:`<button class="contacto-item tel btn-wa" data-num="${numWA}" data-srv="${esc(p.servicio)}" data-id="${esc(p.firestoreId||'')}" data-nombre="${esc(p.nombre)}" data-empresa="${esc(p.empresa||'')}"><svg viewBox="0 0 24 24" width="13" height="13" fill="#25D366" style="vertical-align:middle;margin-right:2px"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg> WhatsApp</button>`):''}
-      ${p.sitioWeb?`<a class="contacto-item" href="${esc(p.sitioWeb)}" target="_blank" rel="noopener" style="text-decoration:none;color:var(--azul);border-color:var(--azul-mid);background:var(--azul-claro);font-weight:600">🌐 Ver web</a>`:''}
+      ${p.sitioWeb?`<a class="contacto-item btn-web" data-id="${esc(p.firestoreId||'')}" data-nombre="${esc(p.nombre)}" data-empresa="${esc(p.empresa||'')}" href="${esc(p.sitioWeb)}" target="_blank" rel="noopener" style="text-decoration:none;color:var(--azul);border-color:var(--azul-mid);background:var(--azul-claro);font-weight:600">🌐 Ver web</a>`:''}
       ${empOk?`<span class="contacto-item">🏢 ${esc(p.empresa)}</span>`:''}
       ${p.barrioOrigen?`<span class="contacto-item" style="color:var(--azul2);border-color:var(--azul-mid);background:var(--azul-claro)">🏘️ ${esc(p.barrioOrigen)}</span>`:''}
     </div>
@@ -2129,7 +2132,7 @@ async function trackEvento(tipo, proveedorId, proveedorNombre, proveedorEmpresa)
   const clave = `cooldown_${tipo}_${proveedorId}_${uid}`;
   if(!pasoCooldown(clave)) return; // mismo usuario+proveedor+acción dentro del último minuto, no contar
   try{
-    const campo = tipo==='llamada' ? 'clicksLlamada' : tipo==='whatsapp' ? 'clicksWhatsapp' : 'clicksCompartir';
+    const campo = tipo==='llamada' ? 'clicksLlamada' : tipo==='whatsapp' ? 'clicksWhatsapp' : tipo==='web' ? 'clicksWeb' : 'clicksCompartir';
     updateDoc(doc(db,'proveedores',proveedorId),{[campo]:increment(1)}).catch(()=>{});
     addDoc(collection(db,'eventos'),{tipo,proveedorId,proveedorNombre:proveedorNombre||'',proveedorEmpresa:proveedorEmpresa||'',uid:currentUser?.uid||'',userName:perfilUsuario?.nombre||currentUser?.email||'',fecha:serverTimestamp()}).catch(()=>{});
   }catch(e){ console.log('trackEvento error:',e); }
@@ -2226,6 +2229,7 @@ document.getElementById('btn-form-submit').addEventListener('click', async ()=>{
       recomendacion:recomen,
       comentario:vecino,
       notas,
+      sitioWeb: (document.getElementById('f-sitioweb')?.value||'').trim(),
       quienInforma:(perfilUsuario?.nombre||'')+(perfilUsuario?.nombre?' | ':'')+'uid:'+currentUser.uid+' | '+currentUser.email,
       barrioVecino: perfilUsuario?.barrio||'',
       areaVecino: perfilUsuario?.area||'',
@@ -2903,6 +2907,7 @@ async function cargarMetricas(){
     // Clicks de contacto (llamada+whatsapp) y compartir, desde eventos
     const clicksContacto = {dia:0,semana:0,mes:0,anio:0,total:0};
     const clicksCompartir = {dia:0,semana:0,mes:0,anio:0,total:0};
+    const clicksWeb = {dia:0,semana:0,mes:0,anio:0,total:0};
     const clicksStarlink = {dia:0,semana:0,mes:0,anio:0,total:0};
     const busquedas = {dia:0,semana:0,mes:0,anio:0,total:0};
     terminosPorPeriodo = { dia:{}, semana:{}, mes:{}, anio:{}, total:{} };
@@ -2914,6 +2919,7 @@ async function cargarMetricas(){
       const c = contarDesde(f);
       if(e.tipo==='llamada'||e.tipo==='whatsapp'){ sumar(clicksContacto,c); clicksContacto.total++; }
       if(e.tipo==='compartir'){ sumar(clicksCompartir,c); clicksCompartir.total++; }
+      if(e.tipo==='web'){ sumar(clicksWeb,c); clicksWeb.total++; }
       if(e.tipo==='starlink'){ sumar(clicksStarlink,c); clicksStarlink.total++; }
       if(e.tipo==='busqueda' && e.termino){
         sumar(busquedas,c); busquedas.total++;
@@ -2932,6 +2938,7 @@ async function cargarMetricas(){
       {label:'🔍 Búsquedas realizadas', d:busquedas},
       {label:'📞 Clicks contactar', d:clicksContacto},
       {label:'🔗 Clicks compartir', d:clicksCompartir},
+      {label:'🌐 Clicks web proveedor', d:clicksWeb},
       {label:'🛰️ Clicks Starlink', d:clicksStarlink},
     ];
 
@@ -3087,6 +3094,7 @@ async function accionPendiente(id, accion, btn){
       await addDoc(collection(db,'proveedores'),{
         nombre:r.nombre,empresa:r.empresa||'',dni:r.dni||'',telefono:r.telefono,
         servicio:r.servicio,recomendacion:r.recomendacion,comentario:r.comentario||'',notas:r.notas||'',
+        descripcionPropia:r.descripcionPropia||'',sitioWeb:r.sitioWeb||'',
         barrio:r.barrio||'',barrioOrigen:r.barrioOrigen||'',
         barriosServicio:r.barriosServicio||[],barrioVecino:r.barrioVecino||'',
         categorias:r.categorias?.length?r.categorias:catsOf(r.servicio),
@@ -3615,19 +3623,36 @@ document.getElementById('btn-registrar-servicio').addEventListener('click', asyn
   if(!barriosServ.length){errEl.textContent='Seleccioná al menos un barrio';errEl.style.display='block';return;}
   const btn=document.getElementById('btn-registrar-servicio');btn.disabled=true;btn.textContent='Enviando...';
   try{
+    const sitioweb=(document.getElementById('sv-sitioweb')?.value||'').trim();
     await addDoc(collection(db,'pendientes'),{
       nombre,empresa,telefono,servicio,
-      recomendacion:'Recomendable',notas:descripcion,descripcionPropia:descripcion,barrio:'No',
+      recomendacion:'Recomendable',notas:descripcion,descripcionPropia:descripcion,sitioWeb:sitioweb,barrio:'No',
       barriosServicio:barriosServ,
       quienInforma:nombre+' (auto-registro) | uid:'+currentUser.uid+' | '+currentUser.email,
       estado:'Pendiente',autoregistrado:true,fecha:serverTimestamp()
     });
-    okEl.style.display='block';
     apiGet({action:'notificarProveedorRegistro',emailProv:currentUser.email,nombreProv:nombre,servicio}).catch(()=>{});
-    ['sv-nombre','sv-empresa','sv-telefono','sv-servicio','sv-descripcion'].forEach(id=>document.getElementById(id).value='');
+    ['sv-nombre','sv-empresa','sv-telefono','sv-servicio','sv-descripcion','sv-sitioweb'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
     poblarCheckboxBarrios('sv-barrios-servicio');
+    // Mostrar estado de éxito prominente
+    document.getElementById('btn-registrar-servicio').style.display='none';
+    okEl.style.cssText='display:block;background:#d1fae5;border-radius:12px;padding:20px;text-align:center;margin-top:8px';
+    okEl.innerHTML=`<div style="font-size:2rem;margin-bottom:8px">✅</div>
+      <p style="font-weight:700;font-size:.95rem;color:#065f46;margin-bottom:6px">¡Tu servicio fue enviado!</p>
+      <p style="font-size:.82rem;color:var(--muted);margin-bottom:14px">El administrador lo revisará y te avisará cuando esté publicado. Evitá envíos duplicados.</p>
+      <button id="btn-sv-nuevo-reg" style="padding:8px 18px;background:white;color:var(--azul);border:1.5px solid var(--azul-mid);border-radius:8px;font-size:.82rem;font-family:Inter,sans-serif;cursor:pointer">✍️ Registrar otro servicio</button>`;
   }catch(e){errEl.textContent='Error al enviar.';errEl.style.display='block';}
   btn.disabled=false;btn.textContent='Enviar para revisión';
+});
+
+// Botón "Registrar otro" en el estado de éxito del auto-registro
+document.getElementById('sv-form-nuevo').addEventListener('click', e=>{
+  if(e.target.id==='btn-sv-nuevo-reg'){
+    const okEl=document.getElementById('sv-ok');
+    okEl.style.cssText='color:var(--verde-ok);font-size:.83rem;display:none;margin-top:8px';
+    okEl.textContent='✅ Enviado. El administrador lo revisará pronto.';
+    document.getElementById('btn-registrar-servicio').style.display='block';
+  }
 });
 
 // ── MODALES ───────────────────────────────────────────────────────────────────
@@ -3723,6 +3748,7 @@ document.getElementById('btn-confirmar-aprobar').addEventListener('click', async
       await addDoc(collection(db,'proveedores'),{
         nombre:r.nombre,empresa:r.empresa||'',dni:r.dni||'',telefono:r.telefono,
         servicio:r.servicio,recomendacion:r.recomendacion,comentario:r.comentario||'',notas:r.notas||'',
+        descripcionPropia:r.descripcionPropia||'',sitioWeb:r.sitioWeb||'',
         barrio:r.barrio||'',barrioOrigen:r.barrioOrigen||'',
         barriosServicio:r.barriosServicio||[],barrioVecino:r.barrioVecino||'',
         categorias:cats.length?cats:catsOf(r.servicio),
@@ -3821,27 +3847,29 @@ async function cargarRanking(periodo){
     // 'historico' → desde queda null, sin filtro de fecha
     const q2 = desde ? query(collection(db,'eventos'),where('fecha','>=',desde)) : collection(db,'eventos');
     const snap = await getDocs(q2);
-    const conteo = {}; // proveedorId -> {nombre, llamada, whatsapp, compartir}
+    const conteo = {}; // proveedorId -> {nombre, llamada, whatsapp, compartir, web}
     snap.forEach(d=>{
       const e = d.data();
-      if(!['llamada','whatsapp','compartir'].includes(e.tipo)) return;
+      if(!['llamada','whatsapp','compartir','web'].includes(e.tipo)) return;
       if(!e.proveedorId) return;
-      if(!conteo[e.proveedorId]) conteo[e.proveedorId]={nombre:e.proveedorNombre||'(sin nombre)',empresa:e.proveedorEmpresa||'',llamada:0,whatsapp:0,compartir:0};
+      if(!conteo[e.proveedorId]) conteo[e.proveedorId]={nombre:e.proveedorNombre||'(sin nombre)',empresa:e.proveedorEmpresa||'',llamada:0,whatsapp:0,compartir:0,web:0};
       if(e.tipo==='llamada')   conteo[e.proveedorId].llamada++;
       if(e.tipo==='whatsapp')  conteo[e.proveedorId].whatsapp++;
       if(e.tipo==='compartir') conteo[e.proveedorId].compartir++;
+      if(e.tipo==='web')       conteo[e.proveedorId].web++;
     });
-    const lista = Object.values(conteo).map(c=>({...c,total:c.llamada+c.whatsapp+c.compartir}));
+    const lista = Object.values(conteo).map(c=>({...c,total:c.llamada+c.whatsapp+c.compartir+c.web}));
     lista.sort((a,b)=>b.total-a.total);
     const top = lista.slice(0,15);
     if(!top.length){ cont.innerHTML='<div class="empty-state"><div class="icon">📊</div><p>Sin actividad registrada en este período</p></div>'; return; }
     cont.innerHTML = `<div style="overflow-x:auto"><table class="tabla-metricas">
-      <thead><tr>${['#','Proveedor','📞','💬','🔗','Total'].map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+      <thead><tr>${['#','Proveedor','📞','💬','🌐','🔗','Total'].map(h=>`<th>${h}</th>`).join('')}</tr></thead>
       <tbody>${top.map((c,i)=>`<tr>
         <td style="font-weight:600;color:var(--muted)">${i+1}</td>
         <td style="font-weight:500">${esc(c.nombre)}${c.empresa?`<br><span style="font-size:.72rem;color:var(--muted);font-weight:400">${esc(c.empresa)}</span>`:''}</td>
         <td class="num">${c.llamada}</td>
         <td class="num">${c.whatsapp}</td>
+        <td class="num">${c.web}</td>
         <td class="num">${c.compartir}</td>
         <td class="total">${c.total}</td>
       </tr>`).join('')}</tbody>
@@ -3873,27 +3901,29 @@ async function cargarRankingUsuarios(periodo){
     else if(periodo==='anio'){ desde=new Date(ahora.getFullYear(),0,1); }
     const q2 = desde ? query(collection(db,'eventos'),where('fecha','>=',desde)) : collection(db,'eventos');
     const snap = await getDocs(q2);
-    const conteo = {}; // uid -> {nombre, llamada, whatsapp, compartir}
+    const conteo = {}; // uid -> {nombre, llamada, whatsapp, compartir, web}
     snap.forEach(d=>{
       const e = d.data();
-      if(!['llamada','whatsapp','compartir'].includes(e.tipo)) return;
+      if(!['llamada','whatsapp','compartir','web'].includes(e.tipo)) return;
       if(!e.uid || e.uid==='anon') return;
-      if(!conteo[e.uid]) conteo[e.uid]={nombre:e.userName||e.uid,llamada:0,whatsapp:0,compartir:0};
+      if(!conteo[e.uid]) conteo[e.uid]={nombre:e.userName||e.uid,llamada:0,whatsapp:0,compartir:0,web:0};
       if(e.tipo==='llamada')   conteo[e.uid].llamada++;
       if(e.tipo==='whatsapp')  conteo[e.uid].whatsapp++;
       if(e.tipo==='compartir') conteo[e.uid].compartir++;
+      if(e.tipo==='web')       conteo[e.uid].web++;
     });
-    const lista = Object.values(conteo).map(c=>({...c,total:c.llamada+c.whatsapp+c.compartir}));
+    const lista = Object.values(conteo).map(c=>({...c,total:c.llamada+c.whatsapp+c.compartir+c.web}));
     lista.sort((a,b)=>b.total-a.total);
     const top = lista.slice(0,10);
     if(!top.length){ cont.innerHTML='<div class="empty-state" style="padding:16px"><div class="icon">👤</div><p>Sin actividad registrada en este período</p></div>'; return; }
     cont.innerHTML = `<div style="overflow-x:auto"><table class="tabla-metricas">
-      <thead><tr>${['#','Usuario','📞','💬','🔗','Total'].map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+      <thead><tr>${['#','Usuario','📞','💬','🌐','🔗','Total'].map(h=>`<th>${h}</th>`).join('')}</tr></thead>
       <tbody>${top.map((c,i)=>`<tr>
         <td style="font-weight:600;color:var(--muted)">${i+1}</td>
         <td style="font-weight:500">${esc(c.nombre)}</td>
         <td class="num">${c.llamada}</td>
         <td class="num">${c.whatsapp}</td>
+        <td class="num">${c.web}</td>
         <td class="num">${c.compartir}</td>
         <td class="total">${c.total}</td>
       </tr>`).join('')}</tbody>
