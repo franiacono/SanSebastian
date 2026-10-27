@@ -2373,6 +2373,8 @@ document.querySelectorAll('.admin-tab[data-atab]').forEach(tab=>{
       comentario:g(6), notas:g(6),
       barrioOrigen, barriosServicio:parseBarriosStr(g(9)),
       categorias,
+      descripcionPropia:g(11),
+      sitioWeb:g(12),
       _ok: !!g(0)&&!!g(3),
     };
   }
@@ -2427,7 +2429,8 @@ document.querySelectorAll('.admin-tab[data-atab]').forEach(tab=>{
         const docData={
           nombre:r.nombre, empresa:r.empresa||'', dni:r.dni||'',
           telefono:r.telefono, servicio:r.servicio||'', recomendacion:r.recomendacion,
-          comentario:r.comentario||'', notas:r.notas||'', descripcionPropia:'',
+          comentario:r.comentario||'', notas:r.notas||'', descripcionPropia:r.descripcionPropia||'',
+          sitioWeb:r.sitioWeb||'',
           barrioOrigen:r.barrioOrigen||'', barriosServicio:r.barriosServicio||[],
           categorias:r.categorias||[], autoregistrado:false, destacado:false,
           verificado:'Si', quienInforma:'Admin - Carga masiva',
