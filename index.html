@@ -1833,10 +1833,15 @@ function navegarAParams(){
   const q = params.get('q');
   const cat = params.get('cat');
   const barrio = params.get('barrio');
-  if(!q && !cat && !barrio) return;
+  const chip = params.get('chip');
+  if(!q && !cat && !barrio && !chip) return;
   if(q){ const el=document.getElementById('search-input'); if(el) el.value=q; }
   if(cat){ const el=document.getElementById('cat-select'); if(el) el.value=cat; }
   if(barrio){ const el=document.getElementById('barrio-filter-select'); if(el) el.value=barrio; }
+  if(chip && CHIPS.find(c=>c.id===chip)){
+    chipActivo=chip;
+    document.querySelectorAll('#chip-row .chip').forEach(b=>b.classList.toggle('active', b.dataset.chip===chip));
+  }
   renderResults();
 }
 
@@ -1928,9 +1933,10 @@ document.getElementById('btn-compartir-busqueda').addEventListener('click', asyn
   const cat = document.getElementById('cat-select').value;
   const barF= document.getElementById('barrio-filter-select').value;
   const p   = new URLSearchParams();
-  if(q)    p.set('q', q);
-  if(cat)  p.set('cat', cat);
-  if(barF) p.set('barrio', barF);
+  if(q)                      p.set('q', q);
+  if(cat)                    p.set('cat', cat);
+  if(barF)                   p.set('barrio', barF);
+  if(chipActivo!=='todos')   p.set('chip', chipActivo);
   const url = 'https://entrevecinos.ar/?' + p.toString();
   const count = document.getElementById('results-count').textContent;
   const texto = `🏘️ Encontré ${count} en EntreVecinos${q?' para "'+q+'"':''}. Mirá acá:\n${url}`;
