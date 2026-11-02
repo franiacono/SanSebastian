@@ -1842,6 +1842,8 @@ function navegarAParams(){
     chipActivo=chip;
     document.querySelectorAll('#chip-row .chip').forEach(b=>b.classList.toggle('active', b.dataset.chip===chip));
   }
+  const sort = params.get('sort');
+  if(sort){ const el=document.getElementById('sort-select'); if(el) el.value=sort; }
   renderResults();
 }
 
@@ -1933,10 +1935,12 @@ document.getElementById('btn-compartir-busqueda').addEventListener('click', asyn
   const cat = document.getElementById('cat-select').value;
   const barF= document.getElementById('barrio-filter-select').value;
   const p   = new URLSearchParams();
+  const srt = document.getElementById('sort-select').value;
   if(q)                      p.set('q', q);
   if(cat)                    p.set('cat', cat);
   if(barF)                   p.set('barrio', barF);
   if(chipActivo!=='todos')   p.set('chip', chipActivo);
+  if(srt && srt!=='recomendados') p.set('sort', srt);
   const url = 'https://entrevecinos.ar/?' + p.toString();
   const count = document.getElementById('results-count').textContent;
   const texto = `🏘️ Encontré ${count} en EntreVecinos${q?' para "'+q+'"':''}. Mirá acá:\n${url}`;
